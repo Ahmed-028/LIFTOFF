@@ -1,6 +1,7 @@
 package com.liftoff.render3d;
 
 import com.liftoff.model.ModuleSlot;
+import com.liftoff.render.Images;
 import javafx.geometry.Insets;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
@@ -8,7 +9,6 @@ import javafx.scene.Node;
 import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
@@ -24,26 +24,30 @@ import javafx.scene.transform.Rotate;
 
 /** Resizable JavaFX viewport for embedding in the ship builder. Use on the FX thread. */
 public final class HangarShipView implements ShipView {
+    /** The hangar picture behind the ship; decoded once, ahead of time, by {@link #preload}. */
+    public static final String BACKDROP = ModelLibrary.RESOURCE_ROOT + "hangar.png";
+
     private final StackPane container = new StackPane();
     private final OrbitCamera camera = new OrbitCamera();
     private final ShipAssembly ship = new ShipAssembly(new ModelLibrary());
     private final SlotPicker picker;
+    private final SubScene viewport;
+    private final Group world;
 
     public HangarShipView() {
-        var background = HangarShipView.class.getResource(ModelLibrary.RESOURCE_ROOT + "hangar.png");
         var fallback = new BackgroundFill(Color.web("#07122B"), CornerRadii.EMPTY, Insets.EMPTY);
-        var backdrop = new BackgroundImage(new Image(background.toExternalForm()), BackgroundRepeat.NO_REPEAT,
+        var backdrop = new BackgroundImage(Images.get(BACKDROP), BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
                 new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, false, true));
         container.setBackground(new Background(new BackgroundFill[]{fallback}, new BackgroundImage[]{backdrop}));
         container.setPrefSize(960, 600);
         container.setMinSize(0, 0);
 
-        var world = new Group(pad(), ship.node(), camera.rig(),
+        world = new Group(pad(), ship.node(), camera.rig(),
                 new AmbientLight(Color.web("#7787A8")),
                 light("#BDB6AA", -3, -8, -6),
                 light("#527DA8", 6, -5, 4));
-        var viewport = new SubScene(world, 1, 1, true, SceneAntialiasing.BALANCED);
+        viewport = new SubScene(world, 1, 1, true, SceneAntialiasing.BALANCED);
         viewport.setFill(Color.TRANSPARENT);
         viewport.widthProperty().bind(container.widthProperty());
         viewport.heightProperty().bind(container.heightProperty());
@@ -55,6 +59,15 @@ public final class HangarShipView implements ShipView {
     @Override
     public Node node() {
         return container;
+    }
+
+    @Override
+    public void dispose() {
+        ship.setCalmMode(true);   // stops every snap and door animation where it stands
+        viewport.widthProperty().unbind();
+        viewport.heightProperty().unbind();
+        world.getChildren().clear();
+        container.getChildren().clear();
     }
 
     @Override
@@ -82,6 +95,30 @@ public final class HangarShipView implements ShipView {
     /** Stops active snap and door animations and applies subsequent changes immediately. */
     public void setCalmMode(boolean calmMode) {
         ship.setCalmMode(calmMode);
+    }
+
+    public boolean isCalmMode() {
+        return ship.isCalmMode();
+    }
+
+    public boolean isCargoBayOpen() {
+        return ship.isCargoBayOpen();
+    }
+
+    /** True while a snap or door animation is running. */
+    public boolean isAnimating() {
+        return ship.isAnimating();
+    }
+
+    /** Moves the camera as a drag of (dx, dy) pixels and a wheel turn of scrollDelta would. */
+    public void orbitCamera(double dx, double dy, double scrollDelta) {
+        camera.orbit(dx, dy);
+        camera.zoom(scrollDelta);
+    }
+
+    /** Where the camera is: yaw and pitch in degrees, then its distance from the ship. Only the player moves it. */
+    public double[] cameraPose() {
+        return camera.pose();
     }
 
     private static PointLight light(String color, double x, double y, double z) {

@@ -1,20 +1,22 @@
 package com.liftoff.engine.score;
 
 import com.liftoff.TestParts;
+import com.liftoff.engine.BuildReport;
 import com.liftoff.engine.ResourceCalculator;
 import com.liftoff.engine.sim.SimFixtures;
 import com.liftoff.engine.sim.SimLimit;
 import com.liftoff.engine.sim.SimRules;
 import com.liftoff.engine.sim.SimulationResult;
 import com.liftoff.model.Capability;
+import com.liftoff.model.Destination;
 import com.liftoff.model.Instrument;
 import com.liftoff.model.MeasurementType;
+import com.liftoff.model.Mission;
 import com.liftoff.model.MissionDesign;
 import com.liftoff.model.Objective;
 import com.liftoff.model.Requirement;
+import com.liftoff.model.StepUnit;
 import com.liftoff.model.ValueBasis;
-import com.liftoff.session.stub.BuildReport;
-import com.liftoff.session.stub.Mission;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -28,10 +30,10 @@ class ScoreCalculatorTest {
     private static final double REQUIRED_GBIT = 100 * 86_400 / 1e6 * SimRules.DAYS_PER_MONTH * 12;
 
     private static final Mission MOON =
-            new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 0, 0);
+            SimFixtures.mission("moon", Destination.MOON_SURFACE, StepUnit.DAY, 10, 0, 0, 0);
 
     static SimulationResult flight(double sentGbit, int launchSlipMonths) {
-        return new SimulationResult(Mission.StepUnit.MONTH, List.of(), List.of(), sentGbit, sentGbit, 0, 0,
+        return new SimulationResult(StepUnit.MONTH, List.of(), List.of(), sentGbit, sentGbit, 0, 0,
                 launchSlipMonths, SimLimit.NONE, -1, sentGbit > 0);
     }
 

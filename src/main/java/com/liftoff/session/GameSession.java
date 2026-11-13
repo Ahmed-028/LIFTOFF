@@ -1,6 +1,9 @@
 package com.liftoff.session;
 
 import com.liftoff.data.MissionEntry;
+import com.liftoff.engine.BuildCalculator;
+import com.liftoff.engine.BuildLoad;
+import com.liftoff.engine.BuildReport;
 import com.liftoff.engine.DesignIssue;
 import com.liftoff.engine.DesignValidator;
 import com.liftoff.engine.ResourceCalculator;
@@ -10,8 +13,6 @@ import com.liftoff.engine.ResourceUsage;
 import com.liftoff.engine.score.Report;
 import com.liftoff.engine.score.ReportBuilder;
 import com.liftoff.engine.score.Score;
-import com.liftoff.engine.score.ScoreCalculator;
-import com.liftoff.engine.sim.Difficulty;
 import com.liftoff.engine.sim.EventDeck;
 import com.liftoff.engine.sim.LaunchChecker;
 import com.liftoff.engine.sim.LaunchIssue;
@@ -21,18 +22,17 @@ import com.liftoff.engine.sim.SimRules;
 import com.liftoff.engine.sim.SimulationResult;
 import com.liftoff.model.Bus;
 import com.liftoff.model.Catalog;
+import com.liftoff.model.Destination;
+import com.liftoff.model.Difficulty;
 import com.liftoff.model.GroundStation;
 import com.liftoff.model.Instrument;
-import com.liftoff.model.LaunchClass;
+import com.liftoff.model.Mission;
 import com.liftoff.model.MissionDesign;
+import com.liftoff.model.ModuleSlot;
 import com.liftoff.model.Objective;
-import com.liftoff.session.stub.BuildCalculator;
-import com.liftoff.session.stub.BuildIssue;
-import com.liftoff.session.stub.BuildReport;
-import com.liftoff.session.stub.Mission;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipBuild;
-import com.liftoff.session.stub.ShipPart;
+import com.liftoff.model.ShipBuild;
+import com.liftoff.model.ShipPart;
+import com.liftoff.model.StepUnit;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -51,9 +51,12 @@ public final class GameSession {
     /** Message keys of the reasons a launch or flight is refused. */
     public static final String NO_MISSION = "flow.noMissionSelected";
     public static final String ALREADY_FLOWN = "flow.alreadyFlown";
+    public static final String FLIGHT_OUTDATED = "flow.flightOutdated";
 
     private final Catalog catalog;
     private final List<Runnable> listeners = new ArrayList<>();
+    /** Counts every change listeners were told about; a prepared flight is valid only while it stands still. */
+    private long changes;
     private MissionDesign design = MissionDesign.empty();
     private ResourceReport resources = ResourceCalculator.calculate(design);
 
@@ -66,7 +69,7 @@ public final class GameSession {
     private MissionFlow flow = newFlow();
 
     private final MissionLog log;
-    private Difficulty difficulty = Difficulty.CADET;
+    private Difficulty difficulty = Difficulty.EASY;
     private List<LaunchIssue> launchIssues = List.of();
     private SimulationResult simulation;
     private Score score;
@@ -108,11 +111,7 @@ public final class GameSession {
         var combined = new EnumMap<ResourceType, ResourceUsage>(ResourceType.class);
         combined.putAll(resources.usages());
         var rocket = design.launchVehicle();
-        var launchClass = mission == null ? null : switch (mission.destination()) {
-            case EARTH -> design.orbit() == null ? null : design.orbit().launchClass();
-            case MOON -> LaunchClass.TRANS_LUNAR;
-            case MARS -> LaunchClass.TRANS_MARS;
-        };
+        var launchClass = mission == null ? null : mission.destination().launchClass(design.orbit());
         combined.put(ResourceType.MASS, ResourceUsage.of(ResourceType.MASS,
                 resources.get(ResourceType.MASS).used() + buildReport.totalMassKg(),
                 rocket == null || launchClass == null ? OptionalDouble.empty() : rocket.capacityFor(launchClass)));
@@ -175,8 +174,16 @@ public final class GameSession {
         update(design.withScienceMonths(months));
     }
 
+    /** How many callbacks are registered; screens remove theirs when they close, so this stays small. */
+    public int listenerCount() {
+        return listeners.size();
+    }
+
     /** Registers a callback run after every change to the design. */
     public void addListener(Runnable onChange) {
+        if (onChange == null) {
+            throw new IllegalArgumentException("A listener is needed");
+        }
         listeners.add(onChange);
     }
 
@@ -227,13 +234,17 @@ public final class GameSession {
         MissionEntry entry = catalog.mission(missionId).orElse(null);
         Objective objective;
         if (entry == null) {
+            // A catalog with briefings only: a robotic Earth mission with no trip of its own.
             objective = found(catalog.objective(missionId), "mission", missionId);
-            mission = new Mission(objective.id(), 0);
+            mission = new Mission(objective.id(), objective.title(), objective.question(),
+                    objective.description(), objective.basedOn(), Difficulty.EASY, Destination.EARTH_ORBIT, false,
+                    objective.targetLatitudeDeg(), objective.prefersSunSynchronous(), objective.required(),
+                    objective.bonus(), objective.budgetCapMusd(), objective.deadlineMonths(),
+                    objective.minScienceMonths(), 0, 0, objective.source());
+            difficulty = Difficulty.EASY;
         } else {
             objective = entry.briefing();
-            mission = new Mission(entry.id(), entry.destination(), entry.stepUnit(), entry.steps(),
-                    entry.deltaVRequiredMs() == null ? 0 : entry.deltaVRequiredMs(),
-                    entry.crew(), entry.suppliesKgPerCrewDay(), entry.surfaceDeltaVRequiredMs());
+            mission = entry.toMission();
             difficulty = entry.difficulty();
         }
         missionEntry = entry;
@@ -259,7 +270,7 @@ public final class GameSession {
         if (mission == null) {
             return 0;
         }
-        double stepDays = mission.stepUnit() == Mission.StepUnit.DAY ? 1 : SimRules.DAYS_PER_MONTH;
+        double stepDays = mission.stepUnit() == StepUnit.DAY ? 1 : SimRules.DAYS_PER_MONTH;
         int steps = mission.steps() > 0 ? mission.steps() : design.scienceMonths();
         return steps * (mission.crew() * mission.suppliesKgPerCrewDay() * stepDays);
     }
@@ -275,6 +286,9 @@ public final class GameSession {
 
     /** @throws IllegalStateException with the reason's message key if the step is locked */
     public void goTo(MissionStep step) {
+        if (step == null) {
+            throw new IllegalArgumentException("A step is needed");
+        }
         moved(flow.current(), flow.goTo(step));
     }
 
@@ -320,8 +334,11 @@ public final class GameSession {
         return difficulty;
     }
 
-    /** Sets how many random events the flight meets. Mission 1 is flown at CADET: none. */
+    /** Sets how many random events the flight meets. Mission 1 is flown at EASY: none. */
     public void setDifficulty(Difficulty newDifficulty) {
+        if (newDifficulty == null) {
+            throw new IllegalArgumentException("A difficulty is needed");
+        }
         difficulty = newDifficulty;
         notifyListeners();
     }
@@ -347,29 +364,54 @@ public final class GameSession {
 
     /**
      * Flies the mission once: simulates it, scores it, writes the report, opens the Report step and
-     * records the mission in the log. The same seed replays the same flight.
+     * records the mission in the log. The same seed replays the same flight. The same as
+     * {@code land(prepareFlight(seed).compute())}, all on the calling thread.
      *
      * @throws IllegalStateException if the launch check has not passed, or the mission was already flown
      */
     public SimulationResult fly(long seed) {
+        return land(prepareFlight(seed).compute());
+    }
+
+    /**
+     * Fixes every input of the flight without changing anything. {@link Flight#compute} can then run
+     * off the FX thread, and {@link #land} brings the result back.
+     *
+     * @throws IllegalStateException if the launch check has not passed, or the mission was already flown
+     */
+    public Flight prepareFlight(long seed) {
         requireOpen(MissionStep.FLY);
         if (simulation != null) {
             throw new IllegalStateException(ALREADY_FLOWN);
         }
-        if (usesModularRadio()) {
-            boolean solarPowered = build.part(ModuleSlot.POWER).map(ShipPart::modelId)
-                    .filter(id -> id.equals("body-solar") || id.equals("deployable-solar")).isPresent();
-            double storage = radioBus().map(Bus::storageGbit).orElse(Double.POSITIVE_INFINITY);
-            simulation = MissionSimulator.run(design, mission, difficulty, seed, new EventDeck(catalog.events()),
-                    new SimExtras(storage, crewSuppliesKg, solarPowered), flightLink());
-        } else {
-            simulation = MissionSimulator.run(design, mission, difficulty, seed);
+        if (!usesModularRadio()) {
+            return new Flight(this, changes, design, mission, difficulty, seed, buildReport, resources,
+                    null, null, null);
         }
-        ResourceReport flightResources = usesModularRadio() ? missionResources() : resources;
-        score = usesModularRadio()
-                ? ScoreCalculator.scoreCombined(design, flightResources, buildReport, simulation, mission)
-                : ScoreCalculator.score(design, flightResources, buildReport, simulation, mission);
-        report = ReportBuilder.build(design, flightResources, List.of(), simulation, mission);
+        boolean solarPowered = build.part(ModuleSlot.POWER).map(ShipPart::modelId)
+                .filter(id -> id.equals("body-solar") || id.equals("deployable-solar")).isPresent();
+        double storage = radioBus().map(Bus::storageGbit).orElse(Double.POSITIVE_INFINITY);
+        return new Flight(this, changes, design, mission, difficulty, seed, buildReport, missionResources(),
+                new EventDeck(catalog.events()), new SimExtras(storage, crewSuppliesKg, solarPowered), flightLink());
+    }
+
+    /**
+     * Records a computed flight: opens the Report step, logs the mission and tells listeners.
+     *
+     * @throws IllegalStateException with {@link #FLIGHT_OUTDATED} if the session changed after the
+     *         flight was prepared, or {@link #ALREADY_FLOWN} if a flight has landed already
+     */
+    public SimulationResult land(Flight.Outcome outcome) {
+        if (simulation != null) {
+            throw new IllegalStateException(ALREADY_FLOWN);
+        }
+        if (outcome.flight().owner() != this || outcome.flight().preparedAt() != changes) {
+            throw new IllegalStateException(FLIGHT_OUTDATED);
+        }
+        requireOpen(MissionStep.FLY);
+        simulation = outcome.simulation();
+        score = outcome.score();
+        report = outcome.report();
         flow.markSimulationFinished();
         log.add(new MissionLog.Entry(mission.id(), difficulty, score.total(), score.stars(),
                 Instant.now().toString()));
@@ -442,21 +484,11 @@ public final class GameSession {
             buildReport = BuildCalculator.calculate(build, mission);
             return;
         }
-        buildReport = BuildCalculator.calculate(build, mission,
+        buildReport = BuildCalculator.calculate(build, mission, new BuildLoad(
                 design.instruments().stream().mapToDouble(Instrument::massKg).sum(),
                 design.instruments().stream().mapToDouble(Instrument::avgPowerW).sum(),
-                crewSuppliesKg, requiredCrewSuppliesKg());
-        var budget = resources.get(ResourceType.BUDGET);
-        double cap = missionEntry.briefing().budgetCapMusd();
-        double totalCost = buildReport.costMusd() + budget.used();
-        if (totalCost > cap) {
-            var report = buildReport;
-            var issues = new ArrayList<>(report.issues());
-            issues.add(new BuildIssue(BuildIssue.Kind.OVER_BUDGET, null, totalCost, cap));
-            buildReport = new BuildReport(report.dryMassKg(), report.propellantKg(), report.totalMassKg(),
-                    report.costMusd(), report.powerSupplyW(), report.powerDrawW(), report.deltaVAvailableMs(),
-                    report.deltaVRequiredMs(), issues);
-        }
+                crewSuppliesKg, requiredCrewSuppliesKg(),
+                resources.get(ResourceType.BUDGET).used()));
     }
 
     private boolean usesModularRadio() {
@@ -464,14 +496,14 @@ public final class GameSession {
     }
 
     private Optional<Bus> radioBus() {
-        if (missionEntry.destination() != Mission.Destination.EARTH) {
+        if (missionEntry.destination() != Destination.EARTH_ORBIT) {
             return Optional.empty();
         }
         return build.part(ModuleSlot.AIRFRAME).flatMap(part -> catalog.bus(part.id()));
     }
 
     private MissionSimulator.DeepSpaceLink flightLink() {
-        boolean earth = missionEntry.destination() == Mission.Destination.EARTH;
+        boolean earth = missionEntry.destination() == Destination.EARTH_ORBIT;
         double rate = earth ? radioBus().map(Bus::downlinkMbps).orElse(0.0) : missionEntry.downlinkMbps();
         var contact = earth ? OptionalDouble.empty() : OptionalDouble.of(missionEntry.contactMinutesPerDay());
         return new MissionSimulator.DeepSpaceLink(Math.max(0, buildReport.powerSupplyW() - powerDrawByShip()),
@@ -483,6 +515,7 @@ public final class GameSession {
     }
 
     private void notifyListeners() {
+        changes++;
         List.copyOf(listeners).forEach(Runnable::run);
     }
 

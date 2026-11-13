@@ -1,6 +1,6 @@
 package com.liftoff.session;
 
-import com.liftoff.engine.sim.Difficulty;
+import com.liftoff.model.Difficulty;
 import com.liftoff.session.MissionLog.Entry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -22,7 +22,7 @@ class MissionLogTest {
     Path folder;
 
     private static Entry entry(String missionId, double score) {
-        return new Entry(missionId, Difficulty.CADET, score, 2, "2026-11-13T10:00:00Z");
+        return new Entry(missionId, Difficulty.EASY, score, 2, "2026-11-13T10:00:00Z");
     }
 
     @Test
@@ -37,7 +37,7 @@ class MissionLogTest {
     void entriesSurviveARoundTripThroughTheFile() {
         Path file = folder.resolve("deep").resolve("mission-log.json");
         MissionLog log = new MissionLog(file);
-        Entry first = new Entry("farm-watch", Difficulty.MISSION_DIRECTOR, 87.5, 3, "2026-11-13T10:00:00Z");
+        Entry first = new Entry("farm-watch", Difficulty.HARD, 87.5, 3, "2026-11-13T10:00:00Z");
 
         assertTrue(log.add(first));
         assertTrue(log.add(entry("moon-landing", 40)));
@@ -106,5 +106,33 @@ class MissionLogTest {
     void theDefaultLogLivesInTheLiftoffFolderOfTheHomeDirectory() {
         assertEquals(Path.of(System.getProperty("user.home"), ".liftoff", "mission-log.json"),
                 MissionLog.defaultPath());
+    }
+
+    @Test
+    void withABackgroundWriterTheFileIsWrittenOffTheCallingThreadInOrder() throws IOException {
+        Path file = folder.resolve("mission-log.json");
+        List<Runnable> queued = new java.util.ArrayList<>();
+        MissionLog log = new MissionLog(file, queued::add);
+
+        assertTrue(log.add(entry("farm-watch", 70)));
+        assertTrue(log.add(entry("moon-landing", 80)));
+
+        assertEquals(2, log.entries().size(), "the log in memory is up to date at once");
+        assertFalse(Files.exists(file), "nothing written on the calling thread");
+        assertEquals(2, queued.size());
+        queued.forEach(Runnable::run);
+        assertEquals(List.of(entry("farm-watch", 70), entry("moon-landing", 80)), new MissionLog(file).entries());
+    }
+
+    @Test
+    void aBackgroundWriteThatFailsIsSwallowed() throws IOException {
+        Path blocked = Files.createDirectory(folder.resolve("blocked.json"));
+        List<Runnable> queued = new java.util.ArrayList<>();
+        MissionLog log = new MissionLog(blocked, queued::add);
+
+        log.add(entry("farm-watch", 70));
+        queued.forEach(Runnable::run);
+
+        assertEquals(1, log.entries().size());
     }
 }

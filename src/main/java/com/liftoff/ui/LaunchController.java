@@ -1,7 +1,7 @@
 package com.liftoff.ui;
 
-import com.liftoff.session.MissionStep;
 import com.liftoff.render.RocketArt;
+import com.liftoff.session.MissionStep;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;

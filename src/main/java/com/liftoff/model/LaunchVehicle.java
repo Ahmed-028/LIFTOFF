@@ -23,4 +23,9 @@ public record LaunchVehicle(
         Double capacity = capacityKg.get(launchClass);
         return capacity == null ? OptionalDouble.empty() : OptionalDouble.of(capacity);
     }
+
+    /** True if the catalog has a published capacity for a trip to that destination. */
+    public boolean offeredFor(Destination destination) {
+        return destination.launchClasses().stream().anyMatch(launchClass -> capacityKg.containsKey(launchClass));
+    }
 }

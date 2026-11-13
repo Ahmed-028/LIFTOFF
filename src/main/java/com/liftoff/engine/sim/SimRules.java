@@ -1,5 +1,7 @@
 package com.liftoff.engine.sim;
 
+import com.liftoff.model.Difficulty;
+
 /**
  * Tunable rules of the flight simulation. Every value here is a game parameter, not NASA data:
  * they set how the game feels and are open to the balance review.
@@ -27,21 +29,27 @@ public final class SimRules {
     /** Share of solar power lost during a dust storm. Game parameter, not NASA data. */
     public static final double DUST_SOLAR_POWER_LOST_FRACTION = 0.5;
 
-    /** Chance of an event in one step at ENGINEER. Game parameter, not NASA data. */
-    public static final double EVENT_CHANCE_ENGINEER = 0.10;
+    /** Chance of an event in one step at MEDIUM difficulty. Game parameter, not NASA data. */
+    public static final double EVENT_CHANCE_MEDIUM = 0.10;
 
-    /** Chance of an event in one step at MISSION_DIRECTOR. Game parameter, not NASA data. */
-    public static final double EVENT_CHANCE_MISSION_DIRECTOR = 0.25;
+    /** Chance of an event in one step at HARD difficulty. Game parameter, not NASA data. */
+    public static final double EVENT_CHANCE_HARD = 0.25;
+
+    /**
+     * Most steps one flight may take: 100 years of months. Only a guard against a runaway science
+     * time; every mission in the catalog ends long before it. Game parameter, not NASA data.
+     */
+    public static final int MAX_STEPS = 1200;
 
     private SimRules() {
     }
 
-    /** Chance (0 to 1) that a step draws an event. CADET never does. Game parameter, not NASA data. */
+    /** Chance (0 to 1) that a step draws an event. EASY never does. Game parameter, not NASA data. */
     public static double eventChancePerStep(Difficulty difficulty) {
         return switch (difficulty) {
-            case CADET -> 0;
-            case ENGINEER -> EVENT_CHANCE_ENGINEER;
-            case MISSION_DIRECTOR -> EVENT_CHANCE_MISSION_DIRECTOR;
+            case EASY -> 0;
+            case MEDIUM -> EVENT_CHANCE_MEDIUM;
+            case HARD -> EVENT_CHANCE_HARD;
         };
     }
 }

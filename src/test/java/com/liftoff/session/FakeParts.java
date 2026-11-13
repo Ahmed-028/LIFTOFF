@@ -1,8 +1,8 @@
 package com.liftoff.session;
 
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipBuild;
-import com.liftoff.session.stub.ShipPart;
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.ShipBuild;
+import com.liftoff.model.ShipPart;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,8 @@ final class FakeParts {
 
     static ShipPart part(String id, ModuleSlot slot) {
         return new ShipPart(id, slot, id, id, "test fake", "nothing real", List.of(),
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null, id, null);
+                0, 0, 0, 0, 0, 0, 0, 0, 0, slot == ModuleSlot.THRUSTERS ? 1 : 0, 0, 0, 0,
+                com.liftoff.model.ValueBasis.GAME_ESTIMATE, id, com.liftoff.TestParts.SOURCE);
     }
 
     /** Two parts per slot: "airframe-a", "airframe-b", "thrusters-a", ... */

@@ -22,4 +22,19 @@ public record BuildReport(
     public boolean canConfirm() {
         return issues.isEmpty();
     }
+
+    /** The fuel gauge's state: how the speed change the trip needs compares with what the tanks can give. */
+    public ResourceLevel fuelLevel() {
+        if (deltaVRequiredMs <= 0) {
+            return ResourceLevel.OK;
+        }
+        if (issues.stream().anyMatch(issue -> issue.kind() == BuildIssue.Kind.SLOT_EMPTY)) {
+            return ResourceLevel.UNKNOWN;
+        }
+        if (deltaVAvailableMs < deltaVRequiredMs) {
+            return ResourceLevel.OVER;
+        }
+        return deltaVRequiredMs >= GameRules.TIGHT_FRACTION * deltaVAvailableMs
+                ? ResourceLevel.TIGHT : ResourceLevel.OK;
+    }
 }

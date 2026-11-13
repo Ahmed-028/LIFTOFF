@@ -1,8 +1,8 @@
 package com.liftoff.ui;
 
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.ShipBuild;
 import com.liftoff.render.Icons;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipBuild;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyEvent;

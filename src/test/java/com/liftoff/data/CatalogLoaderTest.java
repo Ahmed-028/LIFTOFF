@@ -2,7 +2,6 @@ package com.liftoff.data;
 
 import com.liftoff.TestParts;
 import com.liftoff.engine.OrbitMath;
-import com.liftoff.engine.sim.Difficulty;
 import com.liftoff.engine.sim.EventDeck;
 import com.liftoff.engine.sim.MissionSimulator;
 import com.liftoff.engine.sim.SimEventType;
@@ -10,21 +9,21 @@ import com.liftoff.engine.sim.SimLimit;
 import com.liftoff.model.Bus;
 import com.liftoff.model.Capability;
 import com.liftoff.model.Catalog;
+import com.liftoff.model.Difficulty;
 import com.liftoff.model.GroundStation;
 import com.liftoff.model.Instrument;
 import com.liftoff.model.LaunchClass;
 import com.liftoff.model.LaunchVehicle;
 import com.liftoff.model.MissionDesign;
+import com.liftoff.model.ModuleSlot;
 import com.liftoff.model.Objective;
 import com.liftoff.model.Orbit;
 import com.liftoff.model.Requirement;
+import com.liftoff.model.ShipPart;
 import com.liftoff.model.SourceRef;
 import com.liftoff.model.ValueBasis;
 import com.liftoff.session.GameSession;
 import com.liftoff.session.MissionStep;
-import com.liftoff.session.stub.Mission;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipPart;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -119,7 +118,7 @@ class CatalogLoaderTest {
         Bus bus = catalog.bus("eo1-class").orElseThrow();
         MissionDesign design = MissionDesign.empty().withBus(bus)
                 .plusInstrument(catalog.instrument("ali").orElseThrow()).withScienceMonths(1);
-        var result = MissionSimulator.run(design, new Mission("farm-watch", 0), Difficulty.CADET, 1);
+        var result = MissionSimulator.run(design, com.liftoff.engine.sim.SimFixtures.mission("farm-watch", 0), Difficulty.EASY, 1);
 
         assertEquals(48, result.storedAtEndGbit(), 1e-9);
         assertEquals(result.totalProducedGbit() - 48, result.totalLostGbit(), 1e-9);
@@ -164,7 +163,19 @@ class CatalogLoaderTest {
     @Test
     void validationRejectsNonpositiveDimensionsWhereUsed() {
         assertInvalidPart(ModuleSlot.CARGO_BAY, "model", 0, "bay length");
-        assertInvalidPart(ModuleSlot.SATELLITE, "model", -1, "payload length");
+        assertInvalidPart(ModuleSlot.SATELLITE, "model", 0, "payload length");
+    }
+
+    @Test
+    void aNegativeFigureInAPartFileIsACatalogError() {
+        // The real ShipPart refuses a negative figure itself; the loader must report it, not crash.
+        String json = "[{\"id\":\"bad\",\"slot\":\"SATELLITE\",\"name\":\"n\",\"kidName\":\"k\","
+                + "\"description\":\"d\",\"basedOn\":\"b\",\"missions\":[\"farm-watch\"],\"massKg\":-1,"
+                + "\"powerSupplyW\":0,\"powerDrawW\":0,\"payloadMassKg\":0,\"bayLengthM\":0,\"bayDiameterM\":0,"
+                + "\"lengthM\":1,\"diameterM\":1,\"thrustN\":0,\"specificImpulseS\":0,\"propellantCapacityKg\":0,"
+                + "\"dataGbitPerDay\":0,\"costMusd\":0,\"costBasis\":\"GAME_ESTIMATE\",\"modelId\":\"m\","
+                + "\"source\":{\"title\":\"t\",\"detail\":\"d\",\"url\":\"u\"}}]";
+        assertThrows(CatalogException.class, () -> CatalogLoader.parseList(json, ShipPart.class));
     }
 
     private static void assertInvalidPart(ModuleSlot slot, String modelId, double length, String problem) {

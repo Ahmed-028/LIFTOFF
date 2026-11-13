@@ -6,6 +6,12 @@ The in-game OBJ variants use simplified geometry from the NASA source models.
 They have flat game materials and are scaled for the hangar. Game dimensions,
 power, mass and costs come from the mission catalog.
 
+Every model stays under about 5,000 triangles (document 06). `nasa-perseverance`
+(14,380), `nasa-apollo` (8,145) and `nasa-sorce` (7,061) were brought to 4,799
+each with the dev tool `ModelSimplifier` (vertex clustering; materials under a
+tenth of a model's triangles, such as the SORCE solar panels, are left exact).
+`ModelLibraryTest` checks the budget for every file.
+
 | In-game asset | NASA source folder |
 | --- | --- |
 | nasa-eo1.obj | [Earth Observing-1](https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Earth%20Observing-1%20%28EO-1%29) |

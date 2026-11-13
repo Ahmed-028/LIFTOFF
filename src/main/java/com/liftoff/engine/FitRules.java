@@ -34,7 +34,7 @@ public final class FitRules {
         return List.copyOf(issues);
     }
 
-    /** Checks the total cargo (bay plus what is in it) against what the airframe can carry. */
+    /** Checks the payload's mass against what the airframe can carry (doc 06, section 4). */
     public static Optional<BuildIssue> airframeCarries(ShipPart airframe, double cargoKg) {
         if (cargoKg > airframe.payloadMassKg()) {
             return Optional.of(new BuildIssue(BuildIssue.Kind.PAYLOAD_TOO_HEAVY, ModuleSlot.AIRFRAME,

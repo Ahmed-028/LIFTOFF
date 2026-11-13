@@ -1,19 +1,17 @@
 package com.liftoff.ui;
 
+import com.liftoff.model.ShipPart;
 import com.liftoff.render.Icons;
-import com.liftoff.session.stub.ShipPart;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public final class PartDetailPanel extends VBox {
     private final UiText text;
-    private final PartPreview preview;
 
-    PartDetailPanel(UiText text, PartPreview preview) {
+    PartDetailPanel(UiText text) {
         super(6);
         this.text = text;
-        this.preview = preview;
         getStyleClass().add("part-detail");
     }
 
@@ -22,7 +20,7 @@ public final class PartDetailPanel extends VBox {
             getChildren().setAll(text.label(text.get("ship.noPart"), "muted"));
             return;
         }
-        var image = new StackPane(preview.thumbnail(part, 190, 90));
+        var image = new StackPane(PartPreview.thumbnail(part, 190, 90));
         image.getStyleClass().add("part-picture");
         getChildren().setAll(text.label(part.kidName(), "section-title"), image,
                 row(text.get("detail.mass", part.massKg()), Icons.mass(17)),

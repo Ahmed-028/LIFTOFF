@@ -66,6 +66,11 @@ final class OrbitCamera {
                 MIN_DISTANCE, MAX_DISTANCE));
     }
 
+    /** Yaw and pitch in degrees, then the distance from the ship. */
+    double[] pose() {
+        return new double[] {yaw.getAngle(), pitch.getAngle(), -camera.getTranslateZ()};
+    }
+
     Point3D origin() {
         return camera.localToScene(Point3D.ZERO);
     }

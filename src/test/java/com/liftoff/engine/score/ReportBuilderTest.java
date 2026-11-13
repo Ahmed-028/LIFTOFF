@@ -2,17 +2,19 @@ package com.liftoff.engine.score;
 
 import com.liftoff.TestParts;
 import com.liftoff.engine.ResourceCalculator;
-import com.liftoff.engine.sim.Difficulty;
 import com.liftoff.engine.sim.EventDeck;
-import com.liftoff.engine.sim.LaunchIssue;
 import com.liftoff.engine.sim.LaunchIssue.Kind;
+import com.liftoff.engine.sim.LaunchIssue;
 import com.liftoff.engine.sim.MissionSimulator;
 import com.liftoff.engine.sim.SimExtras;
 import com.liftoff.engine.sim.SimFixtures;
 import com.liftoff.engine.sim.SimulationResult;
+import com.liftoff.model.Destination;
+import com.liftoff.model.Difficulty;
 import com.liftoff.model.MeasurementType;
+import com.liftoff.model.Mission;
 import com.liftoff.model.MissionDesign;
-import com.liftoff.session.stub.Mission;
+import com.liftoff.model.StepUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ReportBuilderTest {
 
     private static SimulationResult fly(MissionDesign design, Mission mission, SimExtras extras) {
-        return MissionSimulator.run(design, mission, Difficulty.CADET, 1, EventDeck.empty(), extras);
+        return MissionSimulator.run(design, mission, Difficulty.EASY, 1, EventDeck.empty(), extras);
     }
 
     private static Report flown(MissionDesign design) {
@@ -168,7 +170,7 @@ class ReportBuilderTest {
     @Test
     void runningOutOfSuppliesNamesTheDayAndSuggestsMore() {
         // 2 people x 5 kg a day with 60 kg on board: day 7 is the first without supplies.
-        Mission moon = new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 2, 5);
+        Mission moon = SimFixtures.mission("moon", Destination.MOON_SURFACE, StepUnit.DAY, 10, 0, 2, 5);
 
         Report report = flown(SimFixtures.design(), moon, new SimExtras(Double.POSITIVE_INFINITY, 60, true));
 

@@ -6,6 +6,7 @@ import com.liftoff.app.ScreenController;
 import com.liftoff.render.RocketArt;
 import com.liftoff.session.GameSession;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 
 import java.util.ResourceBundle;
@@ -18,6 +19,9 @@ public final class TitleController implements ScreenController {
     @FXML
     private StackPane artHolder;
 
+    @FXML
+    private Button start;
+
     private SceneNavigator navigator;
 
     @FXML
@@ -28,6 +32,8 @@ public final class TitleController implements ScreenController {
     @Override
     public void attach(SceneNavigator navigator, GameSession session, ResourceBundle messages) {
         this.navigator = navigator;
+        start.setDisable(!navigator.isReady());
+        navigator.whenReady(() -> start.setDisable(false));
     }
 
     @FXML

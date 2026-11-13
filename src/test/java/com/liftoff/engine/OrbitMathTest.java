@@ -83,4 +83,22 @@ class OrbitMathTest {
         assertEquals(OrbitMath.contactMinutesPerDay(sunSynchronous, 64.9),
                 OrbitMath.contactMinutesPerDay(sunSynchronous, -64.9), 0.01);
     }
+
+    @Test
+    void contactTimeIsWorkedOutOnceAndRepeatsExactly() {
+        Orbit orbit = TestParts.orbit("memo", 705, 98.2, LaunchClass.POLAR);
+        double first = OrbitMath.contactMinutesPerDay(orbit, 78.2);
+        long start = System.nanoTime();
+        for (int i = 0; i < 10_000; i++) {
+            assertEquals(first, OrbitMath.contactMinutesPerDay(orbit, 78.2));
+        }
+        assertTrue(System.nanoTime() - start < 1_000_000_000L, "10,000 repeats must not redo 7,200 samples each");
+    }
+
+    @Test
+    void twoOrbitsWithTheSameIdButDifferentHeightsAreNotConfused() {
+        double low = OrbitMath.contactMinutesPerDay(TestParts.orbit("same", 400, 98.2, LaunchClass.POLAR), 78.2);
+        double high = OrbitMath.contactMinutesPerDay(TestParts.orbit("same", 900, 98.2, LaunchClass.POLAR), 78.2);
+        assertTrue(high > low);
+    }
 }

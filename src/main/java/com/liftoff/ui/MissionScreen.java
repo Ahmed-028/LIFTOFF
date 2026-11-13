@@ -6,6 +6,7 @@ import com.liftoff.app.ScreenController;
 import com.liftoff.data.MissionEntry;
 import com.liftoff.session.GameSession;
 import com.liftoff.session.MissionStep;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 
@@ -19,7 +20,9 @@ public abstract class MissionScreen implements ScreenController {
     protected GameSession session;
     protected UiText text;
     private StepperBar stepper;
-    private final Runnable onSessionChange = this::refresh;
+    private final Runnable onSessionChange = this::queueRefresh;
+    private boolean refreshQueued;
+    private boolean disposed;
 
     @Override
     public final void attach(SceneNavigator navigator, GameSession session, ResourceBundle messages) {
@@ -35,7 +38,33 @@ public abstract class MissionScreen implements ScreenController {
 
     @Override
     public void dispose() {
+        disposed = true;
         session.removeListener(onSessionChange);
+    }
+
+    /** True once the screen has been replaced; late callbacks must then do nothing. */
+    protected final boolean isDisposed() {
+        return disposed;
+    }
+
+    /**
+     * One action can change the session several times (go to a step, then confirm). The screen is
+     * redrawn once, on the next pulse, however many times it was told.
+     */
+    private void queueRefresh() {
+        if (refreshQueued || disposed) {
+            return;
+        }
+        refreshQueued = true;
+        Platform.runLater(this::settle);
+    }
+
+    @Override
+    public final void settle() {
+        if (refreshQueued && !disposed) {
+            refreshQueued = false;
+            refresh();
+        }
     }
 
     protected MissionEntry mission() {
@@ -47,7 +76,19 @@ public abstract class MissionScreen implements ScreenController {
     protected void update() {}
 
     protected void onStep(MissionStep step) {
-        session.goTo(step);
+        move(() -> session.goTo(step));
+    }
+
+    /**
+     * Makes a move in the mission flow and shows the step the session ends up on. A move the flow
+     * refuses (the step is locked) leaves the player where they are: it is not an error.
+     */
+    protected final void move(Runnable change) {
+        try {
+            change.run();
+        } catch (IllegalStateException locked) {
+            // The session did not move; the screen for its current step is shown again below.
+        }
         navigator.showMissionStep();
     }
 
@@ -63,13 +104,11 @@ public abstract class MissionScreen implements ScreenController {
 
     @FXML
     protected void onBack() {
-        session.back();
-        navigator.showMissionStep();
+        move(session::back);
     }
 
     @FXML
     protected void onNext() {
-        session.next();
-        navigator.showMissionStep();
+        move(session::next);
     }
 }

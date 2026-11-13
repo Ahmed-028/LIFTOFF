@@ -1,10 +1,10 @@
 package com.liftoff.ui;
 
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.ShipPart;
 import com.liftoff.render3d.HangarShipView;
 import com.liftoff.render3d.ShipView;
 import com.liftoff.session.MissionStep;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipPart;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -63,11 +63,10 @@ public final class ShipBuilderController extends MissionScreen {
             hangarHint.setText(text.get("ship.fallbackHint"));
         }
 
-        var preview = new PartPreview();
         tabs = new ModuleTabs(text, this::showSlot);
-        strip = new PartStrip(text, preview, this::choose, this::focus, this::clearHighlight);
-        details = new PartDetailPanel(text, preview);
-        gauges = new BuildGauges(text, false);
+        strip = new PartStrip(text, this::choose, this::focus, this::clearHighlight);
+        details = new PartDetailPanel(text);
+        gauges = BuildGauges.row(text);
         warnings = new WarningList(text);
         confirmation = new BuildConfirmation(confirmGate, confirm);
         tabsHost.getChildren().setAll(tabs);
@@ -80,7 +79,7 @@ public final class ShipBuilderController extends MissionScreen {
     @Override
     protected void update() {
         for (ModuleSlot slot : ModuleSlot.values()) {
-            shipView.showPart(renderSlot(slot), session.build().part(slot)
+            shipView.showPart(slot, session.build().part(slot)
                     .map(part -> slot == ModuleSlot.SATELLITE ? PartPreview.modelFor(part) : part.modelId())
                     .orElse(null));
         }
@@ -92,18 +91,23 @@ public final class ShipBuilderController extends MissionScreen {
 
         var suppliesLocked = session.reasonLocked(MissionStep.SUPPLIES);
         supplies.setDisable(suppliesLocked.isPresent());
-        Tooltip.uninstall(suppliesGate, supplies.getTooltip());
-        supplies.setTooltip(suppliesLocked.map(key -> new Tooltip(text.get(key))).orElse(null));
-        Tooltip.install(suppliesGate, supplies.getTooltip());
+        String reason = suppliesLocked.map(text::get).orElse(null);
+        var tooltip = supplies.getTooltip();
+        if (!java.util.Objects.equals(reason, tooltip == null ? null : tooltip.getText())) {
+            Tooltip.uninstall(suppliesGate, tooltip);
+            supplies.setTooltip(reason == null ? null : new Tooltip(reason));
+            Tooltip.install(suppliesGate, supplies.getTooltip());
+        }
 
         confirmation.refresh(session, text);
     }
 
     @FXML
     private void onConfirm() {
-        session.goTo(MissionStep.REVIEW);
-        session.confirmBuild();
-        navigator.showMissionStep();
+        move(() -> {
+            session.goTo(MissionStep.REVIEW);
+            session.confirmBuild();
+        });
     }
 
     private void showSlot(ModuleSlot slot) {
@@ -133,32 +137,49 @@ public final class ShipBuilderController extends MissionScreen {
         }
     }
 
-    private ShipPart dragPart(DragEvent event) {
-        var id = event.getDragboard().getContent(PartCard.PART_ID);
-        return id instanceof String partId ? session.catalog().partsFor(mission().id(), active).stream()
-                .filter(part -> part.id().equals(partId)).findFirst().orElse(null) : null;
+    /** The card being dragged, if it is one of the cards of the open tab. */
+    private ShipPart draggedPart(Object partId) {
+        return partId instanceof String id ? session.catalog().partsFor(mission().id(), active).stream()
+                .filter(part -> part.id().equals(id)).findFirst().orElse(null) : null;
     }
 
     private void dragOver(DragEvent event) {
-        var part = dragPart(event);
+        var part = draggedPart(event.getDragboard().getContent(PartCard.PART_ID));
         var target = part == null ? null : shipView.slotAt(event.getSceneX(), event.getSceneY());
         shipView.setDropHighlight(target);
-        if (part != null && target == renderSlot(part.slot())) {
+        if (part != null && target == part.slot()) {
             event.acceptTransferModes(TransferMode.COPY);
         }
         event.consume();
     }
 
     private void drop(DragEvent event) {
-        var part = dragPart(event);
-        boolean matches = part != null
-                && shipView.slotAt(event.getSceneX(), event.getSceneY()) == renderSlot(part.slot());
-        if (matches) {
-            choose(part);
-        }
+        boolean fitted = dropPart(event.getDragboard().getContent(PartCard.PART_ID),
+                shipView.slotAt(event.getSceneX(), event.getSceneY()));
         clearHighlight();
-        event.setDropCompleted(matches);
+        event.setDropCompleted(fitted);
         event.consume();
+    }
+
+    /**
+     * What a drop does: on the place that matches the dragged card, the same as a click on the
+     * card; anywhere else, nothing.
+     *
+     * @param partId what the drag carries
+     * @param target the place on the ship under the pointer, or null if there is none
+     * @return true if the part was fitted
+     */
+    boolean dropPart(Object partId, ModuleSlot target) {
+        var part = draggedPart(partId);
+        if (part == null || target != part.slot()) {
+            return false;
+        }
+        choose(part);
+        return true;
+    }
+
+    ShipView shipView() {
+        return shipView;
     }
 
     private void clearHighlight() {
@@ -168,10 +189,7 @@ public final class ShipBuilderController extends MissionScreen {
     @Override
     public void dispose() {
         confirmation.hideWarning();
+        shipView.dispose();
         super.dispose();
-    }
-
-    private static com.liftoff.model.ModuleSlot renderSlot(ModuleSlot slot) {
-        return com.liftoff.model.ModuleSlot.valueOf(slot.name());
     }
 }

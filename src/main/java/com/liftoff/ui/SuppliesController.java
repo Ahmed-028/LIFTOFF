@@ -1,35 +1,34 @@
 package com.liftoff.ui;
 
+import com.liftoff.model.Destination;
 import com.liftoff.model.GroundStation;
 import com.liftoff.model.Instrument;
-import com.liftoff.model.Objective;
-import com.liftoff.model.LaunchClass;
 import com.liftoff.model.LaunchVehicle;
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.Objective;
 import com.liftoff.model.Orbit;
+import com.liftoff.model.ShipPart;
 import com.liftoff.session.MissionStep;
-import com.liftoff.session.stub.Mission;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipPart;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Locale;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class SuppliesController extends MissionScreen {
-    private final PartPreview previews = new PartPreview();
     @FXML private VBox instruments;
     @FXML private VBox stations;
     @FXML private StackPane gaugeHost;
@@ -57,116 +56,116 @@ public final class SuppliesController extends MissionScreen {
     @Override
     protected void setUp() {
         var entry = mission();
-        boolean earth = entry.destination() == Mission.Destination.EARTH;
-        boolean variableDuration = entry.steps() == 0;
         var catalog = session.catalog();
-        show(orbitGroup, earth);
-        show(durationGroup, variableDuration);
+        show(orbitGroup, entry.destination() == Destination.EARTH_ORBIT);
+        show(durationGroup, entry.steps() == 0);
         show(crewGroup, entry.crew() > 0);
 
-        rocket.setConverter(names(LaunchVehicle::kidName));
-        rocket.setTooltip(new javafx.scene.control.Tooltip(text.get("supplies.chooseRocket")));
-        rocket.getItems().setAll(catalog.launchVehicles().stream()
-                .filter(vehicle -> Arrays.stream(classes(entry.destination()))
-                        .anyMatch(launchClass -> vehicle.capacityFor(launchClass).isPresent())).toList());
-        rocket.setValue(session.design().launchVehicle());
-        rocket.setOnAction(event -> {
-            if (rocket.getValue() != null) {
-                session.chooseLaunchVehicle(rocket.getValue().id());
-            }
-        });
-        if (earth) {
-            orbit.setConverter(names(Orbit::kidName));
-            orbit.getItems().setAll(catalog.orbits());
-            orbit.setValue(session.design().orbit());
-            orbit.setTooltip(new javafx.scene.control.Tooltip(text.get("supplies.chooseOrbit")));
-            orbit.setOnAction(event -> {
-                if (orbit.getValue() != null) {
-                    session.chooseOrbit(orbit.getValue().id());
-                }
-            });
+        choices(rocket, catalog.launchVehicles().stream().filter(vehicle -> vehicle.offeredFor(entry.destination()))
+                .toList(), session.design().launchVehicle(), LaunchVehicle::kidName,
+                vehicle -> session.chooseLaunchVehicle(vehicle.id()));
+        rocket.setTooltip(new Tooltip(text.get("supplies.chooseRocket")));
+        if (orbitGroup.isVisible()) {
+            choices(orbit, catalog.orbits(), session.design().orbit(), Orbit::kidName,
+                    chosen -> session.chooseOrbit(chosen.id()));
+            orbit.setTooltip(new Tooltip(text.get("supplies.chooseOrbit")));
         }
-
-        if (variableDuration) {
-            int start = entry.briefing().minScienceMonths();
-            int end = entry.briefing().deadlineMonths();
-            for (int months = start; months <= end; months++) {
-                duration.getItems().add(months);
-            }
-            duration.setValue(session.design().scienceMonths());
-            duration.setOnAction(event -> session.setScienceMonths(duration.getValue()));
+        choices(airframe, catalog.partsFor(entry.id(), ModuleSlot.AIRFRAME),
+                session.build().part(ModuleSlot.AIRFRAME).orElse(null), ShipPart::kidName,
+                part -> session.choosePart(part.id()));
+        if (durationGroup.isVisible()) {
+            setUpDuration(entry.briefing());
         }
-
         supplies.setText(Double.toString(session.crewSuppliesKg()));
         show(suppliesError, false);
         supplies.textProperty().addListener((property, previous, current) -> updateSupplies(current));
 
-        var goal = entry.briefing();
-        var options = catalog.instruments().stream()
-                .sorted(Comparator.comparingInt(item -> measurementPriority(item, goal))).toList();
-        for (var instrument : options) {
-            var option = new CheckBox(instrument.kidName());
-            option.setId("instrument-" + instrument.id());
-            option.setSelected(session.design().instruments().contains(instrument));
-            option.setOnAction(event -> {
-                showInstrument(instrument);
-                if (option.isSelected()) {
-                    session.addInstrument(instrument.id());
-                } else {
-                    session.removeInstrument(instrument.id());
-                }
-            });
-            option.focusedProperty().addListener((property, before, focused) -> {
-                if (focused) {
-                    showInstrument(instrument);
-                }
-            });
-            option.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showInstrument(instrument));
-            option.setWrapText(true);
-            String measurements = instrument.capabilities().stream()
-                    .map(capability -> text.get("measurement." + capability.type()))
-                    .distinct().collect(Collectors.joining(" · "));
-            instruments.getChildren().addAll(option, text.label(measurements, "body-text"),
-                    text.label(text.get("supplies.instrumentStats", instrument.massKg(), instrument.avgPowerW(),
-                            instrument.dataGbitPerDay(), text.cost(instrument.costMusd(), instrument.costBasis())), "muted"));
-        }
-        if (!options.isEmpty()) {
-            showInstrument(session.design().instruments().stream().findFirst().orElse(options.getFirst()));
-        }
-        airframe.setConverter(names(ShipPart::kidName));
-        airframe.getItems().setAll(catalog.partsFor(entry.id(), ModuleSlot.AIRFRAME));
-        airframe.setValue(session.build().part(ModuleSlot.AIRFRAME).orElse(null));
-        airframe.setOnAction(event -> {
-            if (airframe.getValue() != null) {
-                session.choosePart(airframe.getValue().id());
-            }
-        });
+        setUpInstruments(entry.briefing());
+        catalog.groundStations().forEach(this::addStation);
         supplyTabs.getSelectionModel().selectedIndexProperty().addListener((property, before, index) -> {
             previousTab.setDisable(index.intValue() == 0);
             nextTab.setDisable(index.intValue() == supplyTabs.getTabs().size() - 1);
         });
         previousTab.setDisable(true);
 
-        for (GroundStation station : catalog.groundStations()) {
-            var option = new CheckBox(station.kidName());
-            option.setId("station-" + station.id());
-            option.setSelected(session.design().hasStation(station.id()));
-            option.setOnAction(event -> session.toggleStation(station.id()));
-            stations.getChildren().addAll(option, text.label(text.get("supplies.stationStats", station.bands(),
-                    text.cost(station.costMusdPerMonth(), station.costBasis())), "muted"));
-        }
-
-        gauges = new BuildGauges(text, true);
+        gauges = BuildGauges.column(text);
         warnings = new WarningList(text);
         gaugeHost.getChildren().setAll(gauges);
         readout.getChildren().add(warnings);
+    }
+
+    /** Fills a choice box, shows the current choice, and passes each new choice to the session. */
+    private static <T> void choices(ChoiceBox<T> box, List<T> items, T current, Function<T, String> name,
+                                    Consumer<T> choose) {
+        box.setConverter(names(name));
+        box.getItems().setAll(items);
+        box.setValue(current);
+        box.setOnAction(event -> {
+            if (box.getValue() != null) {
+                choose.accept(box.getValue());
+            }
+        });
+    }
+
+    private void setUpDuration(Objective goal) {
+        for (int months = goal.minScienceMonths(); months <= goal.deadlineMonths(); months++) {
+            duration.getItems().add(months);
+        }
+        duration.setValue(session.design().scienceMonths());
+        duration.setOnAction(event -> session.setScienceMonths(duration.getValue()));
+    }
+
+    /** One check box per instrument, the most useful to the goal first. */
+    private void setUpInstruments(Objective goal) {
+        var options = session.catalog().instruments().stream()
+                .sorted(Comparator.comparingInt(goal::relevanceOf)).toList();
+        options.forEach(this::addInstrument);
+        if (!options.isEmpty()) {
+            showInstrument(session.design().instruments().stream().findFirst().orElse(options.getFirst()));
+        }
+    }
+
+    private void addInstrument(Instrument instrument) {
+        var option = new CheckBox(instrument.kidName());
+        option.setId("instrument-" + instrument.id());
+        option.setSelected(session.design().instruments().contains(instrument));
+        option.setWrapText(true);
+        option.setOnAction(event -> {
+            showInstrument(instrument);
+            if (option.isSelected()) {
+                session.addInstrument(instrument.id());
+            } else {
+                session.removeInstrument(instrument.id());
+            }
+        });
+        option.focusedProperty().addListener((property, before, focused) -> {
+            if (focused) {
+                showInstrument(instrument);
+            }
+        });
+        option.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showInstrument(instrument));
+        String measurements = instrument.capabilities().stream()
+                .map(capability -> text.get("measurement." + capability.type()))
+                .distinct().collect(Collectors.joining(" · "));
+        instruments.getChildren().addAll(option, text.label(measurements, "body-text"),
+                text.label(text.get("supplies.instrumentStats", instrument.massKg(), instrument.avgPowerW(),
+                        instrument.dataGbitPerDay(), text.cost(instrument.costMusd(), instrument.costBasis())), "muted"));
+    }
+
+    private void addStation(GroundStation station) {
+        var option = new CheckBox(station.kidName());
+        option.setId("station-" + station.id());
+        option.setSelected(session.design().hasStation(station.id()));
+        option.setOnAction(event -> session.toggleStation(station.id()));
+        stations.getChildren().addAll(option, text.label(text.get("supplies.stationStats", station.bands(),
+                text.cost(station.costMusdPerMonth(), station.costBasis())), "muted"));
     }
 
     private void showInstrument(Instrument instrument) {
         String model = InstrumentVisual.model(instrument);
         boolean renderModel = model != null && javafx.application.Platform.isSupported(javafx.application.ConditionalFeature.SCENE3D);
         instrumentPreview.getChildren().setAll(text.label(instrument.name(), "section-title"),
-                renderModel ? previews.thumbnail(model, 240, 126) : InstrumentVisual.diagram(instrument),
+                renderModel ? PartPreview.thumbnail(model, 240, 126) : InstrumentVisual.diagram(instrument),
                 text.label(text.get(renderModel ? "supplies.nasaInstrument" : "supplies.schematic"), "muted"),
                 text.label(text.get("supplies.instrumentStats", instrument.massKg(), instrument.avgPowerW(),
                         instrument.dataGbitPerDay(), text.cost(instrument.costMusd(), instrument.costBasis())), "reading-value"));
@@ -195,7 +194,7 @@ public final class SuppliesController extends MissionScreen {
         var selected = session.build().part(ModuleSlot.AIRFRAME).orElse(null);
         if (selected != null && !selected.equals(spacecraftPreview.getUserData())) {
             spacecraftPreview.setUserData(selected);
-            spacecraftPreview.getChildren().setAll(previews.thumbnail(selected, 310, 175),
+            spacecraftPreview.getChildren().setAll(PartPreview.thumbnail(selected, 310, 175),
                     text.label(selected.kidName(), "section-title"), text.label(selected.description(), "muted"));
         }
         crewMinimum.setText(text.get("supplies.crewMinimum", session.requiredCrewSuppliesKg()));
@@ -235,22 +234,6 @@ public final class SuppliesController extends MissionScreen {
             return;
         }
         super.onStep(step);
-    }
-
-    private static LaunchClass[] classes(Mission.Destination destination) {
-        return switch (destination) {
-            case EARTH -> new LaunchClass[] { LaunchClass.LOW_INCLINATION, LaunchClass.POLAR };
-            case MOON -> new LaunchClass[] { LaunchClass.TRANS_LUNAR };
-            case MARS -> new LaunchClass[] { LaunchClass.TRANS_MARS };
-        };
-    }
-
-    private static int measurementPriority(Instrument instrument, Objective goal) {
-        if (instrument.capabilities().stream().anyMatch(capability -> goal.required().stream()
-                .anyMatch(requirement -> requirement.type() == capability.type()))) {
-            return 0;
-        }
-        return instrument.capabilities().stream().anyMatch(capability -> goal.bonus().contains(capability.type())) ? 1 : 2;
     }
 
     private static <T> StringConverter<T> names(Function<T, String> label) {

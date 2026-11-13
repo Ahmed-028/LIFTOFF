@@ -1,17 +1,18 @@
 package com.liftoff.engine.sim;
 
+import com.liftoff.engine.BuildReport;
 import com.liftoff.engine.OrbitMath;
 import com.liftoff.engine.ResourceCalculator;
 import com.liftoff.engine.ResourceReport;
 import com.liftoff.engine.ResourceType;
 import com.liftoff.engine.ResourceUsage;
 import com.liftoff.engine.sim.LaunchIssue.Kind;
+import com.liftoff.model.Destination;
 import com.liftoff.model.LaunchClass;
 import com.liftoff.model.LaunchVehicle;
+import com.liftoff.model.Mission;
 import com.liftoff.model.MissionDesign;
 import com.liftoff.model.Orbit;
-import com.liftoff.session.stub.BuildReport;
-import com.liftoff.session.stub.Mission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,14 +37,10 @@ public final class LaunchChecker {
                                           LaunchVehicle rocket, Orbit orbit) {
         List<LaunchIssue> issues = new ArrayList<>();
         ResourceReport resources = ResourceCalculator.calculate(design);
-        boolean earth = mission.destination() == Mission.Destination.EARTH;
+        boolean earth = mission.destination() == Destination.EARTH_ORBIT;
 
         double massKg = resources.get(ResourceType.MASS).used() + (build == null ? 0 : build.totalMassKg());
-        LaunchClass launchClass = switch (mission.destination()) {
-            case EARTH -> orbit == null ? null : orbit.launchClass();
-            case MOON -> LaunchClass.TRANS_LUNAR;
-            case MARS -> LaunchClass.TRANS_MARS;
-        };
+        LaunchClass launchClass = mission.destination().launchClass(orbit);
         OptionalDouble capacityKg = rocket == null || launchClass == null
                 ? OptionalDouble.empty() : rocket.capacityFor(launchClass);
         if (capacityKg.isEmpty()) {

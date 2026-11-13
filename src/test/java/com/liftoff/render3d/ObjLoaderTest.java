@@ -52,4 +52,12 @@ class ObjLoaderTest {
                 new StringReader("v 0 0 0\nf 1 0 2\n")));
         org.junit.jupiter.api.Assertions.assertTrue(error.getMessage().startsWith("OBJ line 2:"));
     }
+
+    @Test
+    void tabsSeparateValuesJustLikeSpaces() throws Exception {
+        var mesh = ObjLoader.load(new java.io.StringReader(
+                "v\t0 0 0\nv 1\t0\t0\nv  0  1  0\nf\t1 2\t3\n"));
+        assertEquals(9, mesh.getPoints().size());
+        assertEquals(1, mesh.getFaces().size() / mesh.getFaceElementSize());
+    }
 }

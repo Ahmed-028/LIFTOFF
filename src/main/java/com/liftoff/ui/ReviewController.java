@@ -1,10 +1,10 @@
 package com.liftoff.ui;
 
+import com.liftoff.model.Destination;
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.ShipPart;
 import com.liftoff.render.Icons;
 import com.liftoff.session.MissionStep;
-import com.liftoff.session.stub.Mission;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipPart;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -21,7 +21,7 @@ public final class ReviewController extends MissionScreen {
 
     @Override
     protected void setUp() {
-        gauges = new BuildGauges(text, true);
+        gauges = BuildGauges.column(text);
         warnings = new WarningList(text);
         confirmation = new BuildConfirmation(confirmGate, confirm);
         inspection.getChildren().addAll(gauges, warnings);
@@ -41,7 +41,7 @@ public final class ReviewController extends MissionScreen {
         if (design.orbit() != null) {
             selectedParts.getChildren().add(text.label(text.get("step.accessible",
                     text.get("supplies.orbit"), design.orbit().kidName()), "detail-row"));
-        } else if (mission().destination() == Mission.Destination.EARTH) {
+        } else if (mission().destination() == Destination.EARTH_ORBIT) {
             selectedParts.getChildren().add(text.label(text.get("review.noOrbit"), "warning"));
         }
     }
@@ -50,8 +50,7 @@ public final class ReviewController extends MissionScreen {
     protected void update() {
         var report = session.buildReport();
         gauges.refresh(session);
-        warnings.showBuild(report.issues());
-        warnings.addDesign(session.designIssues());
+        warnings.show(report.issues(), session.designIssues());
         confirm.setText(text.get(session.isUnlocked(MissionStep.LAUNCH) ? "review.launch" : "review.confirm"));
         confirmation.refresh(session, text);
     }

@@ -4,9 +4,9 @@
     "type": "SOLAR_STORM",
     "messageKey": "event.solarStorm",
     "destinations": [
-      "EARTH",
-      "MOON",
-      "MARS"
+      "EARTH_ORBIT",
+      "MOON_SURFACE",
+      "MARS_SURFACE"
     ],
     "realExample": "During the October 2003 solar storms, Genesis switched to safe mode and radiation interrupted Chandra observations.",
     "source": {
@@ -20,9 +20,9 @@
     "type": "STATION_OUTAGE",
     "messageKey": "event.stationOutage",
     "destinations": [
-      "EARTH",
-      "MOON",
-      "MARS"
+      "EARTH_ORBIT",
+      "MOON_SURFACE",
+      "MARS_SURFACE"
     ],
     "realExample": "The Canberra DSS-43 antenna went offline for equipment upgrades in 2020, interrupting command capability for Voyager 2.",
     "source": {
@@ -36,9 +36,9 @@
     "type": "INSTRUMENT_FAULT",
     "messageKey": "event.instrumentFault",
     "destinations": [
-      "EARTH",
-      "MOON",
-      "MARS"
+      "EARTH_ORBIT",
+      "MOON_SURFACE",
+      "MARS_SURFACE"
     ],
     "realExample": "An electrical fault shut down all three channels of Hubble's Advanced Camera for Surveys in January 2007.",
     "source": {
@@ -52,9 +52,9 @@
     "type": "LAUNCH_SLIP",
     "messageKey": "event.launchSlip",
     "destinations": [
-      "EARTH",
-      "MOON",
-      "MARS"
+      "EARTH_ORBIT",
+      "MOON_SURFACE",
+      "MARS_SURFACE"
     ],
     "realExample": "A hydrogen leak forced NASA to call off an Artemis I launch attempt in September 2022.",
     "source": {
@@ -68,7 +68,7 @@
     "type": "DUST_STORM",
     "messageKey": "event.dustStorm",
     "destinations": [
-      "MARS"
+      "MARS_SURFACE"
     ],
     "realExample": "A January 2022 dust storm reduced sunlight enough for InSight to pause its science work and conserve power.",
     "source": {

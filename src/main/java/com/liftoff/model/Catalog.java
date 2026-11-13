@@ -2,8 +2,8 @@ package com.liftoff.model;
 
 import com.liftoff.data.MissionEntry;
 import com.liftoff.engine.sim.EventCard;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipPart;
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.ShipPart;
 
 import java.util.List;
 import java.util.Optional;

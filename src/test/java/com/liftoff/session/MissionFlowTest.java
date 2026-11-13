@@ -1,7 +1,7 @@
 package com.liftoff.session;
 
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipBuild;
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.ShipBuild;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

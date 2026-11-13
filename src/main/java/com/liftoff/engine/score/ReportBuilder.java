@@ -8,9 +8,9 @@ import com.liftoff.engine.sim.SimLimit;
 import com.liftoff.engine.sim.SimStep;
 import com.liftoff.engine.sim.SimulationResult;
 import com.liftoff.model.Capability;
+import com.liftoff.model.Mission;
 import com.liftoff.model.MissionDesign;
 import com.liftoff.model.Requirement;
-import com.liftoff.session.stub.Mission;
 
 import java.util.ArrayList;
 import java.util.Comparator;

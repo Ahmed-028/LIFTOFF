@@ -4,9 +4,12 @@ import com.liftoff.TestParts;
 import com.liftoff.data.CatalogLoader;
 import com.liftoff.engine.OrbitMath;
 import com.liftoff.model.Catalog;
+import com.liftoff.model.Destination;
+import com.liftoff.model.Difficulty;
+import com.liftoff.model.Mission;
 import com.liftoff.model.MissionDesign;
+import com.liftoff.model.StepUnit;
 import com.liftoff.session.GameSession;
-import com.liftoff.session.stub.Mission;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,12 +25,12 @@ class MissionSimulatorTest {
     private final EventDeck deck = SimFixtures.deck();
 
     private static SimulationResult quiet(MissionDesign design) {
-        return MissionSimulator.run(design, SimFixtures.EARTH, Difficulty.CADET, 1, EventDeck.empty(),
+        return MissionSimulator.run(design, SimFixtures.EARTH, Difficulty.EASY, 1, EventDeck.empty(),
                 SimExtras.none());
     }
 
     private SimulationResult eventful(MissionDesign design, long seed) {
-        return MissionSimulator.run(design, SimFixtures.EARTH, Difficulty.MISSION_DIRECTOR, seed, deck,
+        return MissionSimulator.run(design, SimFixtures.EARTH, Difficulty.HARD, seed, deck,
                 SimExtras.none());
     }
 
@@ -48,10 +51,10 @@ class MissionSimulatorTest {
         session.toggleStation("svalbard");
         session.chooseLaunchVehicle("atlas-v-401");
         MissionDesign design = session.design();
-        Mission mission = new Mission("farm-watch", 0);
+        Mission mission = SimFixtures.mission("farm-watch", 0);
 
         assertEquals(List.of(), LaunchChecker.check(design, mission, design.launchVehicle(), design.orbit()));
-        SimulationResult result = MissionSimulator.run(design, mission, Difficulty.CADET, 2026);
+        SimulationResult result = MissionSimulator.run(design, mission, Difficulty.EASY, 2026);
 
         // Independent of the simulator: kbps x 86,400 / 1e6 produced, Mbps x contact minutes x 60 / 1000 sent.
         double producedPerDay = catalog.instrument("ali").orElseThrow().avgDataRateKbps() * 86_400 / 1e6;
@@ -100,7 +103,7 @@ class MissionSimulatorTest {
 
     @Test
     void cadetHasNoEventsEvenWithAFullDeck() {
-        SimulationResult result = MissionSimulator.run(SimFixtures.design(), SimFixtures.EARTH, Difficulty.CADET,
+        SimulationResult result = MissionSimulator.run(SimFixtures.design(), SimFixtures.EARTH, Difficulty.EASY,
                 5, deck, SimExtras.none());
 
         assertTrue(result.events().isEmpty());
@@ -111,7 +114,7 @@ class MissionSimulatorTest {
     void dataSentNeverExceedsDataProducedAndNothingIsNegative() {
         MissionDesign tight = SimFixtures.design().withBus(TestParts.bus("slow-radio", 100, 40, 0.01, 10, 12));
         for (long seed = 0; seed < 50; seed++) {
-            SimulationResult result = MissionSimulator.run(tight, SimFixtures.EARTH, Difficulty.MISSION_DIRECTOR,
+            SimulationResult result = MissionSimulator.run(tight, SimFixtures.EARTH, Difficulty.HARD,
                     seed, deck, new SimExtras(5, 0, true));
             double produced = 0;
             double sent = 0;
@@ -156,7 +159,7 @@ class MissionSimulatorTest {
     void dataThatDoesNotFitInStorageIsCountedAsLost() {
         MissionDesign design = SimFixtures.design().minusStation("north");
 
-        SimulationResult result = MissionSimulator.run(design, SimFixtures.EARTH, Difficulty.CADET, 1,
+        SimulationResult result = MissionSimulator.run(design, SimFixtures.EARTH, Difficulty.EASY, 1,
                 EventDeck.empty(), new SimExtras(10, 0, true));
 
         assertEquals(10, result.storedAtEndGbit(), 1e-9);
@@ -167,11 +170,11 @@ class MissionSimulatorTest {
     @Test
     void aMoonMissionIsSteppedInDaysAndFailsOnTheDayTheSuppliesRunOut() {
         // 2 people x 5 kg a day = 10 kg a day; 60 kg lasts days 0 to 5.
-        Mission moon = new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 2, 5);
+        Mission moon = SimFixtures.mission("moon", Destination.MOON_SURFACE, StepUnit.DAY, 10, 0, 2, 5);
 
-        SimulationResult shortOf = MissionSimulator.run(SimFixtures.design(), moon, Difficulty.CADET, 1,
+        SimulationResult shortOf = MissionSimulator.run(SimFixtures.design(), moon, Difficulty.EASY, 1,
                 EventDeck.empty(), new SimExtras(Double.POSITIVE_INFINITY, 60, true));
-        SimulationResult enough = MissionSimulator.run(SimFixtures.design(), moon, Difficulty.CADET, 1,
+        SimulationResult enough = MissionSimulator.run(SimFixtures.design(), moon, Difficulty.EASY, 1,
                 EventDeck.empty(), new SimExtras(Double.POSITIVE_INFINITY, 100, true));
 
         assertFalse(shortOf.success());
@@ -188,16 +191,16 @@ class MissionSimulatorTest {
 
     @Test
     void marsDustLowersSolarPowerButNotANuclearSource() {
-        Mission mars = new Mission("mars", Mission.Destination.MARS, Mission.StepUnit.MONTH, 24, 0, 0, 0);
+        Mission mars = SimFixtures.mission("mars", Destination.MARS_SURFACE, StepUnit.MONTH, 24, 0, 0, 0);
         EventDeck dustOnly = new EventDeck(deck.cards().stream()
                 .filter(card -> card.type() == SimEventType.DUST_STORM).toList());
         // 50 W supplied, 50 W drawn: any loss of supply shows up as lost data.
         MissionDesign design = SimFixtures.design().withBus(TestParts.bus("exact", 100, 50, 10, 10, 12));
-        SimulationResult calm = MissionSimulator.run(design, mars, Difficulty.CADET, 3, dustOnly, SimExtras.none());
+        SimulationResult calm = MissionSimulator.run(design, mars, Difficulty.EASY, 3, dustOnly, SimExtras.none());
 
-        SimulationResult solar = MissionSimulator.run(design, mars, Difficulty.MISSION_DIRECTOR, 3, dustOnly,
+        SimulationResult solar = MissionSimulator.run(design, mars, Difficulty.HARD, 3, dustOnly,
                 new SimExtras(Double.POSITIVE_INFINITY, 0, true));
-        SimulationResult nuclear = MissionSimulator.run(design, mars, Difficulty.MISSION_DIRECTOR, 3, dustOnly,
+        SimulationResult nuclear = MissionSimulator.run(design, mars, Difficulty.HARD, 3, dustOnly,
                 new SimExtras(Double.POSITIVE_INFINITY, 0, false));
 
         assertFalse(solar.events().isEmpty());
@@ -216,7 +219,7 @@ class MissionSimulatorTest {
         SimulationResult calm = quiet(longMission);
 
         SimulationResult stormy = MissionSimulator.run(longMission, SimFixtures.EARTH,
-                Difficulty.MISSION_DIRECTOR, 3, stormOnly, SimExtras.none());
+                Difficulty.HARD, 3, stormOnly, SimExtras.none());
 
         assertFalse(stormy.events().isEmpty());
         assertTrue(stormy.totalProducedGbit() < calm.totalProducedGbit());

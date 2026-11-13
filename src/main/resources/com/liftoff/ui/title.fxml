@@ -8,5 +8,5 @@
     <Label text="%title.name" styleClass="game-title"/>
     <Label text="%title.tagline" styleClass="tagline"/>
     <StackPane fx:id="artHolder" minHeight="295"/>
-    <Button text="%title.start" onAction="#onStart" defaultButton="true" styleClass="primary, big"/>
+    <Button fx:id="start" id="start" text="%title.start" onAction="#onStart" defaultButton="true" styleClass="primary, big"/>
 </VBox>

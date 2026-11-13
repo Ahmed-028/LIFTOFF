@@ -116,6 +116,22 @@ interface ShipView {
 }
 ```
 
+**Integration notes (2026-11-13).** The temporary `session.stub` copies of
+these contracts are gone; everything uses `model` and `engine`. Three things
+were added while joining the work:
+
+- `BuildIssue.Kind.SUPPLIES_SHORT` (crew supplies packed vs needed; no slot).
+- `engine/BuildLoad` and `BuildCalculator.calculate(build, mission, load)`:
+  instrument mass and power, crew supplies and non-ship costs chosen on the
+  Supplies step. Fuel is worked out in two legs when the mission has a surface
+  leg (see `data-sources.md`, "Deep-space flight assumptions").
+- `Mission` also carries `stepUnit`, `steps`, `crew` and
+  `surfaceDeltaVRequiredMs`; `MissionEntry.toMission()` builds it from
+  `missions.json`. Difficulty is `model.Difficulty` (EASY, MEDIUM, HARD).
+
+The airframe mass check is "payload mass ≤ airframe payload mass" as written
+in section 4; the cargo bay's own mass is not counted against it.
+
 `Mission` replaces `Objective` as the name of a playable goal and gains
 `difficulty`, `destination`, `deltaVRequiredMs` and `steps`. Member 2 renames
 it and keeps the old tests green.

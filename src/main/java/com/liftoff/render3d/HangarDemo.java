@@ -10,8 +10,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -87,6 +87,18 @@ public final class HangarDemo {
             HBox.setHgrow(button, Priority.ALWAYS);
         }
 
+        toolbar.getChildren().addAll(bay, calm);
+        toolbar.setPadding(new Insets(12, 12, 12, 12));
+        var root = new BorderPane(view.node(), header(), null, toolbar, null);
+        root.setStyle("-fx-background-color: #07122B; -fx-font-family: 'Segoe UI';");
+        var scene = new Scene(root, 1060, 720);
+        listenForKeys(scene, buttons, bay);
+        view.node().setOnMouseMoved(event -> view.setDropHighlight(view.slotAt(event.getSceneX(), event.getSceneY())));
+        view.node().setOnMouseExited(event -> view.setDropHighlight(null));
+        return scene;
+    }
+
+    private static VBox header() {
         var title = new Label("LIFTOFF  /  3D HANGAR");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #E9FAFF;");
         var help = new Label("Drag to orbit   •   Scroll to zoom   •   1–5 swap parts   •   B toggles the bay");
@@ -97,11 +109,11 @@ public final class HangarDemo {
             header.getChildren().getLast().setStyle("-fx-text-fill: #FFB76B;");
         }
         header.setPadding(new Insets(12, 16, 11, 16));
-        toolbar.getChildren().addAll(bay, calm);
-        toolbar.setPadding(new Insets(12, 12, 12, 12));
-        var root = new BorderPane(view.node(), header, null, toolbar, null);
-        root.setStyle("-fx-background-color: #07122B; -fx-font-family: 'Segoe UI';");
-        var scene = new Scene(root, 1060, 720);
+        return header;
+    }
+
+    /** Keys 1 to 5 swap the part in that slot; B opens or closes the bay. */
+    private static void listenForKeys(Scene scene, Map<ModuleSlot, Button> buttons, ToggleButton bay) {
         scene.setOnKeyPressed(event -> {
             int slotIndex = SLOT_KEYS.indexOf(event.getCode());
             if (slotIndex < 0) {
@@ -115,9 +127,6 @@ public final class HangarDemo {
                 event.consume();
             }
         });
-        view.node().setOnMouseMoved(event -> view.setDropHighlight(view.slotAt(event.getSceneX(), event.getSceneY())));
-        view.node().setOnMouseExited(event -> view.setDropHighlight(null));
-        return scene;
     }
 
     private static void select(HangarShipView view, Map<ModuleSlot, Integer> choices, Button button, ModuleSlot slot) {

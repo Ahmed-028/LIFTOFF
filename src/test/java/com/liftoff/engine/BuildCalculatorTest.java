@@ -2,6 +2,7 @@ package com.liftoff.engine;
 
 import com.liftoff.SampleData;
 import com.liftoff.TestParts;
+import com.liftoff.model.Destination;
 import com.liftoff.model.Mission;
 import com.liftoff.model.ModuleSlot;
 import com.liftoff.model.ShipBuild;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * bay         50   3 m x 2 m inside, carries 300 kg, $5M
  * satellite  100   2 m x 1 m, draws 100 W, $50M
  * ---------------
- * dry mass  1300   cost $185M, draw 150 W of 200 W, cargo 150 kg of 500 kg
+ * dry mass  1300   cost $185M, draw 150 W of 200 W, payload 100 kg of 500 kg
  * </pre>
  *
  * The mission's delta-v is Isp x g0 x ln 2, so the trip needs propellant equal to the dry mass: 1300 kg.
@@ -119,7 +120,7 @@ class BuildCalculatorTest {
 
     @Test
     void payloadTooHeavyForTheBay() {
-        // 350 kg in a bay rated for 300 kg; the airframe (500 kg) can still carry bay + satellite = 400 kg.
+        // 350 kg in a bay rated for 300 kg; the airframe (500 kg) can still carry the 350 kg satellite.
         ShipBuild build = goodBuild().with(TestParts.satellite("heavy", 350, 2, 1, 100, 50));
         assertEquals(List.of(new BuildIssue(BuildIssue.Kind.PAYLOAD_TOO_HEAVY, ModuleSlot.CARGO_BAY, 350, 300)),
                 issues(build, MISSION));
@@ -127,9 +128,9 @@ class BuildCalculatorTest {
 
     @Test
     void payloadTooHeavyForTheAirframe() {
-        // Cargo is bay + satellite = 150 kg; this airframe carries 120 kg.
-        ShipBuild build = goodBuild().with(TestParts.airframe("weak", 1000, 120, 2000, 50, 100));
-        assertEquals(List.of(new BuildIssue(BuildIssue.Kind.PAYLOAD_TOO_HEAVY, ModuleSlot.AIRFRAME, 150, 120)),
+        // Doc 06 section 4: payload mass <= airframe payload mass. Satellite 100 kg; this airframe carries 80 kg.
+        ShipBuild build = goodBuild().with(TestParts.airframe("weak", 1000, 80, 2000, 50, 100));
+        assertEquals(List.of(new BuildIssue(BuildIssue.Kind.PAYLOAD_TOO_HEAVY, ModuleSlot.AIRFRAME, 100, 80)),
                 issues(build, MISSION));
     }
 
@@ -164,9 +165,9 @@ class BuildCalculatorTest {
 
     @Test
     void exactlyOnEveryLimitStillPasses() {
-        // Needs 1300 kg of propellant, 150 W, 150 kg of cargo and $185M: give exactly that.
+        // Needs 1300 kg of propellant, 150 W, a 100 kg payload and $185M: give exactly that.
         ShipBuild snug = ShipBuild.empty()
-                .with(TestParts.airframe("plane", 1000, 150, 1300.000001, 50, 100))
+                .with(TestParts.airframe("plane", 1000, 100, 1300.000001, 50, 100))
                 .with(THRUSTER)
                 .with(TestParts.power("solar", 50, 150, 20))
                 .with(TestParts.cargoBay("bay", 50, 100, 2, 1, 5))
@@ -219,6 +220,85 @@ class BuildCalculatorTest {
         List<BuildIssue.Kind> kinds = issues(build, MISSION).stream().map(BuildIssue::kind).toList();
         assertEquals(List.of(BuildIssue.Kind.PAYLOAD_TOO_LONG, BuildIssue.Kind.PAYLOAD_TOO_WIDE,
                 BuildIssue.Kind.POWER_SHORT), kinds);
+    }
+
+    // ---- loads beyond the five parts: instruments, crew supplies, other costs ---------------
+
+    @Test
+    void noMissionYetMeansNoTripAndNoBudgetCheck() {
+        BuildReport report = BuildCalculator.calculate(goodBuild(), null);
+        assertEquals(List.of(), report.issues());
+        assertEquals(0, report.deltaVRequiredMs());
+        assertEquals(0, report.propellantKg());
+    }
+
+    @Test
+    void instrumentsAddToThePowerDrawAndToTheMassTheFuelMustPush() {
+        // 100 kg and 60 W of instruments: 210 W drawn of 200 W; fuel = 1400 kg (this delta-v doubles the mass).
+        BuildReport report = BuildCalculator.calculate(goodBuild(), MISSION, new BuildLoad(100, 60, 0, 0, 0));
+        assertEquals(List.of(new BuildIssue(BuildIssue.Kind.POWER_SHORT, ModuleSlot.POWER, 210, 200)),
+                report.issues());
+        assertEquals(1400, report.propellantKg(), TINY);
+        assertEquals(1300, report.dryMassKg(), TINY);
+    }
+
+    @Test
+    void suppliesShort_tooFewCrewSuppliesIsItsOwnIssueOnNoTab() {
+        BuildReport report = BuildCalculator.calculate(goodBuild(), MISSION, new BuildLoad(0, 0, 50, 80, 0));
+        assertEquals(List.of(new BuildIssue(BuildIssue.Kind.SUPPLIES_SHORT, null, 80, 50)), report.issues());
+        // Supplies ride along: 1350 kg pushed, 1350 kg burned.
+        assertEquals(1350, report.propellantKg(), TINY);
+        assertEquals(1300 + 1350 + 50, report.totalMassKg(), TINY);
+    }
+
+    @Test
+    void costsOutsideTheShipCountTowardTheBudget() {
+        // $185M of parts + $20M of instruments, stations and rocket = $205M of $200M.
+        BuildReport report = BuildCalculator.calculate(goodBuild(), MISSION, new BuildLoad(0, 0, 0, 0, 20));
+        assertEquals(List.of(new BuildIssue(BuildIssue.Kind.OVER_BUDGET, null, 205, 200)), report.issues());
+        assertEquals(185, report.costMusd(), TINY);
+    }
+
+    @Test
+    void aMoonTripBurnsTheSurfaceLegFromTheLandersOwnTanks() {
+        // Surface leg and transit leg are each Isp x g0 x ln 2: each doubles the mass it pushes.
+        // Lander 100 kg -> 100 kg from its own 150 kg tanks. Then the whole ship, 1300 + 100 = 1400 kg -> 1400 kg.
+        Mission moon = TestParts.mission("moon", 200, 2 * DELTA_V, Destination.MOON_SURFACE, DELTA_V);
+        ShipPart lander = TestParts.lander("lander", 100, 2, 1, 150, 50);
+        BuildReport report = BuildCalculator.calculate(goodBuild().with(lander), moon);
+        assertEquals(List.of(), report.issues());
+        assertEquals(1500, report.propellantKg(), TINY);
+        assertTrue(report.deltaVAvailableMs() >= report.deltaVRequiredMs());
+
+        ShipPart smallTanks = TestParts.lander("lander", 100, 2, 1, 90, 50);
+        List<BuildIssue> issues = issues(goodBuild().with(smallTanks), moon);
+        assertEquals(1, issues.size());
+        assertEquals(BuildIssue.Kind.FUEL_SHORT, issues.get(0).kind());
+        assertEquals(ModuleSlot.SATELLITE, issues.get(0).slot());
+        assertEquals(100, issues.get(0).needed(), TINY);
+        assertEquals(90, issues.get(0).available(), TINY);
+    }
+
+    @Test
+    void aMarsLandingBurnsTheSurfaceLegFromTheEntryStagesTanks() {
+        // Landed mass = payload 100 + bay 50 + power 50 = 200 kg -> 200 kg from the bay's tanks.
+        Mission mars = TestParts.mission("mars", 200, 2 * DELTA_V, Destination.MARS_SURFACE, DELTA_V);
+        ShipPart entry = TestParts.entryStage("entry", 50, 300, 3, 2, 150, 5);
+        List<BuildIssue> issues = issues(goodBuild().with(entry), mars);
+        assertEquals(1, issues.size());
+        assertEquals(BuildIssue.Kind.FUEL_SHORT, issues.get(0).kind());
+        assertEquals(ModuleSlot.CARGO_BAY, issues.get(0).slot());
+        assertEquals(200, issues.get(0).needed(), TINY);
+        assertEquals(150, issues.get(0).available(), TINY);
+    }
+
+    @Test
+    void aSurfaceTripOnAnUnfinishedShipWaitsForTheMissingParts() {
+        Mission moon = TestParts.mission("moon", 200, 2 * DELTA_V, Destination.MOON_SURFACE, DELTA_V);
+        ShipBuild build = ShipBuild.empty().with(AIRFRAME).with(THRUSTER);
+        BuildReport report = BuildCalculator.calculate(build, moon);
+        assertEquals(0, report.propellantKg());
+        assertTrue(report.issues().stream().allMatch(issue -> issue.kind() == BuildIssue.Kind.SLOT_EMPTY));
     }
 
     // ---- the shared sample catalog ---------------------------------------------------------

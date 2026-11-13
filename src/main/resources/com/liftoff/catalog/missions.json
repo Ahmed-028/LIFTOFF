@@ -26,8 +26,8 @@
         "url": "https://landsat.gsfc.nasa.gov/satellites/landsat-8/spacecraft-instruments/operational-land-imager/"
       }
     },
-    "difficulty": "CADET",
-    "destination": "EARTH",
+    "difficulty": "EASY",
+    "destination": "EARTH_ORBIT",
     "ladder": true,
     "stepUnit": "MONTH",
     "steps": 0,
@@ -74,8 +74,8 @@
         "url": "https://www.nasa.gov/reference/orion-spacecraft/"
       }
     },
-    "difficulty": "ENGINEER",
-    "destination": "MOON",
+    "difficulty": "MEDIUM",
+    "destination": "MOON_SURFACE",
     "ladder": true,
     "stepUnit": "DAY",
     "steps": 8,
@@ -134,8 +134,8 @@
         "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/launch/quick_facts/"
       }
     },
-    "difficulty": "MISSION_DIRECTOR",
-    "destination": "MARS",
+    "difficulty": "HARD",
+    "destination": "MARS_SURFACE",
     "ladder": true,
     "stepUnit": "MONTH",
     "steps": 6,
@@ -186,8 +186,8 @@
         "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
       }
     },
-    "difficulty": "ENGINEER",
-    "destination": "EARTH",
+    "difficulty": "MEDIUM",
+    "destination": "EARTH_ORBIT",
     "ladder": false,
     "stepUnit": "MONTH",
     "steps": 0,
@@ -233,8 +233,8 @@
         "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
       }
     },
-    "difficulty": "ENGINEER",
-    "destination": "EARTH",
+    "difficulty": "MEDIUM",
+    "destination": "EARTH_ORBIT",
     "ladder": false,
     "stepUnit": "MONTH",
     "steps": 0,

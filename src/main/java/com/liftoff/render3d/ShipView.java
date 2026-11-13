@@ -16,4 +16,8 @@ public interface ShipView {
 
     /** Returns the frontmost visible slot at a point in the embedding scene, or null. */
     ModuleSlot slotAt(double sceneX, double sceneY);
+
+    /** Called when the screen closes: stops animations and lets go of the scene. */
+    default void dispose() {
+    }
 }

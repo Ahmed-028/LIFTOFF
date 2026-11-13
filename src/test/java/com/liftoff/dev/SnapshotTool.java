@@ -23,7 +23,6 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,9 +30,12 @@ import java.nio.file.Path;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import javax.imageio.ImageIO;
 
 /** Clicks through the shipped UI and captures each screen at both supported QA sizes. */
 public final class SnapshotTool {
+    /** The navigator of the run in progress; the screens are brought up to date before every look. */
+    private static SceneNavigator navigator;
     private final Path folder;
     private final CompletableFuture<Void> done = new CompletableFuture<>();
 
@@ -63,7 +65,7 @@ public final class SnapshotTool {
             var scene = new Scene(new StackPane(), 1280, height);
             scene.getStylesheets().add(LiftoffApp.class.getResource(LiftoffApp.STYLESHEET).toExternalForm());
             var messages = ResourceBundle.getBundle(LiftoffApp.MESSAGES_BUNDLE);
-            var navigator = new SceneNavigator(scene, session, messages);
+            navigator = new SceneNavigator(scene, session, messages);
             var stage = new Stage();
             stage.setScene(scene);
             stage.show();
@@ -74,6 +76,10 @@ public final class SnapshotTool {
             save(scene, output.resolve("01-title.png"));
             button(scene, ".primary").fire();
             save(scene, output.resolve("02-mission-select.png"));
+            navigator.showError(new IllegalStateException("Snapshot of the error screen"));
+            save(scene, output.resolve("12-error.png"));
+            button(scene, "#error-back").fire();
+            require(lookup(scene, "#mission-farm-watch") != null, "Go back did not return to the missions");
             button(scene, "#open-sources").fire();
             save(scene, output.resolve("10-sources.png"));
             var sources = (TitledPane) lookup(scene, ".titled-pane");
@@ -173,7 +179,7 @@ public final class SnapshotTool {
     private void verifyMoon(Scene scene, GameSession session, CheckedAction next) {
         startMission(scene, "moon-landing", "apollo-service-module", "rl10c-1", "shuttle-fuel-cell",
                 "apollo-11-adapter", "apollo-11-lander");
-        require(session.difficulty() == com.liftoff.engine.sim.Difficulty.ENGINEER, "Moon must use medium difficulty");
+        require(session.difficulty() == com.liftoff.model.Difficulty.MEDIUM, "Moon must use medium difficulty");
         supplyTab(scene, 1);
         button(scene, "#instrument-lola").fire();
         supplyTab(scene, 2);
@@ -195,7 +201,7 @@ public final class SnapshotTool {
     private void verifyMars(Scene scene, GameSession session, CheckedAction next) {
         startMission(scene, "mars-drones", "curiosity-cruise", "mr-106", "mmrtg", "mars-2020-entry",
                 "perseverance");
-        require(session.difficulty() == com.liftoff.engine.sim.Difficulty.MISSION_DIRECTOR,
+        require(session.difficulty() == com.liftoff.model.Difficulty.HARD,
                 "Mars must use hard difficulty");
         supplyTab(scene, 1);
         button(scene, "#instrument-mastcam-z").fire();
@@ -273,6 +279,7 @@ public final class SnapshotTool {
     }
 
     private static javafx.scene.Node lookup(Scene scene, String selector) {
+        navigator.settle();
         scene.getRoot().applyCss();
         scene.getRoot().layout();
         return scene.lookup(selector);
@@ -295,6 +302,7 @@ public final class SnapshotTool {
     }
 
     private static void save(Scene scene, Path file) throws IOException {
+        navigator.settle();
         WritableImage image = scene.snapshot(null);
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();

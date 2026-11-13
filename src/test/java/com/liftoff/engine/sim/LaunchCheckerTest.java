@@ -1,11 +1,13 @@
 package com.liftoff.engine.sim;
 
 import com.liftoff.TestParts;
+import com.liftoff.engine.BuildReport;
 import com.liftoff.engine.sim.LaunchIssue.Kind;
+import com.liftoff.model.Destination;
 import com.liftoff.model.LaunchClass;
+import com.liftoff.model.Mission;
 import com.liftoff.model.MissionDesign;
-import com.liftoff.session.stub.BuildReport;
-import com.liftoff.session.stub.Mission;
+import com.liftoff.model.StepUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -60,7 +62,7 @@ class LaunchCheckerTest {
     @Test
     void aRocketWithOnlyEarthCapacityCannotLaunchToTheMoon() {
         MissionDesign design = SimFixtures.design();
-        Mission moon = new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 0, 0);
+        Mission moon = SimFixtures.mission("moon", Destination.MOON_SURFACE, StepUnit.DAY, 10, 0, 0, 0);
 
         List<Kind> kinds = kinds(LaunchChecker.check(design, moon, design.launchVehicle(), design.orbit()));
 
@@ -70,8 +72,8 @@ class LaunchCheckerTest {
     @Test
     void transferCapacityComesFromTheMissionDestinationWithoutAnEarthOrbit() {
         MissionDesign design = SimFixtures.design();
-        Mission moon = new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 0, 0);
-        Mission mars = new Mission("mars", Mission.Destination.MARS, Mission.StepUnit.MONTH, 6, 0, 0, 0);
+        Mission moon = SimFixtures.mission("moon", Destination.MOON_SURFACE, StepUnit.DAY, 10, 0, 0, 0);
+        Mission mars = SimFixtures.mission("mars", Destination.MARS_SURFACE, StepUnit.MONTH, 6, 0, 0, 0);
         var rocket = TestParts.rocket("transfer", Map.of(LaunchClass.TRANS_LUNAR, 200.0,
                 LaunchClass.TRANS_MARS, 100.0), 20);
 
@@ -123,7 +125,7 @@ class LaunchCheckerTest {
     void theTargetLatitudeIsOnlyCheckedForEarthMissions() {
         MissionDesign design = SimFixtures.design()
                 .withOrbit(TestParts.orbit("tilted", 700, 35, LaunchClass.POLAR));
-        Mission mars = new Mission("mars", Mission.Destination.MARS, Mission.StepUnit.MONTH, 12, 0, 0, 0);
+        Mission mars = SimFixtures.mission("mars", Destination.MARS_SURFACE, StepUnit.MONTH, 12, 0, 0, 0);
 
         List<Kind> kinds = kinds(LaunchChecker.check(design, mars, design.launchVehicle(), design.orbit()));
 

@@ -25,7 +25,7 @@ final class SlotShipView implements ShipView {
             var label = new Label();
             label.getStyleClass().add("slot-target");
             label.setMinWidth(210);
-            label.setGraphic(Icons.forModule(com.liftoff.session.stub.ModuleSlot.valueOf(slot.name()), 18));
+            label.setGraphic(Icons.forModule(slot, 18));
             targets.put(slot, label);
             showPart(slot, null);
             rows.getChildren().add(label);

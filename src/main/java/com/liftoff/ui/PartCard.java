@@ -1,7 +1,6 @@
 package com.liftoff.ui;
 
-import com.liftoff.render.Icons;
-import com.liftoff.session.stub.ShipPart;
+import com.liftoff.model.ShipPart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.input.ClipboardContent;
@@ -14,13 +13,13 @@ public final class PartCard extends Button {
     private final ShipPart part;
     private final UiText text;
 
-    PartCard(ShipPart part, UiText text, PartPreview preview, Runnable choose, Runnable endDrag) {
+    PartCard(ShipPart part, UiText text, Runnable choose, Runnable endDrag) {
         this.part = part;
         this.text = text;
         setId("part-" + part.id());
         getStyleClass().add("part-card");
         setContentDisplay(ContentDisplay.TOP);
-        setGraphic(preview.thumbnail(part, 100, 46));
+        setGraphic(PartPreview.thumbnail(part, 100, 46));
         setWrapText(true);
         setOnAction(event -> choose.run());
         setOnDragDetected(event -> {

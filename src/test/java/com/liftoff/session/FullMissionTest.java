@@ -1,21 +1,21 @@
 package com.liftoff.session;
 
 import com.liftoff.data.CatalogLoader;
+import com.liftoff.engine.BuildIssue;
 import com.liftoff.engine.ResourceLevel;
 import com.liftoff.engine.ResourceType;
 import com.liftoff.engine.score.Report;
 import com.liftoff.engine.score.Score;
 import com.liftoff.engine.score.ScoreRules;
-import com.liftoff.engine.sim.Difficulty;
 import com.liftoff.engine.sim.LaunchIssue;
 import com.liftoff.engine.sim.SimEventType;
 import com.liftoff.engine.sim.SimLimit;
 import com.liftoff.model.Catalog;
+import com.liftoff.model.Difficulty;
 import com.liftoff.model.MissionDesign;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.Mission.StepUnit;
-import com.liftoff.session.stub.BuildIssue;
-import com.liftoff.session.stub.ShipBuild;
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.ShipBuild;
+import com.liftoff.model.StepUnit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,7 +121,7 @@ class FullMissionTest {
         List<MissionLog.Entry> saved = new MissionLog(folder.resolve("mission-log.json")).entries();
         assertEquals(1, saved.size());
         assertEquals("farm-watch", saved.get(0).missionId());
-        assertEquals(Difficulty.CADET, saved.get(0).difficulty());
+        assertEquals(Difficulty.EASY, saved.get(0).difficulty());
         assertEquals(session.score().orElseThrow().total(), saved.get(0).score(), 1e-9);
         assertEquals(3, saved.get(0).stars());
         assertFalse(saved.get(0).finishedAt().isBlank());

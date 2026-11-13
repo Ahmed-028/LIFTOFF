@@ -1,6 +1,7 @@
 package com.liftoff.engine.sim;
 
-import com.liftoff.session.stub.Mission.Destination;
+import com.liftoff.model.Destination;
+import com.liftoff.model.Difficulty;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,36 +30,36 @@ class EventDeckTest {
 
     @Test
     void cadetNeverDrawsAnEvent() {
-        assertEquals(0, drawn(deck, Difficulty.CADET, 7));
+        assertEquals(0, drawn(deck, Difficulty.EASY, 7));
     }
 
     @Test
     void anEmptyDeckNeverDrawsAnEvent() {
-        assertEquals(0, drawn(EventDeck.empty(), Difficulty.MISSION_DIRECTOR, 7));
+        assertEquals(0, drawn(EventDeck.empty(), Difficulty.HARD, 7));
     }
 
     @Test
     void theSameSeedAndStepAlwaysDrawTheSameCard() {
         for (int step = 0; step < STEPS; step++) {
-            assertEquals(deck.draw(Difficulty.MISSION_DIRECTOR, 42, step),
-                    deck.draw(Difficulty.MISSION_DIRECTOR, 42, step));
+            assertEquals(deck.draw(Difficulty.HARD, 42, step),
+                    deck.draw(Difficulty.HARD, 42, step));
         }
     }
 
     @Test
     void differentSeedsGiveDifferentDraws() {
         List<Optional<EventCard>> first = IntStream.range(0, STEPS)
-                .mapToObj(step -> deck.draw(Difficulty.MISSION_DIRECTOR, 1, step)).toList();
+                .mapToObj(step -> deck.draw(Difficulty.HARD, 1, step)).toList();
         List<Optional<EventCard>> second = IntStream.range(0, STEPS)
-                .mapToObj(step -> deck.draw(Difficulty.MISSION_DIRECTOR, 2, step)).toList();
+                .mapToObj(step -> deck.draw(Difficulty.HARD, 2, step)).toList();
 
         assertFalse(first.equals(second));
     }
 
     @Test
     void harderDifficultiesDrawMoreEvents() {
-        long engineer = drawn(deck, Difficulty.ENGINEER, 7);
-        long director = drawn(deck, Difficulty.MISSION_DIRECTOR, 7);
+        long engineer = drawn(deck, Difficulty.MEDIUM, 7);
+        long director = drawn(deck, Difficulty.HARD, 7);
 
         assertTrue(engineer > 0);
         assertTrue(director > engineer, engineer + " vs " + director);
@@ -66,7 +67,7 @@ class EventDeckTest {
 
     @Test
     void aDeckCanBeNarrowedToTheEventsOfOneDestination() {
-        List<SimEventType> moon = deck.forDestination(Destination.MOON).cards().stream()
+        List<SimEventType> moon = deck.forDestination(Destination.MOON_SURFACE).cards().stream()
                 .map(EventCard::type).toList();
 
         assertEquals(List.of(SimEventType.SOLAR_STORM, SimEventType.LAUNCH_SLIP), moon);

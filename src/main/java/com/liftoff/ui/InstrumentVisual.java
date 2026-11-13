@@ -1,14 +1,14 @@
 package com.liftoff.ui;
 
 import com.liftoff.model.Instrument;
+import com.liftoff.render.Images;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 
 import java.util.Map;
 
@@ -50,11 +50,11 @@ final class InstrumentVisual {
 
     static Node hostImage(Instrument instrument) {
         var host = HOSTS.get(instrument.id());
-        var file = host == null ? null : InstrumentVisual.class.getResource("/com/liftoff/art/nasa/" + host.file() + ".jpg");
-        if (file == null) {
+        var picture = host == null ? null : Images.get("/com/liftoff/art/nasa/" + host.file() + ".jpg", 240, 120);
+        if (picture == null) {
             return null;
         }
-        var image = new ImageView(new Image(file.toExternalForm(), 240, 120, true, true));
+        var image = new ImageView(picture);
         image.setAccessibleText(host.name());
         return image;
     }

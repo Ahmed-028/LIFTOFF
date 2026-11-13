@@ -1,9 +1,12 @@
 package com.liftoff.ui;
 
 import com.liftoff.engine.sim.SimulationResult;
+import com.liftoff.session.Flight;
 import com.liftoff.session.MissionStep;
+import com.liftoff.util.Background;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,6 +14,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.util.Duration;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class FlyController extends MissionScreen {
@@ -26,13 +30,41 @@ public final class FlyController extends MissionScreen {
     private Timeline timer;
     private int index;
 
+    /**
+     * The flight is computed on a background thread and lands back here; until then the screen
+     * shows "Liftoff" and the playback buttons wait.
+     */
     @Override
     protected void setUp() {
-        flight = session.simulation().orElseGet(() -> session.fly(ThreadLocalRandom.current().nextLong()));
         time.setText(text.get("fly.ready"));
         telemetry.setText(text.get("fly.standby"));
         timer = new Timeline(new KeyFrame(Duration.millis(430), event -> showNextStep()));
         timer.setCycleCount(Timeline.INDEFINITE);
+        var flown = session.simulation();
+        if (flown.isPresent()) {
+            play(flown.get());
+            return;
+        }
+        playback.setDisable(true);
+        skip.setDisable(true);
+        Flight prepared = session.prepareFlight(ThreadLocalRandom.current().nextLong());
+        CompletableFuture.supplyAsync(prepared::compute, Background.POOL).whenComplete((outcome, problem) ->
+                Platform.runLater(() -> {
+                    if (isDisposed()) {
+                        return;
+                    }
+                    if (problem != null) {
+                        navigator.showError(problem.getCause() == null ? problem : problem.getCause());
+                    } else {
+                        play(session.land(outcome));
+                    }
+                }));
+    }
+
+    private void play(SimulationResult result) {
+        flight = result;
+        playback.setDisable(false);
+        skip.setDisable(false);
         if (flight.timeline().isEmpty()) {
             finish();
         } else {

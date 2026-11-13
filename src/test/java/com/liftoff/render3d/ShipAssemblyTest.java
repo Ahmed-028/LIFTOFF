@@ -49,13 +49,18 @@ class ShipAssemblyTest {
     }
 
     @Test
-    void repeatedSelectionsAndUnknownIdsPreserveTheExistingPart() {
+    void repeatedSelectionsKeepThePartAndAMissingModelShowsABoxInsteadOfFailing() {
         var ship = new ShipAssembly(new ModelLibrary());
         assertTrue(ship.showPart(POWER, "body-solar"));
         var power = ship.partNode(POWER);
         assertFalse(ship.showPart(POWER, "body-solar"));
-        assertThrows(IllegalArgumentException.class, () -> ship.showPart(POWER, "unknown"));
         assertSame(power, ship.partNode(POWER));
+        assertThrows(IllegalArgumentException.class, () -> ship.showPart(POWER, "not a valid id"));
+        assertSame(power, ship.partNode(POWER), "a refused id leaves the part in place");
+
+        assertTrue(ship.showPart(POWER, "unknown"));
+        assertNotNull(ship.partNode(POWER), "the game carries on with a labelled box");
+        assertTrue(ModelLibrary.failed("unknown"));
         assertTrue(ship.showPart(POWER, null));
         assertNull(ship.partNode(POWER));
     }

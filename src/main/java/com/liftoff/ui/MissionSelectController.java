@@ -23,6 +23,7 @@ public final class MissionSelectController implements ScreenController {
         for (MissionEntry mission : session.catalog().missions()) {
             var card = new ObjectiveCard(mission, text, () -> {
                 session.selectMission(mission.id());
+                PartPreview.prepare(session.catalog(), mission.id());
                 navigator.showMissionStep();
             });
             HBox.setHgrow(card, Priority.ALWAYS);

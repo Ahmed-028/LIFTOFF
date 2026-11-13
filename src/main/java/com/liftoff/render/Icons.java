@@ -1,8 +1,8 @@
 package com.liftoff.render;
 
+import com.liftoff.engine.BuildIssue;
 import com.liftoff.engine.ResourceType;
-import com.liftoff.session.stub.BuildIssue;
-import com.liftoff.session.stub.ModuleSlot;
+import com.liftoff.model.ModuleSlot;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;

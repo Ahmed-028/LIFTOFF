@@ -38,3 +38,13 @@ On Windows PowerShell or cmd, use `mvnw.cmd` in place of `./mvnw`.
 After `./mvnw test-compile dependency:build-classpath -Dmdep.outputFile=target/cp.txt`,
 run `com.liftoff.dev.SnapshotTool` from the test classes with that classpath;
 it writes a PNG of every screen to `target/snapshots/`.
+
+## Guard rails for changes
+
+| Check | What it protects |
+|---|---|
+| `GoldenEngineTest` | Every engine number, in full precision, for hundreds of seeded designs and flights. A refactor must leave `src/test/resources/com/liftoff/golden/` untouched; to accept a deliberate change of rules, run with `-Dgolden.update=true` and review the diff |
+| `PerformanceBudgetTest` | Generous time budgets for builds, flights, gauges, model copies and catalog loading |
+| `LeakTest` | Opens every screen 100 times; listeners and node counts must stay flat and closed screens must be collectable |
+| `com.liftoff.dev.PerfProbe` | Run like `SnapshotTool`: times start-up, opening the builder, part swaps and flights. `-Dprobe.readMs=1000` waits on the briefing as a player would |
+| `com.liftoff.render3d.ModelSimplifier` | Brings a model file under the 5,000-triangle budget |

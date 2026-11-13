@@ -19,13 +19,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.FutureTask;
+import javax.imageio.ImageIO;
 
 /** Captures the demo's closed and open states with the same scene snapshot method as SnapshotTool. */
 public final class HangarSnapshotTool {

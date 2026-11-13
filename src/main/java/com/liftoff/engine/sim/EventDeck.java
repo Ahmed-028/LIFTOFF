@@ -3,7 +3,8 @@ package com.liftoff.engine.sim;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.liftoff.session.stub.Mission.Destination;
+import com.liftoff.model.Destination;
+import com.liftoff.model.Difficulty;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,12 +47,21 @@ public final class EventDeck {
         }
     }
 
-    /** The deck bundled with the game; empty while events.json is not in the catalog. */
+    /** The deck bundled with the game; empty while events.json is not in the catalog. Read once. */
     public static EventDeck fromClasspath() {
-        try (InputStream in = EventDeck.class.getResourceAsStream(CATALOG_RESOURCE)) {
-            return in == null ? empty() : parse(new String(in.readAllBytes(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        return Bundled.DECK;
+    }
+
+    /** Holds the bundled deck; the file is read the first time it is asked for, then never again. */
+    private static final class Bundled {
+        static final EventDeck DECK = read();
+
+        private static EventDeck read() {
+            try (InputStream in = EventDeck.class.getResourceAsStream(CATALOG_RESOURCE)) {
+                return in == null ? empty() : parse(new String(in.readAllBytes(), StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 

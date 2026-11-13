@@ -1,6 +1,6 @@
 package com.liftoff.ui;
 
-import com.liftoff.session.stub.ShipPart;
+import com.liftoff.model.ShipPart;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 
 public final class PartStrip extends HBox {
     private final UiText text;
-    private final PartPreview preview;
     private final Consumer<ShipPart> onChoose;
     private final Consumer<ShipPart> onFocus;
     private final Runnable endDrag;
@@ -25,11 +24,10 @@ public final class PartStrip extends HBox {
     private final Button next;
     private final List<PartCard> buttons = new ArrayList<>();
 
-    PartStrip(UiText text, PartPreview preview, Consumer<ShipPart> onChoose,
+    PartStrip(UiText text, Consumer<ShipPart> onChoose,
               Consumer<ShipPart> onFocus, Runnable endDrag) {
         super(8);
         this.text = text;
-        this.preview = preview;
         this.onChoose = onChoose;
         this.onFocus = onFocus;
         this.endDrag = endDrag;
@@ -55,23 +53,7 @@ public final class PartStrip extends HBox {
         buttons.clear();
         cards.getChildren().clear();
         for (ShipPart part : parts) {
-            var card = new PartCard(part, text, preview, () -> onChoose.accept(part), endDrag);
-            int index = buttons.size();
-            card.focusedProperty().addListener((property, before, focused) -> {
-                if (focused) {
-                    reveal(card);
-                    onFocus.accept(part);
-                }
-            });
-            card.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                switch (event.getCode()) {
-                    case LEFT, UP -> move(index, -1);
-                    case RIGHT, DOWN -> move(index, 1);
-                    case ENTER -> card.fire();
-                    default -> { return; }
-                }
-                event.consume();
-            });
+            var card = card(part, buttons.size());
             buttons.add(card);
             cards.getChildren().add(card);
         }
@@ -81,6 +63,29 @@ public final class PartStrip extends HBox {
             buttons.stream().filter(card -> card.getId().equals("part-" + selected)).findFirst()
                     .ifPresent(card -> Platform.runLater(() -> reveal(card)));
         }
+    }
+
+    /** A card that follows focus into view, moves with the arrow keys and chooses with Enter. */
+    private PartCard card(ShipPart part, int index) {
+        var card = new PartCard(part, text, () -> onChoose.accept(part), endDrag);
+        card.focusedProperty().addListener((property, before, focused) -> {
+            if (focused) {
+                reveal(card);
+                onFocus.accept(part);
+            }
+        });
+        card.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            switch (event.getCode()) {
+                case LEFT, UP -> move(index, -1);
+                case RIGHT, DOWN -> move(index, 1);
+                case ENTER -> card.fire();
+                default -> {
+                    return;
+                }
+            }
+            event.consume();
+        });
+        return card;
     }
 
     void select(String selected) {

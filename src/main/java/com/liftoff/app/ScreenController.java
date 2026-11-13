@@ -13,4 +13,8 @@ public interface ScreenController {
     /** Called when the screen is replaced, so it can stop listening to the session. */
     default void dispose() {
     }
+
+    /** Applies at once any redraw still waiting for the next pulse. */
+    default void settle() {
+    }
 }

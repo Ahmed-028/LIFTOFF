@@ -1,8 +1,8 @@
 package com.liftoff.ui;
 
 import com.liftoff.app.LiftoffApp;
-import com.liftoff.session.stub.BuildIssue;
-import com.liftoff.session.stub.ModuleSlot;
+import com.liftoff.engine.BuildIssue;
+import com.liftoff.model.ModuleSlot;
 import org.junit.jupiter.api.Test;
 
 import java.util.Locale;

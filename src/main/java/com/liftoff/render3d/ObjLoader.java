@@ -31,12 +31,8 @@ public final class ObjLoader {
 
     private static Geometry parse(Reader reader) throws IOException {
         var lines = new BufferedReader(reader);
-        var points = new ArrayList<Float>();
-        var textures = new ArrayList<>(List.of(0f, 0f));
-        var faces = new LinkedHashMap<String, List<Integer>>();
-        String material = "hull";
+        var parser = new Parser();
         int lineNumber = 0;
-        int normals = 0;
         String line;
         while ((line = lines.readLine()) != null) {
             lineNumber++;
@@ -47,42 +43,57 @@ public final class ObjLoader {
             }
             String[] tokens = content.split("\\s+");
             try {
-                switch (tokens[0]) {
-                    case "v" -> {
-                        points.add(coordinate(tokens, 1));
-                        points.add(-coordinate(tokens, 2));
-                        points.add(coordinate(tokens, 3));
-                    }
-                    case "vt" -> {
-                        textures.add(coordinate(tokens, 1));
-                        textures.add(tokens.length > 2 ? 1 - coordinate(tokens, 2) : 0f);
-                    }
-                    case "vn" -> {
-                        coordinate(tokens, 1);
-                        coordinate(tokens, 2);
-                        coordinate(tokens, 3);
-                        normals++;
-                    }
-                    case "usemtl" -> material = tokens[1];
-                    case "f" -> {
-                        List<Corner> corners = new ArrayList<>();
-                        for (int i = 1; i < tokens.length; i++) {
-                            corners.add(corner(tokens[i], points.size() / 3, textures.size() / 2 - 1, normals));
-                        }
-                        triangulate(corners, points, faces.computeIfAbsent(material, key -> new ArrayList<>()));
-                    }
-                    default -> {
-                        // Object/group names and external material libraries are optional.
-                    }
-                }
+                parser.read(tokens);
             } catch (IllegalArgumentException | IndexOutOfBoundsException ex) {
                 throw new IOException("OBJ line " + lineNumber + ": invalid " + tokens[0], ex);
             }
         }
-        if (faces.isEmpty()) {
+        if (parser.faces.isEmpty()) {
             throw new IOException("OBJ contains no faces");
         }
-        return new Geometry(points, textures, faces);
+        return new Geometry(parser.points, parser.textures, parser.faces);
+    }
+
+    /** What has been read so far: points, texture coordinates and faces grouped by material. */
+    private static final class Parser {
+        final List<Float> points = new ArrayList<>();
+        final List<Float> textures = new ArrayList<>(List.of(0f, 0f));
+        final Map<String, List<Integer>> faces = new LinkedHashMap<>();
+        String material = "hull";
+        int normals;
+
+        void read(String[] tokens) {
+            switch (tokens[0]) {
+                case "v" -> {
+                    points.add(coordinate(tokens, 1));
+                    points.add(-coordinate(tokens, 2));
+                    points.add(coordinate(tokens, 3));
+                }
+                case "vt" -> {
+                    textures.add(coordinate(tokens, 1));
+                    textures.add(tokens.length > 2 ? 1 - coordinate(tokens, 2) : 0f);
+                }
+                case "vn" -> {
+                    coordinate(tokens, 1);
+                    coordinate(tokens, 2);
+                    coordinate(tokens, 3);
+                    normals++;
+                }
+                case "usemtl" -> material = tokens[1];
+                case "f" -> face(tokens);
+                default -> {
+                    // Object/group names and external material libraries are optional.
+                }
+            }
+        }
+
+        private void face(String[] tokens) {
+            List<Corner> corners = new ArrayList<>();
+            for (int i = 1; i < tokens.length; i++) {
+                corners.add(corner(tokens[i], points.size() / 3, textures.size() / 2 - 1, normals));
+            }
+            triangulate(corners, points, faces.computeIfAbsent(material, key -> new ArrayList<>()));
+        }
     }
 
     private static float coordinate(String[] tokens, int index) {

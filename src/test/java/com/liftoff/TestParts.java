@@ -15,6 +15,7 @@ import com.liftoff.model.Orbit;
 import com.liftoff.model.Requirement;
 import com.liftoff.model.ShipPart;
 import com.liftoff.model.SourceRef;
+import com.liftoff.model.StepUnit;
 import com.liftoff.model.ValueBasis;
 
 import java.util.List;
@@ -80,6 +81,26 @@ public final class TestParts {
         return new Mission(id, id, "", "", "", Difficulty.EASY, Destination.EARTH_ORBIT, true,
                 targetLatitudeDeg, false, required, List.of(), budgetCapMusd, 36, 12,
                 deltaVRequiredMs, 0, SOURCE);
+    }
+
+    /** A mission to another destination, with the share of the trip flown by the surface stage. */
+    public static Mission mission(String id, double budgetCapMusd, double deltaVRequiredMs,
+                                  Destination destination, double surfaceDeltaVRequiredMs) {
+        return new Mission(id, id, "", "", "", Difficulty.EASY, destination, true,
+                0, false, List.of(), List.of(), budgetCapMusd, 36, 12,
+                deltaVRequiredMs, 0, StepUnit.MONTH, 0, 0, surfaceDeltaVRequiredMs, SOURCE);
+    }
+
+    /** A payload with its own tanks (a Moon lander). */
+    public static ShipPart lander(String id, double massKg, double lengthM, double diameterM,
+                                  double tanksKg, double costMusd) {
+        return shipPart(id, ModuleSlot.SATELLITE, massKg, 0, 0, 0, 0, 0, lengthM, diameterM, 0, tanksKg, costMusd);
+    }
+
+    /** A cargo bay with its own tanks (a Mars entry and descent stage). */
+    public static ShipPart entryStage(String id, double massKg, double payloadKg, double lengthM,
+                                      double diameterM, double tanksKg, double costMusd) {
+        return shipPart(id, ModuleSlot.CARGO_BAY, massKg, 0, 0, payloadKg, lengthM, diameterM, 0, 0, 0, tanksKg, costMusd);
     }
 
     /** The main body: carries cargo up to payloadKg and holds tanksKg of propellant. */

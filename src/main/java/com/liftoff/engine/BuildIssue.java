@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * One thing wrong with the ship, with the two numbers the warning sentence needs
  * ("Your parts need {needed} W. Your power system gives {available} W.").
- * slot is the tab the warning sits next to; null for OVER_BUDGET, which concerns the whole ship.
+ * slot is the tab the warning sits next to; null for OVER_BUDGET and SUPPLIES_SHORT, which concern the whole ship.
  */
 public record BuildIssue(Kind kind, ModuleSlot slot, double needed, double available) {
 
@@ -24,8 +24,10 @@ public record BuildIssue(Kind kind, ModuleSlot slot, double needed, double avail
         POWER_SHORT,
         /** The trip needs more propellant than the airframe's tanks hold (kg). */
         FUEL_SHORT,
-        /** The parts cost more than the mission's budget ($M). */
-        OVER_BUDGET
+        /** The mission costs more than its budget ($M). */
+        OVER_BUDGET,
+        /** Fewer crew supplies packed than the crew needs for the trip (kg). Concerns no tab. */
+        SUPPLIES_SHORT
     }
 
     public BuildIssue {

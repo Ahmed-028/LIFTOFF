@@ -13,14 +13,27 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
 import java.util.OptionalDouble;
 
 public final class BuildGauges extends StackPane {
     private final UiText text;
     private final boolean expanded;
     private final Pane gauges;
+    /** The figures shown now, so unchanged gauges are not rebuilt. */
+    private Object shown;
 
-    BuildGauges(UiText text, boolean expanded) {
+    /** Mass, budget, power and fuel in one row, for the builder. */
+    static BuildGauges row(UiText text) {
+        return new BuildGauges(text, false);
+    }
+
+    /** Every gauge in a column, data, contact and time included. */
+    static BuildGauges column(UiText text) {
+        return new BuildGauges(text, true);
+    }
+
+    private BuildGauges(UiText text, boolean expanded) {
         this.text = text;
         this.expanded = expanded;
         getStyleClass().add("gauges");
@@ -32,6 +45,10 @@ public final class BuildGauges extends StackPane {
     void refresh(GameSession session) {
         var resources = session.missionResources();
         var build = session.buildReport();
+        if (List.of(resources, build).equals(shown)) {
+            return;
+        }
+        shown = List.of(resources, build);
         gauges.getChildren().clear();
         add(resources.get(ResourceType.MASS));
         add(resources.get(ResourceType.BUDGET));

@@ -1,6 +1,6 @@
 package com.liftoff.engine.sim;
 
-import com.liftoff.session.stub.Mission.StepUnit;
+import com.liftoff.model.StepUnit;
 
 import java.util.List;
 

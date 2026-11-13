@@ -1,9 +1,9 @@
 package com.liftoff.ui;
 
+import com.liftoff.engine.BuildIssue;
 import com.liftoff.engine.DesignIssue;
 import com.liftoff.engine.sim.LaunchIssue;
 import com.liftoff.render.Icons;
-import com.liftoff.session.stub.BuildIssue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -12,6 +12,8 @@ import java.util.List;
 
 public final class WarningList extends VBox {
     private final UiText text;
+    /** What the list shows now, so an unchanged list is not rebuilt. */
+    private Object shown;
 
     WarningList(UiText text) {
         super(6);
@@ -31,17 +33,33 @@ public final class WarningList extends VBox {
     }
 
     void showBuild(List<BuildIssue> issues) {
-        getChildren().setAll(issues.stream()
-                .map(issue -> warning(describe(text, issue), Icons.forWarning(issue.kind(), 18))).toList());
+        show(issues, List.of());
     }
 
-    void addDesign(List<DesignIssue> issues) {
-        issues.forEach(issue -> getChildren().add(warning(describe(text, issue), Icons.warning(18))));
+    /** The build's warnings, then the design's. Redrawn only when either list changed. */
+    void show(List<BuildIssue> build, List<DesignIssue> design) {
+        if (unchanged(List.of(build, design))) {
+            return;
+        }
+        getChildren().setAll(build.stream()
+                .map(issue -> warning(describe(text, issue), Icons.forWarning(issue.kind(), 18))).toList());
+        design.forEach(issue -> getChildren().add(warning(describe(text, issue), Icons.warning(18))));
     }
 
     void showLaunch(List<LaunchIssue> issues) {
+        if (unchanged(issues)) {
+            return;
+        }
         getChildren().setAll(issues.stream().map(issue ->
                 warning(text.get(issue.messageKey(), issue.needed(), issue.available()), Icons.warning(18))).toList());
+    }
+
+    private boolean unchanged(Object shown) {
+        if (shown.equals(this.shown)) {
+            return true;
+        }
+        this.shown = shown;
+        return false;
     }
 
     private Label warning(String content, Node icon) {

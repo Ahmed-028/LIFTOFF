@@ -2,6 +2,9 @@ package com.liftoff.engine;
 
 import com.liftoff.model.Orbit;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /** First-order orbit calculations for circular Earth orbits. */
 public final class OrbitMath {
 
@@ -15,6 +18,18 @@ public final class OrbitMath {
 
     /** Steps around the orbit used to average the time in view. */
     private static final int ORBIT_SAMPLES = 7200;
+
+    /**
+     * Contact minutes already worked out. Keyed by the figures the answer depends on, not by catalog
+     * id, so two orbits that share an id but not an altitude can never be confused. Values never
+     * change once stored. The catalog has a handful of orbits and stations; the bound only stops a
+     * caller sweeping latitudes from growing it without end.
+     */
+    private static final Map<ContactKey, Double> CONTACT = new ConcurrentHashMap<>();
+    private static final int CONTACT_CACHE_LIMIT = 4096;
+
+    private record ContactKey(double altitudeKm, double inclinationDeg, double stationLatitudeDeg) {
+    }
 
     private OrbitMath() {
     }
@@ -49,6 +64,21 @@ public final class OrbitMath {
      * the station's view angle at the spacecraft's current latitude.
      */
     public static double contactMinutesPerDay(Orbit orbit, double stationLatitudeDeg) {
+        var key = new ContactKey(orbit.altitudeKm(), orbit.inclinationDeg(), stationLatitudeDeg);
+        Double known = CONTACT.get(key);
+        if (known != null) {
+            return known;
+        }
+        if (CONTACT.size() >= CONTACT_CACHE_LIMIT) {
+            CONTACT.clear();
+        }
+        double minutes = averageContactMinutes(key);
+        CONTACT.put(key, minutes);
+        return minutes;
+    }
+
+    private static double averageContactMinutes(ContactKey orbit) {
+        double stationLatitudeDeg = orbit.stationLatitudeDeg();
         double viewAngle = Math.toRadians(viewAngleDeg(orbit.altitudeKm(), GameRules.MIN_ELEVATION_DEG));
         double inclination = Math.toRadians(orbit.inclinationDeg());
         double stationLatitude = Math.toRadians(stationLatitudeDeg);

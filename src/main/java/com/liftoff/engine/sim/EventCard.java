@@ -1,7 +1,7 @@
 package com.liftoff.engine.sim;
 
+import com.liftoff.model.Destination;
 import com.liftoff.model.SourceRef;
-import com.liftoff.session.stub.Mission.Destination;
 
 import java.util.List;
 

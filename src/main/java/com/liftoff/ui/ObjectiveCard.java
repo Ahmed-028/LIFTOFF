@@ -1,7 +1,8 @@
 package com.liftoff.ui;
 
 import com.liftoff.data.MissionEntry;
-import com.liftoff.engine.sim.Difficulty;
+import com.liftoff.model.Difficulty;
+import com.liftoff.render.Images;
 import com.liftoff.render.ObjectiveArt;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
@@ -18,7 +19,7 @@ public final class ObjectiveCard extends VBox {
         var goal = mission.briefing();
         getStyleClass().add("objective-card");
         setMaxWidth(Double.MAX_VALUE);
-        boolean recommended = mission.ladder() && mission.difficulty() == Difficulty.CADET;
+        boolean recommended = mission.ladder() && mission.difficulty() == Difficulty.EASY;
         if (recommended) {
             getStyleClass().add("recommended");
         }
@@ -51,12 +52,11 @@ public final class ObjectiveCard extends VBox {
         holder.setMinHeight(height);
         holder.setPrefHeight(height);
         holder.setMaxHeight(height);
-        var resource = ObjectiveCard.class.getResource("/com/liftoff/art/" + missionId + ".jpg");
-        if (resource == null) {
+        Image image = Images.get("/com/liftoff/art/" + missionId + ".jpg");
+        if (image == null) {
             holder.getChildren().setAll(ObjectiveArt.forObjective(missionId, height * .72));
             return;
         }
-        Image image = new Image(resource.toExternalForm());
         ImageView picture = new ImageView(image);
         picture.setManaged(false);
         picture.setFitHeight(height);

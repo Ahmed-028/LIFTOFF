@@ -110,6 +110,18 @@ final class ShipAssembly {
                 this::updatePayloadVisibility);
     }
 
+    boolean isCalmMode() {
+        return calmMode;
+    }
+
+    boolean isCargoBayOpen() {
+        return bayOpen;
+    }
+
+    boolean isAnimating() {
+        return doors.isAnimating() || mounts.values().stream().anyMatch(mount -> mount.snap != null);
+    }
+
     private void updatePayloadVisibility() {
         anchor(SATELLITE).setVisible(bayOpen);
     }

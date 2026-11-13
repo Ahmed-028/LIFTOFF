@@ -1,8 +1,8 @@
 package com.liftoff.ui;
 
-import com.liftoff.session.stub.Mission;
-import com.liftoff.render.Icons;
 import com.liftoff.engine.sim.SimRules;
+import com.liftoff.model.Destination;
+import com.liftoff.render.Icons;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -32,7 +32,7 @@ public final class BriefingController extends MissionScreen {
         addLimit(text.get("briefing.budget", goal.budgetCapMusd()), Icons.coin(24));
         addLimit(text.get("briefing.deadline", goal.deadlineMonths()), Icons.clock(24));
         addLimit(duration, Icons.clock(24));
-        if (mission.destination() == Mission.Destination.EARTH) {
+        if (mission.destination() == Destination.EARTH_ORBIT) {
             addLimit(text.get("briefing.latitude", goal.targetLatitudeDeg()), Icons.warning(24));
         } else {
             addLimit(text.get("briefing.deltaV", mission.deltaVRequiredMs()), Icons.fuel(24));

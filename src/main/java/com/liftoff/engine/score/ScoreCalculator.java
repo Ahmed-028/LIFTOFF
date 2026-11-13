@@ -1,5 +1,6 @@
 package com.liftoff.engine.score;
 
+import com.liftoff.engine.BuildReport;
 import com.liftoff.engine.ResourceLevel;
 import com.liftoff.engine.ResourceReport;
 import com.liftoff.engine.ResourceType;
@@ -7,11 +8,12 @@ import com.liftoff.engine.ResourceUsage;
 import com.liftoff.engine.sim.SimRules;
 import com.liftoff.engine.sim.SimulationResult;
 import com.liftoff.model.Capability;
+import com.liftoff.model.Destination;
 import com.liftoff.model.Instrument;
+import com.liftoff.model.Mission;
 import com.liftoff.model.MissionDesign;
 import com.liftoff.model.Requirement;
-import com.liftoff.session.stub.BuildReport;
-import com.liftoff.session.stub.Mission;
+import com.liftoff.model.StepUnit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,23 +31,23 @@ public final class ScoreCalculator {
      */
     public static Score score(MissionDesign design, ResourceReport resources, BuildReport build,
                               SimulationResult sim, Mission mission) {
-        return score(design, resources, build, sim, mission, false);
+        return score(design, resources, build, sim, mission, build == null ? 0 : build.costMusd());
     }
 
     /** Scores a report whose budget already includes the modular ship. */
     public static Score scoreCombined(MissionDesign design, ResourceReport resources, BuildReport build,
                                       SimulationResult sim, Mission mission) {
-        return score(design, resources, build, sim, mission, true);
+        return score(design, resources, build, sim, mission, 0);
     }
 
     private static Score score(MissionDesign design, ResourceReport resources, BuildReport build,
-                               SimulationResult sim, Mission mission, boolean includesShipCost) {
+                               SimulationResult sim, Mission mission, double shipCostNotInResourcesMusd) {
         double science = ScoreRules.SCIENCE_POINTS * scienceFraction(design, sim, mission);
         double margins = ScoreRules.MARGIN_POINTS * marginShare(resources, build, mission);
 
         ResourceUsage budget = resources.get(ResourceType.BUDGET);
         ResourceUsage time = resources.get(ResourceType.TIME);
-        double costMusd = budget.used() + (includesShipCost || build == null ? 0 : build.costMusd());
+        double costMusd = budget.used() + shipCostNotInResourcesMusd;
         double months = time.used() + (sim == null ? 0 : sim.launchSlipMonths());
         double budgetTime = ScoreRules.BUDGET_POINTS * withinCap(costMusd, budget.capacity())
                 + ScoreRules.TIME_POINTS * withinCap(months, time.capacity());
@@ -82,7 +84,7 @@ public final class ScoreCalculator {
      */
     public static double requiredDataGbit(MissionDesign design, Mission mission) {
         double perDay = design.instruments().stream().mapToDouble(Instrument::dataGbitPerDay).sum();
-        boolean inDays = mission.stepUnit() == Mission.StepUnit.DAY;
+        boolean inDays = mission.stepUnit() == StepUnit.DAY;
         int steps = mission.steps() > 0 ? mission.steps() : design.scienceMonths();
         if (!inDays && design.objective() != null) {
             steps = Math.max(steps, design.objective().minScienceMonths());
@@ -125,7 +127,7 @@ public final class ScoreCalculator {
             credit += credit(resources.get(type).level());
             counted++;
         }
-        if (mission.destination() != Mission.Destination.EARTH) {
+        if (mission.destination() != Destination.EARTH_ORBIT) {
             credit += credit(build == null ? ResourceLevel.UNKNOWN : build.fuelLevel());
             counted++;
         }

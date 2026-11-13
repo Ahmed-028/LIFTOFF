@@ -1,12 +1,14 @@
 package com.liftoff.engine;
 
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Map;
 
-/** The six resources of one design. */
+/** The six resources of one design, always listed in the order of {@link ResourceType}. */
 public record ResourceReport(Map<ResourceType, ResourceUsage> usages) {
 
     public ResourceReport {
-        usages = Map.copyOf(usages);
+        usages = Collections.unmodifiableMap(new EnumMap<>(usages));
     }
 
     public ResourceUsage get(ResourceType type) {

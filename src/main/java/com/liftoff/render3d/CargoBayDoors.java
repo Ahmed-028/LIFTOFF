@@ -87,6 +87,10 @@ final class CargoBayDoors {
         setOpen(open, false, settled);
     }
 
+    boolean isAnimating() {
+        return animation != null;
+    }
+
     double leftAngle() {
         return left.getAngle();
     }
