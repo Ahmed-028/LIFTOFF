@@ -1,0 +1,58 @@
+[
+  {
+    "id": "electron",
+    "name": "Electron",
+    "kidName": "Little Lifter",
+    "description": "A small rocket for small spacecraft. By far the cheapest ride, but it cannot lift much.",
+    "capacityKg": { "LOW_INCLINATION": 300, "POLAR": 200 },
+    "costMusd": 7.5,
+    "costBasis": "PUBLISHED",
+    "source": {
+      "title": "Rocket Lab, Electron",
+      "detail": "300 kg to low Earth orbit (Rocket Lab); 200 kg to sun-synchronous orbit (Rocket Lab figure as quoted by Wikipedia). Cost is the publicly stated launch price as reported in the press, not a NASA contract value.",
+      "url": "https://rocketlabcorp.com/launch/electron/"
+    }
+  },
+  {
+    "id": "pegasus-xl",
+    "name": "Pegasus XL",
+    "kidName": "Sky Dart",
+    "description": "A winged rocket dropped from an aeroplane. It carries small satellites to low orbit.",
+    "capacityKg": { "LOW_INCLINATION": 453.59 },
+    "costMusd": 56.3,
+    "costBasis": "PUBLISHED",
+    "source": {
+      "title": "NASA Launch Services Program Rockets; NASA launch services contract release for ICON",
+      "detail": "Up to 1,000 pounds (453.59 kg) into low Earth orbit. Cost is NASA's total cost to launch ICON. No polar figure has been sourced yet.",
+      "url": "https://www.nasa.gov/launch-services-program-rockets"
+    }
+  },
+  {
+    "id": "falcon-9",
+    "name": "Falcon 9",
+    "kidName": "Heavy Hauler",
+    "description": "A large rocket that can lift very heavy spacecraft to low orbit.",
+    "capacityKg": { "LOW_INCLINATION": 22800 },
+    "costMusd": 80.4,
+    "costBasis": "PUBLISHED",
+    "source": {
+      "title": "SpaceX Falcon 9 capacity (as quoted by Wikipedia); NASA launch services contract release for PACE",
+      "detail": "22,800 kg to low Earth orbit at 28.5 degrees, expendable. Cost is NASA's total cost to launch PACE. No polar figure has been sourced yet.",
+      "url": "https://www.nasa.gov/news-release/nasa-awards-launch-services-contract-for-earth-science-mission/"
+    }
+  },
+  {
+    "id": "atlas-v-401",
+    "name": "Atlas V 401",
+    "kidName": "Big Reliable",
+    "description": "A large rocket that has launched Landsat satellites. It can reach polar orbits with heavy spacecraft, at a high price.",
+    "capacityKg": { "LOW_INCLINATION": 9800, "POLAR": 8080 },
+    "costMusd": 153.8,
+    "costBasis": "PUBLISHED",
+    "source": {
+      "title": "United Launch Alliance, Atlas V performance; NASA launch services contract release for Landsat 9",
+      "detail": "401 configuration: 9,800 kg to LEO at 28.7 degrees, 8,080 kg to LEO at 90 degrees. Cost is NASA's total cost to launch Landsat 9.",
+      "url": "https://www.ulalaunch.com/rockets/atlas-v"
+    }
+  }
+]

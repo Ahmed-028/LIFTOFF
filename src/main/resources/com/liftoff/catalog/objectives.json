@@ -1,0 +1,65 @@
+[
+  {
+    "id": "farm-watch",
+    "title": "Farm Watch",
+    "question": "How healthy are the crops of the Nile Delta, and how much water do they use?",
+    "description": "Farmers need to know which fields are thriving and which are thirsty. Build a spacecraft that can see single fields from space.",
+    "basedOn": "Landsat and EO-1",
+    "targetLatitudeDeg": 31,
+    "prefersSunSynchronous": true,
+    "required": [
+      { "type": "LAND_IMAGING", "maxResolutionM": 30 }
+    ],
+    "bonus": [ "THERMAL_IMAGING" ],
+    "budgetCapMusd": 450,
+    "deadlineMonths": 78,
+    "minScienceMonths": 24,
+    "source": {
+      "title": "NASA Landsat Science, Operational Land Imager",
+      "detail": "30 m imagery is described as sufficient to distinguish features such as urban centres, farms and forests. Budget, deadline and duration are scenario settings.",
+      "url": "https://landsat.gsfc.nasa.gov/satellites/landsat-8/spacecraft-instruments/operational-land-imager/"
+    }
+  },
+  {
+    "id": "storm-chasers",
+    "title": "Storm Chasers",
+    "question": "How much rain falls inside tropical storms?",
+    "description": "Tropical storms bring floods. Build a spacecraft that can measure rain from above, even through thick cloud.",
+    "basedOn": "TRMM",
+    "targetLatitudeDeg": 35,
+    "prefersSunSynchronous": false,
+    "required": [
+      { "type": "RAIN_MICROWAVE", "maxResolutionM": null }
+    ],
+    "bonus": [ "LIGHTNING", "CLOUD_IMAGING" ],
+    "budgetCapMusd": 200,
+    "deadlineMonths": 60,
+    "minScienceMonths": 12,
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "TRMM mission and instruments, PDF p. 256-261. Budget, deadline and duration are scenario settings.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "ice-patrol",
+    "title": "Ice Patrol",
+    "question": "Are the polar ice sheets getting thinner?",
+    "description": "The great ice sheets sit near the poles. Build a spacecraft that can measure the height of the ice, year after year.",
+    "basedOn": "ICESat",
+    "targetLatitudeDeg": 86,
+    "prefersSunSynchronous": false,
+    "required": [
+      { "type": "ICE_HEIGHT_LASER", "maxResolutionM": null }
+    ],
+    "bonus": [ "SEA_ICE_MICROWAVE" ],
+    "budgetCapMusd": 600,
+    "deadlineMonths": 108,
+    "minScienceMonths": 36,
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "ICESat mission and GLAS, PDF p. 176-177. ICESat's 94 degree orbit reaches latitude 86 degrees. Budget, deadline and duration are scenario settings.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  }
+]

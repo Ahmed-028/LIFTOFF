@@ -1,0 +1,50 @@
+[
+  {
+    "id": "tropical-402",
+    "name": "Tropical low orbit (402 km, 35 degrees)",
+    "kidName": "Tropics Loop",
+    "description": "Circles low over the warm middle of the Earth and passes the tropics again and again. It never flies over the far north or south.",
+    "basedOn": "TRMM",
+    "altitudeKm": 402,
+    "inclinationDeg": 35,
+    "sunSynchronous": false,
+    "launchClass": "LOW_INCLINATION",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key TRMM Facts, PDF p. 256.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "sso-705",
+    "name": "Sun-synchronous orbit (705 km, 98.2 degrees)",
+    "kidName": "Sun-Follower",
+    "description": "Passes over each place at the same time of day, so the sunlight in every picture matches. It reaches high latitudes but not the poles themselves.",
+    "basedOn": "Aqua and Landsat 7",
+    "altitudeKm": 705,
+    "inclinationDeg": 98.2,
+    "sunSynchronous": true,
+    "launchClass": "POLAR",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key Aqua Facts, PDF p. 86; Key Landsat 7 Facts, PDF p. 188.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "polar-600",
+    "name": "Near-polar orbit (600 km, 94 degrees)",
+    "kidName": "Pole Crosser",
+    "description": "Flies almost straight over the top and bottom of the Earth, so it can see the ice near both poles.",
+    "basedOn": "ICESat",
+    "altitudeKm": 600,
+    "inclinationDeg": 94,
+    "sunSynchronous": false,
+    "launchClass": "POLAR",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key ICESat Facts, PDF p. 176.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  }
+]

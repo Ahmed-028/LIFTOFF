@@ -1,0 +1,71 @@
+[
+  {
+    "id": "sorce-class",
+    "name": "Small bus (SORCE class)",
+    "kidName": "Scout",
+    "description": "A small, light spacecraft body. Cheap and quick to build, but it can only carry and power a little, and its radio is slow.",
+    "basedOn": "SORCE",
+    "massKg": 248.4,
+    "massBasis": "DERIVED",
+    "payloadMassKg": 66.6,
+    "payloadPowerW": 61.3,
+    "payloadBasis": "DERIVED",
+    "downlinkMbps": 1.5,
+    "designLifeMonths": 60,
+    "costMusd": 37.26,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 24,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key SORCE Facts and instrument facts, PDF p. 232-235. Bus mass = 315 kg spacecraft minus 66.6 kg of instruments flown.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "eo1-class",
+    "name": "Medium bus (EO-1 class)",
+    "kidName": "Explorer",
+    "description": "A mid-sized spacecraft body with a fast X-band radio. Room for one or two modest instruments.",
+    "basedOn": "EO-1",
+    "massKg": 428.5,
+    "massBasis": "DERIVED",
+    "payloadMassKg": 100.5,
+    "payloadPowerW": 115,
+    "payloadBasis": "DERIVED",
+    "downlinkMbps": 105,
+    "designLifeMonths": 18,
+    "costMusd": 64.28,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 30,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key EO-1 Facts and instrument facts, PDF p. 142-144. Bus mass = 529 kg spacecraft minus 100.5 kg of instruments (ALI and LAC).",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "landsat7-class",
+    "name": "Large bus (Landsat 7 class)",
+    "kidName": "Workhorse",
+    "description": "A big, strong spacecraft body that can carry and power a heavy instrument and send data home very fast. Costly and slow to build.",
+    "basedOn": "Landsat 7",
+    "massKg": 1557,
+    "massBasis": "DERIVED",
+    "payloadMassKg": 425,
+    "payloadPowerW": 590,
+    "payloadBasis": "DERIVED",
+    "downlinkMbps": 150,
+    "designLifeMonths": 60,
+    "costMusd": 233.55,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 42,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key Landsat 7 Facts and Key ETM+ Facts, PDF p. 188-190. Bus mass = 1982 kg spacecraft minus the 425 kg ETM+. Downlink is one of its three 150 Mbps links.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "svalbard",
+    "name": "KSAT Svalbard, Norway",
+    "kidName": "Arctic Ear",
+    "latitudeDeg": 78.2,
+    "longitudeDeg": 15.4,
+    "bands": "S/X",
+    "costMusdPerMonth": 0.15,
+    "costBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Near Space Network Complexes",
+      "detail": "Commercial ground stations list. Coordinates are the site location to about 0.1 degree.",
+      "url": "https://www.nasa.gov/technology/space-comms/near-space-network-complexes/"
+    }
+  },
+  {
+    "id": "fairbanks",
+    "name": "Alaska Satellite Facility, Fairbanks",
+    "kidName": "Alaska Ear",
+    "latitudeDeg": 64.9,
+    "longitudeDeg": -147.9,
+    "bands": "S/X",
+    "costMusdPerMonth": 0.15,
+    "costBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Near Space Network Complexes",
+      "detail": "Government ground stations list. Coordinates are the site location to about 0.1 degree.",
+      "url": "https://www.nasa.gov/technology/space-comms/near-space-network-complexes/"
+    }
+  },
+  {
+    "id": "wallops",
+    "name": "Wallops Ground Station, Virginia",
+    "kidName": "Virginia Ear",
+    "latitudeDeg": 37.9,
+    "longitudeDeg": -75.5,
+    "bands": "S/X",
+    "costMusdPerMonth": 0.15,
+    "costBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Near Space Network Complexes",
+      "detail": "Government ground stations list. Coordinates are the site location to about 0.1 degree.",
+      "url": "https://www.nasa.gov/technology/space-comms/near-space-network-complexes/"
+    }
+  },
+  {
+    "id": "south-point",
+    "name": "South Point, Hawaii",
+    "kidName": "Hawaii Ear",
+    "latitudeDeg": 19.0,
+    "longitudeDeg": -155.7,
+    "bands": "S/X",
+    "costMusdPerMonth": 0.15,
+    "costBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Near Space Network Complexes",
+      "detail": "Commercial ground stations list. Coordinates are the site location to about 0.1 degree.",
+      "url": "https://www.nasa.gov/technology/space-comms/near-space-network-complexes/"
+    }
+  },
+  {
+    "id": "singapore",
+    "name": "KSAT Singapore",
+    "kidName": "Equator Ear",
+    "latitudeDeg": 1.3,
+    "longitudeDeg": 103.8,
+    "bands": "S/X",
+    "costMusdPerMonth": 0.15,
+    "costBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Near Space Network Complexes",
+      "detail": "Commercial ground stations list. Coordinates are the site location to about 0.1 degree.",
+      "url": "https://www.nasa.gov/technology/space-comms/near-space-network-complexes/"
+    }
+  },
+  {
+    "id": "mcmurdo",
+    "name": "McMurdo Ground Station, Antarctica",
+    "kidName": "Antarctic Ear",
+    "latitudeDeg": -77.8,
+    "longitudeDeg": 166.7,
+    "bands": "S/X",
+    "costMusdPerMonth": 0.15,
+    "costBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Near Space Network Complexes",
+      "detail": "Government ground stations list. Coordinates are the site location to about 0.1 degree.",
+      "url": "https://www.nasa.gov/technology/space-comms/near-space-network-complexes/"
+    }
+  }
+]

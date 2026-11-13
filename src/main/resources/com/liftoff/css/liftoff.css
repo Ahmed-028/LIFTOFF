@@ -1,0 +1,168 @@
+/* LIFTOFF visual identity. Tokens match docs/02-visual-identity.md and render/Palette.java. */
+
+.root {
+    -color-space-900: #0F1535;
+    -color-space-700: #1B2559;
+    -color-space-500: #2E3A80;
+    -color-paper: #FFF8E7;
+    -color-ink: #1B1B3A;
+    -color-star: #FFFFFF;
+    -color-mist: #C9D4FF;
+    -color-rocket: #FF6B35;
+    -color-sky: #3EC1F3;
+
+    /* Rounded system font until Baloo 2 and Comic Neue are bundled (roadmap M2). */
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 18px;
+    -fx-background-color: -color-space-900;
+}
+
+.screen {
+    -fx-background-color: linear-gradient(to bottom, -color-space-900, -color-space-700);
+    -fx-padding: 24;
+}
+
+/* A scroll pane that shows only its content, no box of its own. */
+.clear-scroll,
+.clear-scroll > .viewport {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* ---------- Text ---------- */
+
+.label {
+    -fx-text-fill: -color-star;
+}
+
+.game-title {
+    -fx-font-size: 96px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-rocket;
+}
+
+.tagline {
+    -fx-font-size: 28px;
+    -fx-text-fill: -color-mist;
+}
+
+.screen-heading {
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Buttons ---------- */
+
+.button {
+    -fx-background-radius: 28;
+    -fx-border-radius: 28;
+    -fx-border-width: 3;
+    -fx-border-color: transparent;
+    -fx-padding: 12 28;
+    -fx-min-height: 56;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 10;
+}
+
+.button.primary {
+    -fx-background-color: -color-rocket;
+    -fx-text-fill: -color-ink;
+}
+
+.button.primary:hover {
+    -fx-background-color: derive(-color-rocket, 20%);
+}
+
+.button.primary:pressed {
+    -fx-background-color: derive(-color-rocket, -15%);
+}
+
+.button.big {
+    -fx-font-size: 28px;
+    -fx-padding: 16 48;
+    -fx-min-height: 72;
+}
+
+.button.secondary {
+    -fx-background-color: -color-space-500;
+    -fx-text-fill: -color-star;
+}
+
+.button.secondary:hover {
+    -fx-background-color: derive(-color-space-500, 20%);
+}
+
+.button:focused {
+    -fx-border-color: -color-sky;
+}
+
+/* ---------- Objective cards ---------- */
+
+.objective-card {
+    -fx-background-color: -color-paper;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-width: 5;
+    -fx-border-color: transparent;
+    -fx-padding: 20;
+    -fx-spacing: 8;
+    -fx-pref-width: 360;
+    -fx-max-width: 420;
+}
+
+.objective-card.chosen {
+    -fx-border-color: -color-sky;
+}
+
+.objective-card .label {
+    -fx-text-fill: -color-ink;
+}
+
+.card-title {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+.card-question {
+    -fx-font-size: 19px;
+}
+
+.card-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-opacity: 0.75;
+}
+
+.card-needs {
+    -fx-font-size: 18px;
+}
+
+.card-limits {
+    -fx-spacing: 24;
+    -fx-padding: 8 0 0 0;
+}
+
+.card-limit {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Briefing ---------- */
+
+.briefing {
+    -fx-background-color: -color-space-500;
+    -fx-background-radius: 20;
+    -fx-padding: 16 24;
+}
+
+.briefing-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.briefing-body {
+    -fx-font-size: 18px;
+    -fx-text-fill: -color-mist;
+}

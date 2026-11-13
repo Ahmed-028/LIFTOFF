@@ -1,0 +1,247 @@
+[
+  {
+    "id": "ali",
+    "name": "Advanced Land Imager (ALI)",
+    "kidName": "Pocket Land Camera",
+    "description": "A small, light camera that takes sharp colour pictures of the land, one scene at a time.",
+    "flewOn": "EO-1",
+    "massKg": 90,
+    "avgPowerW": 100,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 67.8,
+    "dataBasis": "DERIVED",
+    "capabilities": [
+      { "type": "LAND_IMAGING", "resolutionM": 30 }
+    ],
+    "costMusd": 45.0,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 30,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key ALI Facts, PDF p. 143-144. Average data rate derived from 55 Mbps and about 120 scenes per week.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "etm-plus",
+    "name": "Enhanced Thematic Mapper Plus (ETM+)",
+    "kidName": "Big Land Mapper",
+    "description": "A big scanner that maps wide strips of land in colour and also feels heat from the ground.",
+    "flewOn": "Landsat 7",
+    "massKg": 425,
+    "avgPowerW": 244.3,
+    "powerBasis": "DERIVED",
+    "avgDataRateKbps": 25050,
+    "dataBasis": "DERIVED",
+    "capabilities": [
+      { "type": "LAND_IMAGING", "resolutionM": 30 },
+      { "type": "THERMAL_IMAGING", "resolutionM": 60 }
+    ],
+    "costMusd": 212.5,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 36,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key ETM+ Facts, PDF p. 189. 590 W imaging, 175 W standby, 150 Mbps, 16.7% imaging duty cycle.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "aster",
+    "name": "ASTER",
+    "kidName": "Zoom Lens",
+    "description": "A zoom camera with the sharpest view in the kit. It also maps ground temperature, but it is heavy and hungry for power.",
+    "flewOn": "Terra",
+    "massKg": 421,
+    "avgPowerW": 463,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 8300,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      { "type": "LAND_IMAGING", "resolutionM": 15 },
+      { "type": "THERMAL_IMAGING", "resolutionM": 90 }
+    ],
+    "costMusd": 210.5,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 36,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key ASTER Facts, PDF p. 241.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "modis",
+    "name": "MODIS",
+    "kidName": "Wide-Eye Imager",
+    "description": "Sees almost the whole Earth every day in a very wide strip, but small things like single fields are a blur.",
+    "flewOn": "Terra and Aqua",
+    "massKg": 229,
+    "avgPowerW": 162.5,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 6200,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      { "type": "LAND_IMAGING", "resolutionM": 250 },
+      { "type": "THERMAL_IMAGING", "resolutionM": 1000 },
+      { "type": "CLOUD_IMAGING", "resolutionM": 250 }
+    ],
+    "costMusd": 114.5,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 30,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key MODIS Facts, PDF p. 98.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "tmi",
+    "name": "TRMM Microwave Imager (TMI)",
+    "kidName": "Rain Listener",
+    "description": "Listens for the faint microwave glow of rain, so it can measure rainfall even through clouds.",
+    "flewOn": "TRMM",
+    "massKg": 54.1,
+    "avgPowerW": 66.5,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 8.5,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      { "type": "RAIN_MICROWAVE", "resolutionM": null }
+    ],
+    "costMusd": 27.05,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key TMI Facts, PDF p. 260.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "virs",
+    "name": "Visible and Infrared Scanner (VIRS)",
+    "kidName": "Cloud Watcher",
+    "description": "Takes pictures of clouds in light we can see and in heat, day and night.",
+    "flewOn": "TRMM",
+    "massKg": 48.6,
+    "avgPowerW": 51.2,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 49.8,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      { "type": "CLOUD_IMAGING", "resolutionM": 2200 }
+    ],
+    "costMusd": 24.3,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key VIRS Facts, PDF p. 261. Daytime data rate used.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "lis",
+    "name": "Lightning Imaging Sensor (LIS)",
+    "kidName": "Lightning Spotter",
+    "description": "A tiny, fast camera that counts lightning flashes inside storms.",
+    "flewOn": "TRMM",
+    "massKg": 20,
+    "avgPowerW": 33,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 6,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      { "type": "LIGHTNING", "resolutionM": 5000 }
+    ],
+    "costMusd": 10.0,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key LIS Facts, PDF p. 258.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "amsr-e",
+    "name": "AMSR-E",
+    "kidName": "Giant Microwave Dish",
+    "description": "A large spinning dish that measures rain, sea ice and the water in soil. Very capable, very heavy.",
+    "flewOn": "Aqua",
+    "massKg": 314,
+    "avgPowerW": 350,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 87.4,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      { "type": "RAIN_MICROWAVE", "resolutionM": 6000 },
+      { "type": "SEA_ICE_MICROWAVE", "resolutionM": 6000 }
+    ],
+    "costMusd": 157.0,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 36,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key AMSR-E Facts, PDF p. 94.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "glas",
+    "name": "Geoscience Laser Altimeter System (GLAS)",
+    "kidName": "Laser Ruler",
+    "description": "Fires laser pulses at the ground and times the echo to measure the height of ice to within centimetres.",
+    "flewOn": "ICESat",
+    "massKg": 300,
+    "avgPowerW": 330,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 450,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      { "type": "ICE_HEIGHT_LASER", "resolutionM": null }
+    ],
+    "costMusd": 150.0,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 36,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key GLAS Facts, PDF p. 177.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  },
+  {
+    "id": "ceres",
+    "name": "CERES",
+    "kidName": "Earth Energy Meter",
+    "description": "Measures how much sunlight Earth reflects and how much heat it gives off.",
+    "flewOn": "TRMM, Terra and Aqua",
+    "massKg": 50,
+    "avgPowerW": 47,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 10,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      { "type": "ENERGY_BUDGET", "resolutionM": 10000 }
+    ],
+    "costMusd": 25.0,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Earth Science Reference Handbook (2006)",
+      "detail": "Key CERES Facts, PDF p. 96. Figures are for one scanner.",
+      "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+    }
+  }
+]
