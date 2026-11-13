@@ -4,12 +4,24 @@ import com.liftoff.model.Bus;
 import com.liftoff.model.GroundStation;
 import com.liftoff.model.Instrument;
 import com.liftoff.model.MissionDesign;
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.model.ShipBuild;
+import com.liftoff.model.ShipPart;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.function.ToDoubleFunction;
 
-/** Works out the six resources of a design. Pure: same design in, same report out. */
+/**
+ * Works out the six resources of a design. Pure: same design in, same report out.
+ *
+ * <p>Handles both generations of design. A v2 design has a ship built from parts and a mission:
+ * the ship's parts count toward mass, power, budget and data, propellant is added to mass, the
+ * POWER part sets the power limit and the mission sets the caps. A v1 design (bus and objective)
+ * works as before. Downlink rate still comes from the bus: ship parts do not carry one yet.
+ */
 public final class ResourceCalculator {
 
     private static final double SECONDS_PER_MINUTE = 60;
@@ -29,12 +41,13 @@ public final class ResourceCalculator {
         return new ResourceReport(usages);
     }
 
-    /** Bus plus instruments, against what the rocket lifts to the chosen class of orbit. */
+    /**
+     * Everything that flies (ship parts, bus, instruments) plus the propellant for the trip,
+     * against what the rocket lifts to the chosen class of orbit.
+     */
     private static ResourceUsage mass(MissionDesign design) {
-        double used = design.instruments().stream().mapToDouble(Instrument::massKg).sum();
-        if (design.bus() != null) {
-            used += design.bus().massKg();
-        }
+        double dryMassKg = dryMassKg(design);
+        double used = dryMassKg + propellantKg(design, dryMassKg);
         OptionalDouble capacity = OptionalDouble.empty();
         if (design.launchVehicle() != null && design.orbit() != null) {
             capacity = design.launchVehicle().capacityFor(design.orbit().launchClass());
@@ -42,18 +55,49 @@ public final class ResourceCalculator {
         return ResourceUsage.of(ResourceType.MASS, used, capacity);
     }
 
-    /** Average draw of the instruments, against what the bus can supply to its payload. */
+    private static double dryMassKg(MissionDesign design) {
+        double dryMassKg = design.instruments().stream().mapToDouble(Instrument::massKg).sum();
+        dryMassKg += sum(design.build(), ShipPart::massKg);
+        if (design.bus() != null) {
+            dryMassKg += design.bus().massKg();
+        }
+        return dryMassKg;
+    }
+
+    /**
+     * Propellant for the mission's trip, from the rocket equation with the thruster's Isp.
+     * Zero until there is a mission, an airframe (the tanks) and a thruster.
+     */
+    private static double propellantKg(MissionDesign design, double dryMassKg) {
+        Optional<ShipPart> thrusters = design.build().part(ModuleSlot.THRUSTERS);
+        boolean hasTanks = design.build().part(ModuleSlot.AIRFRAME).isPresent();
+        if (design.mission() == null || thrusters.isEmpty() || !hasTanks || dryMassKg <= 0) {
+            return 0;
+        }
+        return FuelMath.propellantKg(dryMassKg, design.mission().deltaVRequiredMs(),
+                thrusters.get().specificImpulseS());
+    }
+
+    /**
+     * Average draw of the instruments and the ship's parts, against what the POWER part supplies.
+     * A design with no POWER part falls back to what the bus can supply to its payload.
+     */
     private static ResourceUsage power(MissionDesign design) {
-        double used = design.instruments().stream().mapToDouble(Instrument::avgPowerW).sum();
-        OptionalDouble capacity = design.bus() == null
-                ? OptionalDouble.empty()
-                : OptionalDouble.of(design.bus().payloadPowerW());
+        double used = design.instruments().stream().mapToDouble(Instrument::avgPowerW).sum()
+                + sum(design.build(), ShipPart::powerDrawW);
+        OptionalDouble capacity = OptionalDouble.empty();
+        if (design.build().part(ModuleSlot.POWER).isPresent()) {
+            capacity = OptionalDouble.of(sum(design.build(), ShipPart::powerSupplyW));
+        } else if (design.bus() != null) {
+            capacity = OptionalDouble.of(design.bus().payloadPowerW());
+        }
         return ResourceUsage.of(ResourceType.POWER, used, capacity);
     }
 
-    /** Everything bought, plus ground stations for every science month, against the objective's cap. */
+    /** Everything bought, plus ground stations for every science month, against the mission's cap. */
     private static ResourceUsage budget(MissionDesign design) {
-        double used = design.instruments().stream().mapToDouble(Instrument::costMusd).sum();
+        double used = design.instruments().stream().mapToDouble(Instrument::costMusd).sum()
+                + sum(design.build(), ShipPart::costMusd);
         if (design.bus() != null) {
             used += design.bus().costMusd();
         }
@@ -63,9 +107,12 @@ public final class ResourceCalculator {
         double stationsPerMonth = design.stations().stream().mapToDouble(GroundStation::costMusdPerMonth).sum();
         used += stationsPerMonth * design.scienceMonths();
 
-        OptionalDouble capacity = design.objective() == null
-                ? OptionalDouble.empty()
-                : OptionalDouble.of(design.objective().budgetCapMusd());
+        OptionalDouble capacity = OptionalDouble.empty();
+        if (design.mission() != null) {
+            capacity = OptionalDouble.of(design.mission().budgetCapMusd());
+        } else if (design.objective() != null) {
+            capacity = OptionalDouble.of(design.objective().budgetCapMusd());
+        }
         return ResourceUsage.of(ResourceType.BUDGET, used, capacity);
     }
 
@@ -93,16 +140,19 @@ public final class ResourceCalculator {
         return ResourceUsage.of(ResourceType.COMMS, used, capacity);
     }
 
-    /** Build and test time plus the science duration, against the objective's deadline. */
+    /** Build and test time plus the science duration, against the mission's deadline. */
     private static ResourceUsage time(MissionDesign design) {
         double used = buildMonths(design) + design.scienceMonths();
-        OptionalDouble capacity = design.objective() == null
-                ? OptionalDouble.empty()
-                : OptionalDouble.of(design.objective().deadlineMonths());
+        OptionalDouble capacity = OptionalDouble.empty();
+        if (design.mission() != null) {
+            capacity = OptionalDouble.of(design.mission().deadlineMonths());
+        } else if (design.objective() != null) {
+            capacity = OptionalDouble.of(design.objective().deadlineMonths());
+        }
         return ResourceUsage.of(ResourceType.TIME, used, capacity);
     }
 
-    /** The slowest part sets the pace; integration and test are added on top. */
+    /** The slowest part sets the pace; integration and test are added on top. Ship parts carry no build time yet. */
     private static int buildMonths(MissionDesign design) {
         if (design.bus() == null && design.instruments().isEmpty()) {
             return 0;
@@ -116,8 +166,10 @@ public final class ResourceCalculator {
                 + GameRules.INTEGRATION_MONTHS_PER_INSTRUMENT * design.instruments().size();
     }
 
+    /** Instruments plus whatever the ship's parts (a satellite with its own camera) produce. */
     private static double dataGbitPerDay(MissionDesign design) {
-        return design.instruments().stream().mapToDouble(Instrument::dataGbitPerDay).sum();
+        return design.instruments().stream().mapToDouble(Instrument::dataGbitPerDay).sum()
+                + sum(design.build(), ShipPart::dataGbitPerDay);
     }
 
     /** Contact from several stations is summed: a small overcount when two see the spacecraft at once. */
@@ -125,5 +177,9 @@ public final class ResourceCalculator {
         return design.stations().stream()
                 .mapToDouble(station -> OrbitMath.contactMinutesPerDay(design.orbit(), station.latitudeDeg()))
                 .sum();
+    }
+
+    private static double sum(ShipBuild build, ToDoubleFunction<ShipPart> figure) {
+        return build.parts().values().stream().mapToDouble(figure).sum();
     }
 }
