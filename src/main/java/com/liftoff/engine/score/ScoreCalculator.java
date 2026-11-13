@@ -1,6 +1,5 @@
 package com.liftoff.engine.score;
 
-import com.liftoff.engine.GameRules;
 import com.liftoff.engine.ResourceLevel;
 import com.liftoff.engine.ResourceReport;
 import com.liftoff.engine.ResourceType;
@@ -30,12 +29,23 @@ public final class ScoreCalculator {
      */
     public static Score score(MissionDesign design, ResourceReport resources, BuildReport build,
                               SimulationResult sim, Mission mission) {
+        return score(design, resources, build, sim, mission, false);
+    }
+
+    /** Scores a report whose budget already includes the modular ship. */
+    public static Score scoreCombined(MissionDesign design, ResourceReport resources, BuildReport build,
+                                      SimulationResult sim, Mission mission) {
+        return score(design, resources, build, sim, mission, true);
+    }
+
+    private static Score score(MissionDesign design, ResourceReport resources, BuildReport build,
+                               SimulationResult sim, Mission mission, boolean includesShipCost) {
         double science = ScoreRules.SCIENCE_POINTS * scienceFraction(design, sim, mission);
         double margins = ScoreRules.MARGIN_POINTS * marginShare(resources, build, mission);
 
         ResourceUsage budget = resources.get(ResourceType.BUDGET);
         ResourceUsage time = resources.get(ResourceType.TIME);
-        double costMusd = budget.used() + (build == null ? 0 : build.costMusd());
+        double costMusd = budget.used() + (includesShipCost || build == null ? 0 : build.costMusd());
         double months = time.used() + (sim == null ? 0 : sim.launchSlipMonths());
         double budgetTime = ScoreRules.BUDGET_POINTS * withinCap(costMusd, budget.capacity())
                 + ScoreRules.TIME_POINTS * withinCap(months, time.capacity());
@@ -116,7 +126,7 @@ public final class ScoreCalculator {
             counted++;
         }
         if (mission.destination() != Mission.Destination.EARTH) {
-            credit += credit(fuelLevel(build));
+            credit += credit(build == null ? ResourceLevel.UNKNOWN : build.fuelLevel());
             counted++;
         }
         return credit / counted;
@@ -128,19 +138,6 @@ public final class ScoreCalculator {
             case TIGHT -> ScoreRules.TIGHT_CREDIT;
             case OVER, UNKNOWN -> 0;
         };
-    }
-
-    /** Delta-v the trip needs against what the ship has, judged like any other resource. */
-    private static ResourceLevel fuelLevel(BuildReport build) {
-        if (build == null) {
-            return ResourceLevel.UNKNOWN;
-        }
-        double needed = build.deltaVRequiredMs();
-        double available = build.deltaVAvailableMs();
-        if (needed > available) {
-            return ResourceLevel.OVER;
-        }
-        return available > 0 && needed >= GameRules.TIGHT_FRACTION * available ? ResourceLevel.TIGHT : ResourceLevel.OK;
     }
 
     /** 1 when inside the cap, cap / used when over it, 0 when the cap is not known. */

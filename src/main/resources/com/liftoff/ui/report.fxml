@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.liftoff.ui.ReportController" styleClass="screen, mission-screen">
+    <top>
+        <VBox spacing="8" styleClass="mission-header">
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+                <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
+            </HBox>
+            <Label text="%report.heading" styleClass="screen-heading" wrapText="true"/>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
+            <VBox spacing="14" styleClass="page-content">
+                <VBox spacing="8" styleClass="panel, score-panel">
+                    <Label fx:id="result" styleClass="eyebrow"/>
+                    <Label fx:id="score" styleClass="score"/>
+                    <Label fx:id="totals" wrapText="true" styleClass="body-text"/>
+                </VBox>
+                <HBox spacing="14">
+                    <VBox fx:id="worked" spacing="8" prefWidth="360" HBox.hgrow="ALWAYS" styleClass="panel">
+                        <Label text="%report.worked" styleClass="section-title"/>
+                    </VBox>
+                    <VBox spacing="8" prefWidth="360" HBox.hgrow="ALWAYS" styleClass="panel">
+                        <Label text="%report.broke" styleClass="section-title"/>
+                        <Label fx:id="broke" wrapText="true" styleClass="body-text"/>
+                    </VBox>
+                    <VBox spacing="8" prefWidth="360" HBox.hgrow="ALWAYS" styleClass="panel">
+                        <Label text="%report.try" styleClass="section-title"/>
+                        <Label fx:id="next" wrapText="true" styleClass="body-text"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="%report.redesign" onAction="#onRedesign" styleClass="primary" />
+        </HBox>
+    </bottom>
+</BorderPane>

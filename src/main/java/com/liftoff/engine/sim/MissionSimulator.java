@@ -10,6 +10,7 @@ import com.liftoff.session.stub.Mission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.SplittableRandom;
 
 /**
@@ -37,8 +38,12 @@ public final class MissionSimulator {
         return run(design, mission, difficulty, seed, deck, extras, null);
     }
 
-    /** A destination's radio and contact window, with power from the selected ship. */
-    public record DeepSpaceLink(double powerW, double downlinkMbps, double contactMinutesPerDay) {}
+    /** Ship power and radio. With no fixed contact window, the chosen orbit sets station visibility. */
+    public record DeepSpaceLink(double powerW, double downlinkMbps, OptionalDouble contactMinutesPerDay) {
+        public DeepSpaceLink(double powerW, double downlinkMbps, double contactMinutesPerDay) {
+            this(powerW, downlinkMbps, OptionalDouble.of(contactMinutesPerDay));
+        }
+    }
 
     public static SimulationResult run(MissionDesign design, Mission mission, Difficulty difficulty, long seed,
                                        EventDeck deck, SimExtras extras, DeepSpaceLink link) {
@@ -58,8 +63,8 @@ public final class MissionSimulator {
         java.util.Arrays.fill(output, 1);
         double[] contactMinutesPerDay = new double[stations.size()];
         for (int i = 0; i < contactMinutesPerDay.length; i++) {
-            if (link != null) {
-                contactMinutesPerDay[i] = link.contactMinutesPerDay() / stations.size();
+            if (link != null && link.contactMinutesPerDay().isPresent()) {
+                contactMinutesPerDay[i] = link.contactMinutesPerDay().getAsDouble() / stations.size();
             } else if (design.orbit() != null) {
                 contactMinutesPerDay[i] = OrbitMath.contactMinutesPerDay(design.orbit(), stations.get(i).latitudeDeg());
             }

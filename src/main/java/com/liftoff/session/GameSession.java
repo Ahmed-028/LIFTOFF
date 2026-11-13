@@ -1,8 +1,12 @@
 package com.liftoff.session;
 
 import com.liftoff.data.MissionEntry;
+import com.liftoff.engine.DesignIssue;
+import com.liftoff.engine.DesignValidator;
 import com.liftoff.engine.ResourceCalculator;
 import com.liftoff.engine.ResourceReport;
+import com.liftoff.engine.ResourceType;
+import com.liftoff.engine.ResourceUsage;
 import com.liftoff.engine.score.Report;
 import com.liftoff.engine.score.ReportBuilder;
 import com.liftoff.engine.score.Score;
@@ -15,12 +19,15 @@ import com.liftoff.engine.sim.MissionSimulator;
 import com.liftoff.engine.sim.SimExtras;
 import com.liftoff.engine.sim.SimRules;
 import com.liftoff.engine.sim.SimulationResult;
+import com.liftoff.model.Bus;
 import com.liftoff.model.Catalog;
 import com.liftoff.model.GroundStation;
 import com.liftoff.model.Instrument;
+import com.liftoff.model.LaunchClass;
 import com.liftoff.model.MissionDesign;
 import com.liftoff.model.Objective;
 import com.liftoff.session.stub.BuildCalculator;
+import com.liftoff.session.stub.BuildIssue;
 import com.liftoff.session.stub.BuildReport;
 import com.liftoff.session.stub.Mission;
 import com.liftoff.session.stub.ModuleSlot;
@@ -29,8 +36,10 @@ import com.liftoff.session.stub.ShipPart;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.Function;
 
 /**
@@ -92,6 +101,38 @@ public final class GameSession {
 
     public ResourceReport resources() {
         return resources;
+    }
+
+    /** Combined limits for the modular builder and review screens. */
+    public ResourceReport missionResources() {
+        var combined = new EnumMap<ResourceType, ResourceUsage>(ResourceType.class);
+        combined.putAll(resources.usages());
+        var rocket = design.launchVehicle();
+        var launchClass = mission == null ? null : switch (mission.destination()) {
+            case EARTH -> design.orbit() == null ? null : design.orbit().launchClass();
+            case MOON -> LaunchClass.TRANS_LUNAR;
+            case MARS -> LaunchClass.TRANS_MARS;
+        };
+        combined.put(ResourceType.MASS, ResourceUsage.of(ResourceType.MASS,
+                resources.get(ResourceType.MASS).used() + buildReport.totalMassKg(),
+                rocket == null || launchClass == null ? OptionalDouble.empty() : rocket.capacityFor(launchClass)));
+        var budget = resources.get(ResourceType.BUDGET);
+        combined.put(ResourceType.BUDGET, ResourceUsage.of(ResourceType.BUDGET,
+                budget.used() + buildReport.costMusd(), budget.capacity()));
+        if (build.part(ModuleSlot.POWER).isPresent()) {
+            combined.put(ResourceType.POWER, ResourceUsage.of(ResourceType.POWER,
+                    buildReport.powerDrawW(), OptionalDouble.of(buildReport.powerSupplyW())));
+        }
+        if (usesModularRadio()) {
+            var link = flightLink();
+            double moduleData = build.parts().values().stream().mapToDouble(ShipPart::dataGbitPerDay).sum();
+            combined.putAll(ResourceCalculator.communication(design, link.downlinkMbps(), link.contactMinutesPerDay(), moduleData));
+        }
+        return new ResourceReport(combined);
+    }
+
+    public List<DesignIssue> designIssues() {
+        return DesignValidator.validate(design);
     }
 
     /** Chooses the mission goal and starts the science duration at the goal's minimum. */
@@ -210,6 +251,19 @@ public final class GameSession {
         return flow.current();
     }
 
+    public double crewSuppliesKg() {
+        return crewSuppliesKg;
+    }
+
+    public double requiredCrewSuppliesKg() {
+        if (mission == null) {
+            return 0;
+        }
+        double stepDays = mission.stepUnit() == Mission.StepUnit.DAY ? 1 : SimRules.DAYS_PER_MONTH;
+        int steps = mission.steps() > 0 ? mission.steps() : design.scienceMonths();
+        return steps * (mission.crew() * mission.suppliesKgPerCrewDay() * stepDays);
+    }
+
     public void setCrewSuppliesKg(double massKg) {
         if (!Double.isFinite(massKg) || massKg < 0) {
             throw new IllegalArgumentException("Crew supplies must be a finite, nonnegative mass");
@@ -302,18 +356,20 @@ public final class GameSession {
         if (simulation != null) {
             throw new IllegalStateException(ALREADY_FLOWN);
         }
-        if (deepSpace()) {
-            ShipPart power = build.part(ModuleSlot.POWER).orElseThrow();
-            var link = new MissionSimulator.DeepSpaceLink(buildReport.powerSupplyW()
-                    - powerDrawByShip(), missionEntry.downlinkMbps(), missionEntry.contactMinutesPerDay());
-            boolean solarPowered = power.modelId().equals("body-solar") || power.modelId().equals("deployable-solar");
+        if (usesModularRadio()) {
+            boolean solarPowered = build.part(ModuleSlot.POWER).map(ShipPart::modelId)
+                    .filter(id -> id.equals("body-solar") || id.equals("deployable-solar")).isPresent();
+            double storage = radioBus().map(Bus::storageGbit).orElse(Double.POSITIVE_INFINITY);
             simulation = MissionSimulator.run(design, mission, difficulty, seed, new EventDeck(catalog.events()),
-                    new SimExtras(Double.POSITIVE_INFINITY, crewSuppliesKg, solarPowered), link);
+                    new SimExtras(storage, crewSuppliesKg, solarPowered), flightLink());
         } else {
             simulation = MissionSimulator.run(design, mission, difficulty, seed);
         }
-        score = ScoreCalculator.score(design, resources, buildReport, simulation, mission);
-        report = ReportBuilder.build(design, resources, List.of(), simulation, mission);
+        ResourceReport flightResources = usesModularRadio() ? missionResources() : resources;
+        score = usesModularRadio()
+                ? ScoreCalculator.scoreCombined(design, flightResources, buildReport, simulation, mission)
+                : ScoreCalculator.score(design, flightResources, buildReport, simulation, mission);
+        report = ReportBuilder.build(design, flightResources, List.of(), simulation, mission);
         flow.markSimulationFinished();
         log.add(new MissionLog.Entry(mission.id(), difficulty, score.total(), score.stars(),
                 Instant.now().toString()));
@@ -382,21 +438,44 @@ public final class GameSession {
     }
 
     private void refreshBuildReport() {
-        if (!deepSpace()) {
+        if (missionEntry == null || design.bus() != null) {
             buildReport = BuildCalculator.calculate(build, mission);
             return;
         }
-        double stepDays = mission.stepUnit() == Mission.StepUnit.DAY ? 1 : SimRules.DAYS_PER_MONTH;
-        int steps = mission.steps() > 0 ? mission.steps() : design.scienceMonths();
-        double requiredSupplies = steps * (mission.crew() * mission.suppliesKgPerCrewDay() * stepDays);
         buildReport = BuildCalculator.calculate(build, mission,
                 design.instruments().stream().mapToDouble(Instrument::massKg).sum(),
                 design.instruments().stream().mapToDouble(Instrument::avgPowerW).sum(),
-                crewSuppliesKg, requiredSupplies);
+                crewSuppliesKg, requiredCrewSuppliesKg());
+        var budget = resources.get(ResourceType.BUDGET);
+        double cap = missionEntry.briefing().budgetCapMusd();
+        double totalCost = buildReport.costMusd() + budget.used();
+        if (totalCost > cap) {
+            var report = buildReport;
+            var issues = new ArrayList<>(report.issues());
+            issues.add(new BuildIssue(BuildIssue.Kind.OVER_BUDGET, null, totalCost, cap));
+            buildReport = new BuildReport(report.dryMassKg(), report.propellantKg(), report.totalMassKg(),
+                    report.costMusd(), report.powerSupplyW(), report.powerDrawW(), report.deltaVAvailableMs(),
+                    report.deltaVRequiredMs(), issues);
+        }
     }
 
-    private boolean deepSpace() {
-        return missionEntry != null && missionEntry.destination() != Mission.Destination.EARTH;
+    private boolean usesModularRadio() {
+        return missionEntry != null && design.bus() == null;
+    }
+
+    private Optional<Bus> radioBus() {
+        if (missionEntry.destination() != Mission.Destination.EARTH) {
+            return Optional.empty();
+        }
+        return build.part(ModuleSlot.AIRFRAME).flatMap(part -> catalog.bus(part.id()));
+    }
+
+    private MissionSimulator.DeepSpaceLink flightLink() {
+        boolean earth = missionEntry.destination() == Mission.Destination.EARTH;
+        double rate = earth ? radioBus().map(Bus::downlinkMbps).orElse(0.0) : missionEntry.downlinkMbps();
+        var contact = earth ? OptionalDouble.empty() : OptionalDouble.of(missionEntry.contactMinutesPerDay());
+        return new MissionSimulator.DeepSpaceLink(Math.max(0, buildReport.powerSupplyW() - powerDrawByShip()),
+                rate, contact);
     }
 
     private double powerDrawByShip() {

@@ -41,6 +41,23 @@ public final class ResourceCalculator {
         return new ResourceReport(usages);
     }
 
+    /** Communication resources using the radio carried by the modular ship. */
+    public static Map<ResourceType, ResourceUsage> communication(MissionDesign design, double downlinkMbps,
+                                                                  OptionalDouble fixedContactMinutes,
+                                                                  double additionalDataGbitPerDay) {
+        OptionalDouble contact = fixedContactMinutes.isPresent()
+                ? OptionalDouble.of(design.stations().isEmpty() ? 0 : fixedContactMinutes.getAsDouble())
+                : design.orbit() == null ? OptionalDouble.empty() : OptionalDouble.of(contactMinutesPerDay(design));
+        double dailyData = dataGbitPerDay(design) + additionalDataGbitPerDay;
+        double gbitPerMinute = downlinkMbps * SECONDS_PER_MINUTE / MEGABITS_PER_GIGABIT;
+        OptionalDouble dataCapacity = contact.isPresent()
+                ? OptionalDouble.of(gbitPerMinute * contact.getAsDouble()) : OptionalDouble.empty();
+        double neededMinutes = gbitPerMinute > 0 ? dailyData / gbitPerMinute : 0;
+        return Map.of(ResourceType.DATA, ResourceUsage.of(ResourceType.DATA, dailyData, dataCapacity),
+                ResourceType.COMMS, ResourceUsage.of(ResourceType.COMMS, neededMinutes,
+                        gbitPerMinute > 0 ? contact : OptionalDouble.empty()));
+    }
+
     /**
      * Everything that flies (ship parts, bus, instruments) plus the propellant for the trip,
      * against what the rocket lifts to the chosen class of orbit.

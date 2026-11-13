@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.liftoff.ui.ShipBuilderController" styleClass="screen, mission-screen, ship-screen">
+    <top>
+        <VBox spacing="8" styleClass="mission-header">
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+                <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
+            </HBox>
+            <Label text="%ship.heading" styleClass="screen-heading" wrapText="true"/>
+        </VBox>
+    </top>
+    <center>
+        <BorderPane styleClass="builder">
+            <left>
+                <VBox spacing="9" prefWidth="168" styleClass="builder-tabs">
+                    <StackPane fx:id="tabsHost"/>
+                    <CheckBox fx:id="calmMode" text="%ship.calm"/>
+                </VBox>
+            </left>
+            <center>
+                <StackPane fx:id="hangarHost" minHeight="155" minWidth="240" styleClass="hangar-frame">
+                    <Label fx:id="hangarHint" text="%ship.hint" mouseTransparent="true" StackPane.alignment="TOP_LEFT" styleClass="hangar-hint"/>
+                </StackPane>
+            </center>
+            <right>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="287" minWidth="238" styleClass="inspection-scroll">
+                    <VBox fx:id="inspection" spacing="11" styleClass="panel"/>
+                </ScrollPane>
+            </right>
+            <bottom>
+                <VBox styleClass="parts-dock" spacing="6">
+                    <StackPane fx:id="gaugesHost"/>
+                    <StackPane fx:id="partsHost"/>
+                </VBox>
+            </bottom>
+        </BorderPane>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+            <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <StackPane fx:id="confirmGate" pickOnBounds="true">
+                <Button fx:id="confirm" text="%review.confirm" onAction="#onConfirm" styleClass="secondary"/>
+            </StackPane>
+            <StackPane fx:id="suppliesGate" pickOnBounds="true">
+                <Button text="%ship.continue" onAction="#onNext" styleClass="primary" fx:id="supplies"/>
+            </StackPane>
+        </HBox>
+    </bottom>
+</BorderPane>

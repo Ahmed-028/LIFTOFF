@@ -1,35 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.liftoff.ui.MissionSelectController"
-            styleClass="screen">
+            fx:controller="com.liftoff.ui.MissionSelectController" styleClass="screen, selection-screen">
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="24">
-            <Button text="%nav.back" onAction="#onBack" cancelButton="true" styleClass="secondary"/>
+        <HBox alignment="CENTER_LEFT" spacing="14" styleClass="selection-header">
+            <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
             <Label text="%select.heading" styleClass="screen-heading"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button id="open-sources" text="%sources.heading" onAction="#onSources" styleClass="secondary"/>
         </HBox>
     </top>
     <center>
-        <!-- Scrolls only when the window is too small to show the cards whole. -->
-        <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="clear-scroll">
-            <BorderPane.margin>
-                <Insets top="16" bottom="16"/>
-            </BorderPane.margin>
-            <HBox fx:id="cardRow" alignment="CENTER" spacing="24"/>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
+            <VBox spacing="14" styleClass="selection-content">
+                <HBox fx:id="mainMissions" spacing="14" fillHeight="true"/>
+                <TitledPane text="%select.extra" expanded="false" animated="false">
+                    <HBox fx:id="extraMissions" spacing="14" styleClass="extra-missions"/>
+                </TitledPane>
+            </VBox>
         </ScrollPane>
     </center>
-    <bottom>
-        <VBox spacing="8" styleClass="briefing">
-            <Label fx:id="briefingTitle" styleClass="briefing-title"/>
-            <Label fx:id="briefingBody" wrapText="true" styleClass="briefing-body"/>
-        </VBox>
-    </bottom>
 </BorderPane>

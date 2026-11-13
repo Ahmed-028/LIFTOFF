@@ -8,6 +8,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ModelLibraryTest {
     @Test
+    void nasaVariantsLoadWithRenderableGeometry() {
+        var library = new ModelLibrary();
+        for (String model : java.util.List.of("eo1", "landsat7", "sorce", "apollo", "ingenuity",
+                "perseverance", "mastcam", "pixl", "rimfax")) {
+            var instance = library.create("nasa-" + model);
+            assertFalse(instance.getChildren().isEmpty(), model);
+            assertTrue(instance.getBoundsInLocal().getWidth() > 0, model);
+        }
+    }
+    @Test
     void everyDemoModelLoadsWithinTheTriangleBudget() {
         var library = new ModelLibrary();
         HangarDemo.MODELS.values().stream().flatMap(java.util.Collection::stream).forEach(id -> {

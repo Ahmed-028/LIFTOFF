@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.liftoff.ui.SuppliesController" styleClass="screen, mission-screen">
+    <top>
+        <VBox spacing="8" styleClass="mission-header">
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+                <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
+            </HBox>
+            <Label text="%supplies.heading" styleClass="screen-heading"/>
+        </VBox>
+    </top>
+    <center>
+        <HBox spacing="12" styleClass="page-content">
+            <TabPane fx:id="supplyTabs" tabClosingPolicy="UNAVAILABLE" minWidth="500" HBox.hgrow="ALWAYS"
+                     styleClass="supplies-tabs">
+                <Tab text="%supplies.flightPlan">
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
+                        <HBox spacing="15" styleClass="panel">
+                            <VBox spacing="8" prefWidth="330" HBox.hgrow="ALWAYS">
+                                <Label text="%slot.AIRFRAME"/>
+                                <ChoiceBox fx:id="airframe" accessibleText="%slot.AIRFRAME" maxWidth="Infinity"/>
+                                <VBox fx:id="spacecraftPreview" spacing="8"/>
+                                <Button text="%supplies.airframe" onAction="#onAirframe" styleClass="secondary"/>
+                            </VBox>
+                            <VBox spacing="9" prefWidth="270" HBox.hgrow="ALWAYS">
+                                <Label text="%supplies.rocket"/>
+                                <ChoiceBox fx:id="rocket" accessibleText="%supplies.rocket" maxWidth="Infinity"/>
+                                <VBox fx:id="orbitGroup" spacing="5">
+                                    <Label text="%supplies.orbit"/>
+                                    <ChoiceBox fx:id="orbit" accessibleText="%supplies.orbit" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox fx:id="durationGroup" spacing="5">
+                                    <Label text="%supplies.duration"/>
+                                    <ChoiceBox fx:id="duration" accessibleText="%supplies.duration" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox fx:id="crewGroup" spacing="5">
+                                    <Label text="%supplies.crew"/>
+                                    <TextField fx:id="supplies" accessibleText="%supplies.crew" maxWidth="190"/>
+                                    <Label fx:id="crewMinimum" wrapText="true" styleClass="reading-value"/>
+                                    <Label fx:id="suppliesError" text="%supplies.invalid" wrapText="true" styleClass="warning"/>
+                                </VBox>
+                            </VBox>
+                        </HBox>
+                    </ScrollPane>
+                </Tab>
+                <Tab text="%supplies.instruments">
+                    <HBox spacing="10" styleClass="panel">
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="390" minWidth="200"
+                                    HBox.hgrow="ALWAYS" styleClass="clear-scroll">
+                            <VBox fx:id="instruments" spacing="7"/>
+                        </ScrollPane>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="290" minWidth="245"
+                                    styleClass="clear-scroll">
+                            <VBox fx:id="instrumentPreview" spacing="8" styleClass="instrument-preview"/>
+                        </ScrollPane>
+                    </HBox>
+                </Tab>
+                <Tab text="%supplies.stations">
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
+                        <VBox fx:id="stations" spacing="12" styleClass="panel"/>
+                    </ScrollPane>
+                </Tab>
+            </TabPane>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="345" minWidth="275" styleClass="inspection-scroll">
+                <VBox fx:id="readout" spacing="12" styleClass="panel, live-readings">
+                    <Label text="%review.gauges" styleClass="section-title"/>
+                    <StackPane fx:id="gaugeHost"/>
+                </VBox>
+            </ScrollPane>
+        </HBox>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+            <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="previousTab" text="%supplies.previousTab" onAction="#onPreviousTab" styleClass="secondary"/>
+            <Button fx:id="nextTab" text="%supplies.nextTab" onAction="#onNextTab" styleClass="secondary"/>
+            <Button fx:id="review" text="%supplies.continue" onAction="#onNext" styleClass="primary"/>
+        </HBox>
+    </bottom>
+</BorderPane>

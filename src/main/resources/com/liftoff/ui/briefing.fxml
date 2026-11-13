@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.liftoff.ui.BriefingController" styleClass="screen, mission-screen, briefing-screen">
+    <top>
+        <VBox spacing="8" styleClass="mission-header">
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+                <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
+            </HBox>
+            <Label text="%step.BRIEFING" styleClass="eyebrow"/>
+            <Label fx:id="title" styleClass="screen-heading" wrapText="true"/>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
+            <HBox spacing="14" styleClass="page-content">
+                <VBox spacing="12" prefWidth="575" HBox.hgrow="ALWAYS" styleClass="panel">
+                    <StackPane fx:id="artwork"/>
+                    <Label fx:id="difficulty" wrapText="true" styleClass="briefing-difficulty"/>
+                    <Label fx:id="question" wrapText="true" styleClass="section-title"/>
+                    <Label fx:id="description" wrapText="true" styleClass="body-text"/>
+                    <Label fx:id="inspiration" wrapText="true" styleClass="muted"/>
+                </VBox>
+                <VBox spacing="12" prefWidth="395" HBox.hgrow="ALWAYS" styleClass="panel">
+                    <Label text="%briefing.constraints" styleClass="section-title"/>
+                    <VBox fx:id="limits" spacing="7"/>
+                    <Separator/>
+                    <Label text="%briefing.measurements" styleClass="section-title"/>
+                    <VBox fx:id="measurements" spacing="8"/>
+                </VBox>
+            </HBox>
+        </ScrollPane>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="%briefing.start" onAction="#onNext" styleClass="primary" />
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -1,5 +1,8 @@
 package com.liftoff.render;
 
+import com.liftoff.engine.ResourceType;
+import com.liftoff.session.stub.BuildIssue;
+import com.liftoff.session.stub.ModuleSlot;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -49,6 +52,70 @@ public final class Icons {
         Polyline mark = stroke(new Polyline(7, 12.5, 10.5, 16, 17, 8.5));
         mark.setFill(Color.TRANSPARENT);
         return scaled(new Group(badge, mark), size);
+    }
+
+    public static Node forResource(ResourceType resource, double size) {
+        return switch (resource) {
+            case MASS -> mass(size);
+            case POWER -> power(size);
+            case BUDGET -> coin(size);
+            case DATA -> data(size);
+            case COMMS -> badge("↗", Palette.COMMS, size);
+            case TIME -> clock(size);
+        };
+    }
+
+    public static Node forModule(ModuleSlot slot, double size) {
+        return switch (slot) {
+            case AIRFRAME -> badge("▲", Palette.SKY, size);
+            case THRUSTERS -> fuel(size);
+            case POWER -> power(size);
+            case CARGO_BAY -> badge("□", Palette.MASS, size);
+            case SATELLITE -> badge("◇", Palette.COMMS, size);
+        };
+    }
+
+    public static Node forWarning(BuildIssue.Kind kind, double size) {
+        return switch (kind) {
+            case SLOT_EMPTY -> warning(size);
+            case PAYLOAD_TOO_HEAVY -> mass(size);
+            case PAYLOAD_TOO_LONG -> badge("↔", Palette.MASS, size);
+            case PAYLOAD_TOO_WIDE -> badge("↕", Palette.MASS, size);
+            case POWER_SHORT -> power(size);
+            case FUEL_SHORT -> fuel(size);
+            case OVER_BUDGET -> coin(size);
+            case SUPPLIES_SHORT -> badge("+", Palette.TIME, size);
+        };
+    }
+
+    public static Node warning(double size) {
+        return badge("!", Palette.POWER, size);
+    }
+
+    public static Node mass(double size) {
+        return badge("▼", Palette.MASS, size);
+    }
+
+    public static Node power(double size) {
+        return badge("ϟ", Palette.POWER, size);
+    }
+
+    public static Node data(double size) {
+        return badge("≡", Palette.DATA, size);
+    }
+
+    public static Node fuel(double size) {
+        return badge("↑", Palette.ROCKET, size);
+    }
+
+    private static Node badge(String glyph, Color color, double size) {
+        Text mark = new Text(glyph);
+        mark.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+        mark.setFill(Palette.INK);
+        mark.setBoundsType(TextBoundsType.VISUAL);
+        mark.setX(12 - mark.getLayoutBounds().getWidth() / 2 - mark.getLayoutBounds().getMinX());
+        mark.setY(12 + mark.getLayoutBounds().getHeight() / 2 - mark.getLayoutBounds().getMaxY());
+        return scaled(new Group(disc(color), mark), size);
     }
 
     private static Circle disc(Color fill) {
