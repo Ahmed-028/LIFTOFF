@@ -3,34 +3,50 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.liftoff.ui.FlyController" styleClass="screen, mission-screen">
+            fx:controller="com.liftoff.ui.FlyController" styleClass="screen, mission-screen, fly-screen">
     <top>
         <VBox spacing="8" styleClass="mission-header">
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="command-bar">
                 <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
             </HBox>
-            <Label text="%fly.heading" styleClass="screen-heading" wrapText="true"/>
+            <Label text="%fly.heading" styleClass="screen-heading"/>
         </VBox>
     </top>
     <center>
-        <HBox spacing="14" styleClass="page-content">
-            <VBox spacing="12" prefWidth="480" HBox.hgrow="ALWAYS" styleClass="panel">
-                <Label fx:id="time" styleClass="section-title"/>
+        <HBox spacing="18" styleClass="page-content">
+            <VBox spacing="10" minWidth="380" HBox.hgrow="ALWAYS">
+                <TabPane id="flight-views" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE" styleClass="supplies-tabs">
+                    <Tab text="%cockpit.exterior">
+                        <StackPane fx:id="viewport" styleClass="flight-viewport" minHeight="220">
+                            <VBox maxWidth="380" maxHeight="-Infinity" mouseTransparent="true"
+                                  StackPane.alignment="TOP_LEFT" styleClass="flight-caption">
+                                <Label fx:id="route" styleClass="eyebrow" wrapText="true"/>
+                                <Label fx:id="phase" id="flight-phase" styleClass="section-title" wrapText="true"/>
+                            </VBox>
+                        </StackPane>
+                    </Tab>
+                    <Tab fx:id="cabinTab" text="%cockpit.tab"/>
+                </TabPane>
                 <ProgressBar fx:id="progress" progress="0" maxWidth="Infinity" accessibleText="%fly.progress"/>
-                <Label fx:id="telemetry" wrapText="true" styleClass="telemetry"/>
-                <Label fx:id="eventSummary" wrapText="true" styleClass="warning"/>
             </VBox>
-            <VBox spacing="12" prefWidth="480" HBox.hgrow="ALWAYS" styleClass="panel">
-                <Label text="%fly.log" styleClass="section-title"/>
-                <ListView fx:id="flightLog" VBox.vgrow="ALWAYS" accessibleText="%fly.log"/>
+            <VBox prefWidth="330" minWidth="285" styleClass="panel, flight-console">
+                <Label fx:id="time" styleClass="section-title"/>
+                <Label fx:id="telemetry" wrapText="true" minHeight="-Infinity" styleClass="telemetry"/>
+                <Label fx:id="eventSummary" wrapText="true" minHeight="-Infinity" visible="false" managed="false" styleClass="flight-alert"/>
+                <Label text="%fly.log" styleClass="eyebrow"/>
+                <ListView fx:id="flightLog" VBox.vgrow="ALWAYS" minHeight="56" accessibleText="%fly.log"/>
             </VBox>
         </HBox>
     </center>
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+        <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="action-bar">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
             <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
+            <CheckBox fx:id="calm" text="%flight.calm"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button fx:id="playback" text="%fly.pause" onAction="#onPlayback" styleClass="secondary"/>
             <Button fx:id="skip" id="skip-playback" text="%fly.skip" onAction="#onSkip" styleClass="secondary"/>

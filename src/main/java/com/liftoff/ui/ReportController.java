@@ -1,6 +1,7 @@
 package com.liftoff.ui;
 
 import com.liftoff.engine.score.WhyCard;
+import com.liftoff.render.Icons;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -12,9 +13,15 @@ public final class ReportController extends MissionScreen {
     @FXML private VBox worked;
     @FXML private Label broke;
     @FXML private Label next;
+    @FXML private Label workedTitle;
+    @FXML private Label brokeTitle;
+    @FXML private Label tryTitle;
 
     @Override
     protected void setUp() {
+        workedTitle.setGraphic(Icons.tick(28));
+        brokeTitle.setGraphic(Icons.warning(28));
+        tryTitle.setGraphic(Icons.next(28));
         var rating = session.score().orElseThrow();
         var flight = session.simulation().orElseThrow();
         var report = session.report().orElseThrow();

@@ -32,6 +32,7 @@ public final class ShipBuilderController extends MissionScreen {
     @FXML private Button supplies;
     @FXML private StackPane confirmGate;
     @FXML private Button confirm;
+    @FXML private Label buildStatus;
 
     private ShipView shipView;
     private ModuleTabs tabs;
@@ -45,13 +46,15 @@ public final class ShipBuilderController extends MissionScreen {
 
     @Override
     protected void setUp() {
+        calmMode.setSelected(navigator.reducedMotion());
+        calmMode.selectedProperty().addListener((property, previous, enabled) -> navigator.setReducedMotion(enabled));
         if (Platform.isSupported(ConditionalFeature.SCENE3D)) {
             var hangar = new HangarShipView();
+            hangar.setCalmMode(calmMode.isSelected());
             calmMode.selectedProperty().addListener((property, previous, enabled) -> hangar.setCalmMode(enabled));
             shipView = hangar;
         } else {
             shipView = new SlotShipView(text);
-            calmMode.setDisable(true);
         }
         Node viewport = shipView.node();
         viewport.setId("ship-viewport");
@@ -89,6 +92,10 @@ public final class ShipBuilderController extends MissionScreen {
         gauges.refresh(session);
         var report = session.buildReport();
         warnings.showBuild(report.issues());
+        int openSlots = ModuleSlot.values().length - session.build().parts().size();
+        buildStatus.setText(openSlots > 0 ? text.get("ship.slotsLeft", openSlots)
+                : report.canConfirm() ? text.get("ship.readyHint")
+                : text.get("ship.fixHint", WarningList.describe(text, report.issues().getFirst())));
 
         var suppliesLocked = session.reasonLocked(MissionStep.SUPPLIES);
         supplies.setDisable(suppliesLocked.isPresent());

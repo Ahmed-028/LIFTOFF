@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 public final class SnapshotTool {
     private final Path folder;
     private final CompletableFuture<Void> done = new CompletableFuture<>();
+    private Path current;
 
     private SnapshotTool(Path folder) {
         this.folder = folder;
@@ -70,6 +71,7 @@ public final class SnapshotTool {
 
             var output = folder.resolve("1280x" + height);
             Files.createDirectories(output);
+            current = output;
             navigator.show(Screen.TITLE);
             save(scene, output.resolve("01-title.png"));
             button(scene, ".primary").fire();
@@ -134,6 +136,7 @@ public final class SnapshotTool {
                 require(session.launchIssues().stream().anyMatch(issue ->
                                 issue.kind() == com.liftoff.engine.sim.LaunchIssue.Kind.MASS_OVER_CAPACITY),
                         "Launch did not show the inadequate rocket warning");
+                require(lookup(scene, ".warning-action") != null, "Launch warning has no next action");
                 button(scene, ".action-bar .secondary").fire();
                 button(scene, ".action-bar .secondary").fire();
                 rocket = (ChoiceBox<?>) lookup(scene, "#rocket");
@@ -144,10 +147,16 @@ public final class SnapshotTool {
                 require(!button(scene, "#confirm").isDisabled(), "Valid build has issues: " + session.buildReport());
                 button(scene, "#confirm").fire();
                 save(scene, output.resolve("07-launch.png"));
+                verifyCabin(scene, "#launch-views");
+                save(scene, output.resolve("14-launch-cabin.png"));
                 button(scene, "#check").fire();
                 require(session.launchIssues().isEmpty(), "Launch failed: " + session.launchIssues());
                 after(3200, () -> {
                     require(session.step() == MissionStep.FLY, "Countdown did not open flight");
+                    require(lookup(scene, "#flight-phase") != null, "Flight has no phase caption");
+                    var views = verifyCabin(scene, "#flight-views");
+                    save(scene, output.resolve("15-flight-cabin.png"));
+                    views.getSelectionModel().selectFirst();
                     button(scene, "#skip-playback").fire();
                     save(scene, output.resolve("08-fly.png"));
                     button(scene, "#report").fire();
@@ -170,7 +179,7 @@ public final class SnapshotTool {
         });
     }
 
-    private void verifyMoon(Scene scene, GameSession session, CheckedAction next) {
+    private void verifyMoon(Scene scene, GameSession session, CheckedAction next) throws IOException {
         startMission(scene, "moon-landing", "apollo-service-module", "rl10c-1", "shuttle-fuel-cell",
                 "apollo-11-adapter", "apollo-11-lander");
         require(session.difficulty() == com.liftoff.engine.sim.Difficulty.ENGINEER, "Moon must use medium difficulty");
@@ -192,7 +201,7 @@ public final class SnapshotTool {
         finishMission(scene, session, next);
     }
 
-    private void verifyMars(Scene scene, GameSession session, CheckedAction next) {
+    private void verifyMars(Scene scene, GameSession session, CheckedAction next) throws IOException {
         startMission(scene, "mars-drones", "curiosity-cruise", "mr-106", "mmrtg", "mars-2020-entry",
                 "perseverance");
         require(session.difficulty() == com.liftoff.engine.sim.Difficulty.MISSION_DIRECTOR,
@@ -207,14 +216,16 @@ public final class SnapshotTool {
         finishMission(scene, session, next);
     }
 
-    private static void startMission(Scene scene, String id, String... partIds) {
+    private void startMission(Scene scene, String id, String... partIds) throws IOException {
         button(scene, ".command-bar .button").fire();
         button(scene, "#mission-" + id).fire();
+        save(scene, current.resolve(id + "-03-briefing.png"));
         button(scene, ".primary").fire();
         var slots = com.liftoff.model.ModuleSlot.values();
         for (int index = 0; index < slots.length; index++) {
             part(scene, slots[index].name(), partIds[index]);
         }
+        save(scene, current.resolve(id + "-04-ship-builder.png"));
         button(scene, "#supplies").fire();
     }
 
@@ -227,19 +238,46 @@ public final class SnapshotTool {
         ((javafx.scene.control.TabPane) lookup(scene, "#supplyTabs")).getSelectionModel().select(index);
     }
 
-    private void finishMission(Scene scene, GameSession session, CheckedAction next) {
+    private void finishMission(Scene scene, GameSession session, CheckedAction next) throws IOException {
+        String id = session.design().objective().id();
+        save(scene, current.resolve(id + "-05-supplies.png"));
         button(scene, "#review").fire();
+        save(scene, current.resolve(id + "-06-review.png"));
         require(!button(scene, "#confirm").isDisabled(), "Build issues: " + session.buildReport());
         button(scene, "#confirm").fire();
         button(scene, "#check").fire();
         require(session.launchIssues().isEmpty(), "Launch failed: " + session.launchIssues());
         after(3200, () -> {
-            button(scene, "#skip-playback").fire();
-            button(scene, "#report").fire();
-            require(session.step() == MissionStep.REPORT && session.simulation().orElseThrow().success(),
-                    "Mission did not fly through to its report");
-            next.run();
+            boolean moon = session.design().objective().id().equals("moon-landing");
+            waitForSurface(scene, 50, () -> {
+                save(scene, folder.resolve("1280x660/" + (moon ? "12-moon-surface.png" : "13-mars-surface.png")));
+                button(scene, "#skip-playback").fire();
+                button(scene, "#report").fire();
+                require(session.step() == MissionStep.REPORT && session.simulation().orElseThrow().success(),
+                        "Mission did not fly through to its report");
+                save(scene, current.resolve(id + "-09-report.png"));
+                next.run();
+            });
         });
+    }
+
+    private void waitForSurface(Scene scene, int attempts, CheckedAction action) throws Exception {
+        var phase = (javafx.scene.control.Label) lookup(scene, "#flight-phase");
+        if (phase.getText().equals("Exploring the surface")) {
+            action.run();
+        } else {
+            require(attempts > 0, "Expected surface scene, saw " + phase.getText());
+            after(160, () -> waitForSurface(scene, attempts - 1, action));
+        }
+    }
+
+    private static javafx.scene.control.TabPane verifyCabin(Scene scene, String selector) {
+        var views = (javafx.scene.control.TabPane) lookup(scene, selector);
+        views.getSelectionModel().select(1);
+        button(scene, "#cabin-forward").fire();
+        require(((javafx.scene.control.Label) lookup(scene, "#cabin-station")).getText().equals("Pilot seat"),
+                "Cabin camera did not advance to the pilot seat");
+        return views;
     }
 
     private void after(int milliseconds, CheckedAction action) {

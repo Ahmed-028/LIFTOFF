@@ -1,248 +1,867 @@
-/* Shared hangar palette and controls for the mission workflow. */
+/*
+ * LIFTOFF hangar theme for young explorers (ages 7-13).
+ *
+ * One navy hangar shell around every screen: cyan shows focus and picks, orange means "go"
+ * (one primary action per screen). Mission screens add a world class (.world-earth,
+ * .world-moon or .world-mars) that recolours the background and panels through the
+ * -world-* looked-up colours below. State is never shown by colour alone: every picked,
+ * locked or warning state also carries a word or a symbol.
+ */
+
+/* ---------- Tokens ---------- */
 .root {
-    -hangar-dark: #07122B;
-    -hangar-panel: #0E2147;
-    -hangar-raised: #1B3A6B;
-    -hangar-border: #285878;
-    -hangar-text: #F3F8FF;
-    -hangar-soft: #B9C7E6;
-    -hangar-cyan: #22E3F2;
-    -hangar-orange: #FF7A1A;
-    -hangar-warning: #FFCB69;
+    -navy-950: #050E26;
+    -navy-900: #071330;
+    -navy-800: #0D1E42;
+    -navy-700: #16305E;
+    -navy-600: #21427A;
+    -shell-line: #33609A;
+    -shell-line-strong: #4F7FBF;
+    -text: #F3F8FF;
+    -text-soft: #C3D3EE;
+    -cyan: #22E3F2;
+    -cyan-soft: #7EF4FB;
+    -orange: #FF7A1A;
+    -orange-high: #FF9C3D;
+    -orange-ink: #1A1206;
+    -amber: #FFCB69;
+    -alert: #FFACA4;
+    -good: #8BE07A;
+
+    /* Bright choice cards that sit on the darker panels. */
+    -card: #F2F8FF;
+    -card-hover: #FFFFFF;
+    -card-ink: #0B1A38;
+    -card-soft: #3D4E70;
+    -card-line: #C4D4EA;
+    -card-picked: #E0FCFF;
+    -card-ring: #0FB7C6;
+    -chip: #DCE8F7;
+    -chip-ink: #16305E;
+    -report-accent: #3B6FD1;
+
+    /* World colours. The shell values here are replaced per mission destination. */
+    -world-top: #12285A;
+    -world-bottom: #071330;
+    -world-panel: #0D1E42;
+    -world-raised: #16305E;
+    -world-line: #33609A;
+    -world-accent: #22E3F2;
+    -world-soft: #C3D3EE;
+
     -fx-font-family: "Barlow";
-    -fx-font-size: 14px;
-    -fx-base: -hangar-panel;
-    -fx-accent: -hangar-cyan;
-    -fx-focus-color: -hangar-cyan;
-    -fx-faint-focus-color: rgba(34, 227, 242, 0.14);
-    -fx-background-color: -hangar-dark;
+    -fx-font-size: 16px;
+    -fx-base: -navy-700;
+    -fx-accent: -cyan;
+    -fx-focus-color: -cyan;
+    -fx-faint-focus-color: rgba(34, 227, 242, 0.18);
+    -fx-background-color: -navy-900;
 }
+
+.world-earth {
+    -world-top: #0E6582;
+    -world-bottom: #08303F;
+    -world-panel: #0B4A5E;
+    -world-raised: #0F6F86;
+    -world-line: #2E9DB4;
+    -world-accent: #8BE07A;
+    -world-soft: #CDEFF8;
+}
+
+.world-moon {
+    -world-top: #2D3478;
+    -world-bottom: #121334;
+    -world-panel: #252B66;
+    -world-raised: #343C88;
+    -world-line: #5B62C9;
+    -world-accent: #D9DEEC;
+    -world-soft: #D7DCF5;
+}
+
+.world-mars {
+    -world-top: #8E3B22;
+    -world-bottom: #3A140E;
+    -world-panel: #5A2419;
+    -world-raised: #7A3424;
+    -world-line: #C2553D;
+    -world-accent: #FF9A5A;
+    -world-soft: #FFE1D2;
+}
+
+/* ---------- Screens ---------- */
 .screen {
-    -fx-padding: 16 23;
-    -fx-background-color: linear-gradient(to bottom right, #07122B, #10264B);
+    -fx-padding: 18 28 16 28;
+    -fx-background-color: linear-gradient(to bottom, -world-top 0%, -world-bottom 100%);
 }
+
 .title-screen, .selection-screen {
+    -fx-background-color: -navy-900;
     -fx-background-image: url("../models/hangar.png");
     -fx-background-size: cover;
     -fx-background-position: center;
 }
-.title-screen {
-    -fx-background-color: -hangar-dark;
+
+.mission-screen {
+    -fx-background-color: radial-gradient(center 85% 0%, radius 70%, rgba(255, 255, 255, 0.10) 0%, transparent 100%),
+            linear-gradient(to bottom, -world-top 0%, -world-bottom 100%);
 }
-.label, .check-box { -fx-text-fill: -hangar-text; }
+
+/* ---------- Type ---------- */
+.label, .check-box, .radio-button { -fx-text-fill: -text; }
+
 .game-title, .screen-heading {
     -fx-font-family: "Barlow Condensed";
     -fx-font-weight: bold;
     -fx-font-style: italic;
-    -fx-text-fill: -hangar-text;
+    -fx-text-fill: -text;
 }
+
 .game-title {
-    -fx-font-size: 94px;
-    -fx-effect: dropshadow(gaussian, #07122B, 16, .65, 0, 4);
+    -fx-font-size: 104px;
+    -fx-effect: dropshadow(gaussian, rgba(5, 14, 38, 0.85), 18, 0.55, 0, 4);
 }
+
 .tagline {
-    -fx-font-size: 24px;
-    -fx-text-fill: #D9E8FF;
-    -fx-effect: dropshadow(gaussian, #07122B, 10, .7, 0, 2);
-}
-.screen-heading { -fx-font-size: 34px; }
-.section-title, .card-title { -fx-font-weight: bold; -fx-font-size: 21px; }
-.card-title { -fx-font-size: 24px; }
-.eyebrow {
-    -fx-text-fill: #80EBF5;
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
-    -fx-font-size: 13px;
+    -fx-text-fill: #E2F7FF;
+    -fx-effect: dropshadow(gaussian, rgba(5, 14, 38, 0.9), 12, 0.6, 0, 2);
 }
-.body-text { -fx-font-size: 15px; -fx-line-spacing: 3; }
-.muted { -fx-text-fill: -hangar-soft; -fx-font-size: 13px; }
+
+.title-note {
+    -fx-font-size: 18px;
+    -fx-text-fill: -text;
+    -fx-background-color: rgba(5, 14, 38, 0.72);
+    -fx-background-radius: 999;
+    -fx-padding: 6 18;
+    -fx-effect: dropshadow(gaussian, rgba(5, 14, 38, 0.9), 10, 0.6, 0, 2);
+}
+
+.screen-heading { -fx-font-size: 40px; }
+.sub-heading, .intro-text { -fx-font-size: 18px; -fx-text-fill: -world-soft; -fx-line-spacing: 4; }
+.selection-screen .intro-text {
+    -fx-text-fill: -text;
+    -fx-background-color: rgba(5, 14, 38, 0.72);
+    -fx-background-radius: 14;
+    -fx-padding: 8 14;
+}
+.section-title { -fx-font-weight: bold; -fx-font-size: 21px; }
+.card-title { -fx-font-weight: bold; -fx-font-size: 28px; }
+
+.eyebrow {
+    -fx-text-fill: -world-accent;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.body-text { -fx-font-size: 17px; -fx-line-spacing: 4; }
+.muted { -fx-text-fill: -world-soft; -fx-font-size: 15px; -fx-line-spacing: 3; }
+.reading-value { -fx-text-fill: -cyan-soft; -fx-font-size: 16px; -fx-font-weight: bold; }
+
+/* ---------- Shell bars ---------- */
 .selection-header, .command-bar {
-    -fx-background-color: rgba(7, 18, 43, .92);
-    -fx-background-radius: 12;
-    -fx-border-color: -hangar-border;
-    -fx-border-radius: 12;
-    -fx-padding: 7 11;
+    -fx-background-color: rgba(7, 19, 48, 0.88);
+    -fx-background-radius: 20;
+    -fx-border-color: -shell-line;
+    -fx-border-radius: 20;
+    -fx-padding: 10 14;
 }
-.selection-content, .page-content { -fx-padding: 13 2 9 2; }
+
+.mission-header { -fx-spacing: 12; }
+
+.mission-chip {
+    -fx-font-weight: bold;
+    -fx-font-size: 17px;
+    -fx-text-fill: -world-accent;
+    -fx-padding: 0 0 0 4;
+}
+
+.selection-content, .page-content { -fx-padding: 18 2 14 2; }
+
 .action-bar {
-    -fx-padding: 10 0 0 0;
-    -fx-border-color: -hangar-border transparent transparent transparent;
+    -fx-background-color: rgba(7, 19, 48, 0.92);
+    -fx-background-radius: 20;
+    -fx-border-color: -shell-line;
+    -fx-border-radius: 20;
+    -fx-padding: 12 14;
+    -fx-alignment: center-right;
 }
-.panel, .objective-card, .part-strip {
-    -fx-background-color: -hangar-panel;
+
+.action-hint { -fx-text-fill: -text-soft; -fx-font-size: 15px; }
+
+/* ---------- Panels and cards ---------- */
+.panel, .part-strip {
+    -fx-background-color: -world-panel;
+    -fx-background-radius: 22;
+    -fx-border-color: -world-line;
+    -fx-border-radius: 22;
+    -fx-padding: 18;
+}
+
+.light-card {
+    -fx-background-color: -card;
+    -fx-background-radius: 22;
+    -fx-padding: 18 20;
+    -fx-spacing: 12;
+}
+.light-card .label, .light-card .section-title { -fx-text-fill: -card-ink; }
+.light-card .muted { -fx-text-fill: -card-soft; }
+
+.objective-card {
+    -fx-spacing: 12;
+    -fx-pref-width: 370;
+    -fx-min-width: 250;
+    -fx-padding: 0 0 20 0;
+    -fx-background-color: linear-gradient(to bottom, -world-raised 0%, -world-bottom 100%);
+    -fx-background-radius: 24;
+    -fx-border-color: -world-line;
+    -fx-border-width: 2;
+    -fx-border-radius: 24;
+}
+.objective-card .card-body { -fx-padding: 0 20 0 20; -fx-spacing: 12; }
+.objective-card .mission-art { -fx-background-radius: 22 22 0 0; }
+.objective-card.recommended {
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.45), 18, 0.25, 0, 0);
+}
+.objective-card.chosen {
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+}
+.objective-card .eyebrow { -fx-text-fill: -world-soft; }
+.objective-card .body-text { -fx-text-fill: #F6FBFF; }
+
+.recommended-badge {
+    -fx-background-color: -good;
+    -fx-text-fill: #0B2B12;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-background-radius: 999;
+    -fx-padding: 6 14;
+}
+
+.info-chip, .briefing-limit {
+    -fx-background-color: rgba(5, 14, 38, 0.38);
     -fx-background-radius: 12;
-    -fx-border-color: -hangar-border;
-    -fx-border-radius: 12;
-    -fx-padding: 14;
+    -fx-padding: 7 12;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+    -fx-graphic-text-gap: 9;
 }
-.objective-card { -fx-spacing: 9; -fx-pref-width: 370; -fx-min-width: 240; }
-.objective-card.chosen, .objective-card.recommended { -fx-border-color: -hangar-cyan; -fx-border-width: 2; -fx-padding: 13; }
-.objective-card .mission-art { -fx-background-color: #091833; }
-.extra-missions, .source-rows { -fx-padding: 10; }
-.mission-art { -fx-background-color: #091833; }
+
+.extra-missions, .source-rows { -fx-padding: 14; -fx-spacing: 14; }
+.mission-art { -fx-background-color: -navy-950; -fx-background-radius: 18; }
+
+/* ---------- Scroll areas ---------- */
+.scroll-pane, .scroll-pane > .viewport, .scroll-pane > .corner,
 .clear-scroll, .clear-scroll > .viewport, .inspection-scroll, .inspection-scroll > .viewport {
     -fx-background-color: transparent;
     -fx-padding: 0;
 }
-.inspection-scroll { -fx-border-insets: 0; }
+.scroll-pane:focused { -fx-background-insets: 0; }
 .scroll-bar { -fx-background-color: transparent; }
-.scroll-bar .thumb { -fx-background-color: #497B9A; -fx-background-radius: 5; }
+.scroll-bar .thumb { -fx-background-color: rgba(195, 211, 238, 0.55); -fx-background-radius: 6; }
+.scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-background-color: transparent; }
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow { -fx-background-color: rgba(195, 211, 238, 0.55); }
+
+/* ---------- Buttons ---------- */
 .button, .toggle-button, .choice-box, .text-field {
-    -fx-background-color: -hangar-raised;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-border-color: #447198;
-    -fx-padding: 7 13;
-    -fx-min-height: 34;
-    -fx-text-fill: -hangar-text;
+    -fx-background-color: -navy-700;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: -shell-line-strong;
+    -fx-border-width: 2;
+    -fx-padding: 8 18;
+    -fx-min-height: 46;
+    -fx-text-fill: -text;
+    -fx-font-size: 16px;
 }
 .button, .toggle-button { -fx-font-weight: bold; -fx-cursor: hand; }
-.button:hover, .toggle-button:hover, .choice-box:hover { -fx-background-color: #265383; }
-.button:focused, .toggle-button:focused, .choice-box:focused, .text-field:focused, .check-box:focused .box {
-    -fx-border-color: -hangar-cyan;
-    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, .35), 8, .2, 0, 0);
+.button:hover, .toggle-button:hover, .choice-box:hover { -fx-background-color: -navy-600; }
+.button:armed { -fx-background-color: -navy-800; }
+
+.button:focused, .toggle-button:focused, .choice-box:focused, .text-field:focused {
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.55), 12, 0.3, 0, 0);
 }
+
 .button.primary {
-    -fx-background-color: linear-gradient(to bottom, #FF9C3D, -hangar-orange);
-    -fx-text-fill: #181925;
+    -fx-background-color: linear-gradient(to bottom, -orange-high 0%, -orange 100%);
+    -fx-text-fill: -orange-ink;
     -fx-border-color: #FFD090;
-    -fx-padding: 8 20;
+    -fx-font-size: 19px;
+    -fx-padding: 10 26;
+    -fx-min-height: 54;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
 }
 .button.primary:hover { -fx-background-color: #FFA650; }
-.button.primary:focused { -fx-border-color: -hangar-cyan; }
-.button:disabled, .toggle-button:disabled { -fx-opacity: .65; -fx-cursor: default; }
-.button.big { -fx-font-size: 20px; -fx-padding: 11 25; }
-.button.step { -fx-font-size: 13px; -fx-padding: 5 11; -fx-min-height: 29; }
-.button.current-step {
-    -fx-background-color: -hangar-cyan;
-    -fx-border-color: -hangar-cyan;
-    -fx-text-fill: #07122B;
+.button.primary:armed { -fx-background-color: #F06A0A; }
+.button.primary:focused { -fx-border-color: -cyan; }
+.button.primary:disabled {
+    -fx-background-color: #6E5240;
+    -fx-text-fill: #F6E6DA;
+    -fx-border-color: #A88468;
+    -fx-border-style: segments(7, 5);
     -fx-opacity: 1;
 }
-.check-box { -fx-cursor: hand; }
-.check-box .box { -fx-background-color: #17375C; -fx-border-color: #447198; -fx-border-radius: 3; }
-.check-box:selected .mark { -fx-background-color: -hangar-cyan; }
-.choice-box { -fx-padding: 0; }
-.choice-box > .label { -fx-padding: 0 7 0 10; }
-.choice-box > .label, .choice-box .menu-item .label { -fx-text-fill: -hangar-text; }
-.context-menu { -fx-background-color: -hangar-panel; -fx-border-color: -hangar-border; }
-.context-menu .menu-item:focused { -fx-background-color: #265383; }
-.text-field { -fx-prompt-text-fill: -hangar-soft; }
+
+.button:disabled, .toggle-button:disabled, .choice-box:disabled, .check-box:disabled {
+    -fx-opacity: 0.6;
+    -fx-cursor: default;
+}
+.button.secondary:disabled { -fx-border-style: segments(7, 5); }
+
+.button.big { -fx-font-size: 24px; -fx-padding: 14 40; -fx-min-height: 64; -fx-background-radius: 20; -fx-border-radius: 20; }
+
+/* Mission steps: current = cyan with a dot, open = outline, locked = dashed edge and a word. */
+.stepper { -fx-spacing: 8; -fx-alignment: center-right; }
+.button.step {
+    -fx-font-size: 15px;
+    -fx-padding: 6 14;
+    -fx-min-height: 40;
+    -fx-background-color: transparent;
+    -fx-border-color: #8FB0E0;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+}
+.button.step:hover { -fx-background-color: rgba(143, 176, 224, 0.18); }
+.button.step:disabled {
+    -fx-opacity: 1;
+    -fx-text-fill: #B9C6E2;
+    -fx-border-color: #6F8DBA;
+    -fx-border-style: segments(6, 4);
+}
+.button.current-step, .button.current-step:disabled {
+    -fx-background-color: -cyan;
+    -fx-border-color: -cyan;
+    -fx-border-style: solid;
+    -fx-text-fill: -navy-900;
+    -fx-opacity: 1;
+}
+
+.button.strip-arrow {
+    -fx-font-size: 26px;
+    -fx-padding: 2 12;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+}
+
+.hyperlink { -fx-text-fill: -cyan-soft; -fx-padding: 0; -fx-font-size: 16px; -fx-underline: true; }
+.hyperlink:focused { -fx-border-color: -cyan; -fx-border-width: 2; -fx-border-radius: 6; }
+
+/* ---------- Form controls ---------- */
+.check-box { -fx-cursor: hand; -fx-font-size: 17px; -fx-label-padding: 0 0 0 10; }
+.check-box > .box {
+    -fx-background-color: -navy-800;
+    -fx-border-color: #8FB0E0;
+    -fx-border-width: 2;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-padding: 5;
+}
+.check-box:selected > .box { -fx-background-color: -cyan; -fx-border-color: -cyan; }
+.check-box > .box > .mark { -fx-padding: 6; -fx-background-color: transparent; }
+.check-box:selected > .box > .mark { -fx-background-color: -navy-900; }
+.check-box:focused > .box {
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.6), 10, 0.3, 0, 0);
+}
+
+.choice-box { -fx-padding: 0 4 0 0; }
+.choice-box > .label { -fx-padding: 0 8 0 12; -fx-text-fill: -text; -fx-font-size: 16px; }
+.choice-box > .open-button > .arrow { -fx-background-color: -cyan; -fx-padding: 4 7; }
+.choice-box .menu-item .label { -fx-text-fill: -text; -fx-font-size: 16px; }
+
+.context-menu {
+    -fx-background-color: -navy-800;
+    -fx-border-color: -shell-line-strong;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 6;
+}
+.menu-item { -fx-padding: 8 14; -fx-background-radius: 8; }
+.menu-item:focused { -fx-background-color: -navy-600; }
+.menu-item:focused .label { -fx-text-fill: -text; }
+
+.text-field {
+    -fx-prompt-text-fill: -text-soft;
+    -fx-highlight-fill: -cyan;
+    -fx-highlight-text-fill: -navy-900;
+    -fx-background-color: -navy-800;
+}
+
+.field-label { -fx-font-weight: bold; -fx-font-size: 17px; }
+
+.separator .line { -fx-border-color: -world-line; -fx-border-width: 1 0 0 0; }
+
+.titled-pane { -fx-text-fill: -text; -fx-font-size: 18px; }
 .titled-pane > .title {
-    -fx-background-color: -hangar-panel;
-    -fx-border-color: -hangar-border;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
+    -fx-background-color: -world-panel;
+    -fx-border-color: -world-line;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-padding: 12 16;
+    -fx-min-height: 50;
+}
+.titled-pane:expanded > .title { -fx-background-radius: 16 16 0 0; -fx-border-radius: 16 16 0 0; }
+.titled-pane > .title > .text { -fx-fill: -text; -fx-font-weight: bold; }
+.titled-pane > .title > .arrow-button > .arrow { -fx-background-color: -cyan; }
+.titled-pane > .content {
+    -fx-background-color: rgba(5, 14, 38, 0.6);
+    -fx-border-color: -world-line;
+    -fx-background-radius: 0 0 16 16;
+    -fx-border-radius: 0 0 16 16;
+}
+.titled-pane:focused > .title { -fx-border-color: -cyan; -fx-border-width: 3; }
+
+/* ---------- Tooltips ---------- */
+.tooltip {
+    -fx-background-color: -card;
+    -fx-text-fill: -card-ink;
+    -fx-font-size: 15px;
+    -fx-background-radius: 12;
     -fx-padding: 9 13;
+    -fx-effect: dropshadow(gaussian, rgba(5, 14, 38, 0.5), 12, 0.2, 0, 3);
 }
-.titled-pane, .titled-pane > .title > .text { -fx-text-fill: -hangar-text; }
-.titled-pane > .content { -fx-background-color: -hangar-dark; -fx-border-color: -hangar-border; }
-.titled-pane:focused > .title { -fx-border-color: -hangar-cyan; }
-.hyperlink { -fx-text-fill: #80EBF5; -fx-padding: 0; }
-.builder { -fx-padding: 8 0 0 0; }
-.ship-screen { -fx-padding: 13 23; }
-.builder-tabs { -fx-padding: 1 9 0 0; }
-.ship-screen .screen-heading { -fx-font-size: 31px; }
+
+/* ---------- Choice cards (instruments, ground stations) ---------- */
+.choice-card {
+    -fx-background-color: -card;
+    -fx-background-radius: 20;
+    -fx-border-color: -card-line;
+    -fx-border-width: 2;
+    -fx-border-radius: 20;
+    -fx-padding: 16 18;
+    -fx-spacing: 10;
+    -fx-cursor: hand;
+}
+.choice-card:hover { -fx-background-color: -card-hover; }
+.choice-card.chosen {
+    -fx-background-color: -card-picked;
+    -fx-border-color: -card-ring;
+    -fx-border-width: 3;
+    -fx-padding: 15 17;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.5), 14, 0.25, 0, 0);
+}
+.choice-card.focused-card {
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+    -fx-padding: 15 17;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.75), 16, 0.35, 0, 0);
+}
+.choice-card .label, .choice-card .check-box { -fx-text-fill: -card-ink; }
+.choice-card .check-box { -fx-font-size: 21px; -fx-font-weight: bold; }
+.choice-card .check-box > .box { -fx-background-color: #FFFFFF; -fx-border-color: #6C7FA3; }
+.choice-card .check-box:selected > .box { -fx-background-color: #0B6F7A; -fx-border-color: #0B6F7A; }
+.choice-card .check-box:selected > .box > .mark { -fx-background-color: #FFFFFF; }
+.choice-card .muted { -fx-text-fill: -card-soft; -fx-font-size: 15px; }
+.choice-card .body-text { -fx-text-fill: #1E2E4F; -fx-font-size: 17px; }
+.choice-card .discover-label { -fx-text-fill: #0B6F7A; -fx-font-size: 13px; -fx-font-weight: bold; }
+
+.pick-badge {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-padding: 4 12;
+}
+.choice-card .pick-badge { -fx-text-fill: #1D4F8C; -fx-border-color: #1D4F8C; -fx-border-width: 2; }
+.choice-card.chosen .pick-badge { -fx-text-fill: #FFFFFF; -fx-background-color: #0B6F7A; -fx-border-color: #0B6F7A; }
+
+.stat-chip {
+    -fx-background-color: -chip;
+    -fx-background-radius: 10;
+    -fx-padding: 5 10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-graphic-text-gap: 6;
+}
+.choice-card .stat-chip, .light-card .stat-chip { -fx-text-fill: -chip-ink; }
+
+.goal-tag {
+    -fx-background-radius: 10;
+    -fx-padding: 5 10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.choice-card .goal-tag { -fx-background-color: #D7F5DC; -fx-text-fill: #145226; }
+.choice-card .goal-tag.required { -fx-background-color: #0B6F7A; -fx-text-fill: #FFFFFF; }
+.choice-card .goal-tag.bonus { -fx-background-color: #FFF0CC; -fx-text-fill: #6B4A00; }
+
+.choice-heading { -fx-font-size: 28px; -fx-font-weight: bold; }
+
+/* ---------- Briefing ---------- */
+.briefing-difficulty {
+    -fx-padding: 8 14;
+    -fx-background-radius: 999;
+    -fx-background-color: rgba(5, 14, 38, 0.55);
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFE3B8;
+    -fx-font-size: 15px;
+}
+.briefing-question { -fx-font-size: 26px; -fx-font-weight: bold; -fx-line-spacing: 3; }
+
+.goal-row {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: -world-line;
+    -fx-border-width: 2;
+    -fx-padding: 12 14;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+}
+.goal-row.bonus { -fx-border-style: segments(7, 5); -fx-border-color: #9AA3D8; }
+.goal-row .label { -fx-text-fill: -card-ink; -fx-font-size: 17px; }
+.goal-badge {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-padding: 4 11;
+}
+.goal-row .goal-badge { -fx-text-fill: #FFFFFF; -fx-background-color: -world-raised; }
+.goal-row.bonus .goal-badge { -fx-text-fill: -card-ink; -fx-background-color: transparent; -fx-border-color: -world-line; -fx-border-width: 2; }
+.briefing-target { -fx-font-weight: bold; }
+
+/* ---------- Ship builder ---------- */
+.builder { -fx-padding: 12 0 0 0; }
+.ship-screen { -fx-padding: 14 24 12 24; }
+.ship-screen .screen-heading { -fx-font-size: 32px; }
+.ship-screen .mission-header { -fx-spacing: 6; }
+.ship-screen .action-bar { -fx-padding: 8 12; }
+.ship-screen .button.primary { -fx-min-height: 48; -fx-padding: 6 22; -fx-font-size: 18px; }
+.ship-screen .check-box { -fx-font-size: 16px; }
+.ship-screen .sub-heading { -fx-font-size: 17px; }
+.builder-tabs { -fx-padding: 0 12 0 2; }
+
 .module-tab {
-    -fx-alignment: CENTER_LEFT;
-    -fx-min-height: 43;
-    -fx-padding: 3 9;
-    -fx-text-alignment: LEFT;
+    -fx-alignment: center-left;
+    -fx-min-height: 46;
+    -fx-padding: 3 10;
+    -fx-text-alignment: left;
+    -fx-graphic-text-gap: 10;
+    -fx-background-color: rgba(5, 14, 38, 0.45);
+    -fx-border-color: -world-line;
+    -fx-font-size: 16px;
+    -fx-line-spacing: 1;
 }
-.module-tab:selected, .part-card.chosen, .slot-target.chosen {
-    -fx-border-color: -hangar-cyan;
-    -fx-background-color: #174160;
+.module-tab:hover { -fx-background-color: rgba(5, 14, 38, 0.25); }
+.module-tab:selected {
+    -fx-background-color: -world-raised;
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.45), 12, 0.25, 0, 0);
 }
+
 .hangar-frame {
-    -fx-background-color: -hangar-dark;
-    -fx-border-color: -hangar-border;
-    -fx-padding: 1;
+    -fx-background-color: -navy-950;
+    -fx-background-radius: 22;
+    -fx-border-color: -world-line;
+    -fx-border-width: 3;
+    -fx-border-radius: 22;
+    -fx-padding: 3;
 }
 .hangar-hint {
-    -fx-background-color: rgba(7, 18, 43, .88);
-    -fx-text-fill: -hangar-text;
-    -fx-padding: 5 9;
-    -fx-font-size: 12px;
+    -fx-background-color: rgba(7, 19, 48, 0.85);
+    -fx-background-radius: 999;
+    -fx-text-fill: -text;
+    -fx-padding: 6 14;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-translate-x: 10;
+    -fx-translate-y: 10;
 }
+
 .slot-viewport {
-    -fx-background-image: url("../models/hangar.png");
-    -fx-background-size: cover;
-    -fx-background-position: center;
+    -fx-background-color: linear-gradient(to bottom, -world-top 0%, -world-bottom 100%);
+    -fx-background-radius: 18;
+    -fx-padding: 14;
 }
 .slot-target {
-    -fx-background-color: -hangar-panel;
-    -fx-border-color: -hangar-border;
-    -fx-padding: 5 9;
-}
-.parts-dock { -fx-padding: 7 0; }
-.compact-gauge {
-    -fx-padding: 4 8;
-    -fx-background-color: -hangar-panel;
-    -fx-background-radius: 7;
-}
-.part-strip { -fx-padding: 5; -fx-alignment: CENTER; }
-.button.part-card {
-    -fx-min-width: 137;
-    -fx-pref-width: 137;
-    -fx-pref-height: 102;
-    -fx-text-alignment: CENTER;
-    -fx-padding: 4 5;
-    -fx-font-size: 12px;
-    -fx-graphic-text-gap: 2;
-}
-.button.strip-arrow { -fx-font-size: 24px; -fx-padding: 3 9; }
-.part-picture { -fx-background-color: #091833; -fx-background-radius: 7; }
-.detail-row {
-    -fx-padding: 4 0;
-    -fx-border-color: transparent transparent #23496A transparent;
-}
-.gauge-label { -fx-font-size: 13px; -fx-font-weight: bold; }
-.gauge-reading { -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8EEEF8; }
-.compact-gauge .gauge-reading { -fx-font-size: 14px; }
-.compact-gauge .gauge-label { -fx-font-size: 12px; }
-.compact-gauge { -fx-padding: 2 8; }
-.ship-screen .parts-dock { -fx-padding: 5 0; }
-.ship-screen .button.part-card { -fx-pref-height: 94; }
-.gauge-state { -fx-font-size: 12px; -fx-text-fill: -hangar-soft; }
-.gauge-state.state-tight, .warning { -fx-text-fill: -hangar-warning; }
-.gauge-state.state-over { -fx-text-fill: #FFACA4; }
-.supplies-tabs .tab-header-background { -fx-background-color: #091932; }
-.supplies-tabs .tab { -fx-background-color: #1B3A6B; -fx-padding: 6 12; }
-.supplies-tabs .tab:selected { -fx-background-color: #185371; }
-.supplies-tabs .tab-label { -fx-text-fill: #F3F8FF; -fx-font-weight: bold; }
-.instrument-preview { -fx-padding: 3 6 8 10; }
-.live-readings { -fx-border-color: #32A5BC; }
-.live-readings .gauge-label, .reading-value { -fx-text-fill: #8EEEF8; -fx-font-size: 16px; -fx-font-weight: bold; }
-.briefing-screen .panel { -fx-border-color: #2F7998; }
-.briefing-difficulty, .briefing-limit, .briefing-target {
-    -fx-padding: 7 10;
-    -fx-background-radius: 7;
-    -fx-background-color: #16385A;
+    -fx-background-color: -card;
+    -fx-text-fill: -card-ink;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: -card-line;
+    -fx-border-width: 2;
+    -fx-padding: 7 12;
+    -fx-graphic-text-gap: 8;
     -fx-font-weight: bold;
-    -fx-text-fill: #A9F3FB;
-    -fx-graphic-text-gap: 9;
 }
-.briefing-difficulty { -fx-text-fill: #FFD19B; -fx-background-color: #423148; }
-.briefing-target { -fx-background-color: #17494D; }
-.progress-bar { -fx-pref-height: 7; }
-.progress-bar > .track { -fx-background-color: #07162F; -fx-background-insets: 0; -fx-padding: 0; }
-.progress-bar > .bar { -fx-background-color: -hangar-cyan; -fx-background-insets: 0; -fx-padding: 0; }
-.progress-bar.state-tight > .bar { -fx-background-color: -hangar-warning; }
+.slot-target.chosen {
+    -fx-background-color: -card-picked;
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+}
+
+.parts-dock { -fx-padding: 10 0 6 0; -fx-spacing: 8; }
+
+.gauges { -fx-padding: 0; }
+.compact-gauge {
+    -fx-padding: 5 12;
+    -fx-background-color: rgba(5, 14, 38, 0.5);
+    -fx-background-radius: 14;
+}
+.part-strip { -fx-padding: 8; -fx-alignment: center; -fx-background-radius: 20; -fx-border-radius: 20; }
+
+.button.part-card {
+    -fx-min-width: 146;
+    -fx-pref-width: 146;
+    -fx-pref-height: 104;
+    -fx-text-alignment: center;
+    -fx-padding: 6 6;
+    -fx-font-size: 14px;
+    -fx-graphic-text-gap: 4;
+    -fx-background-color: -card;
+    -fx-text-fill: -card-ink;
+    -fx-border-color: -card-line;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+}
+.button.part-card:hover { -fx-background-color: -card-hover; }
+.button.part-card.chosen {
+    -fx-background-color: -card-picked;
+    -fx-border-color: -card-ring;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.5), 12, 0.25, 0, 0);
+}
+.button.part-card:focused { -fx-border-color: -cyan; -fx-border-width: 3; }
+.ship-screen .button.part-card { -fx-pref-height: 96; }
+.fitted-badge {
+    -fx-background-color: #0B6F7A;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 999;
+    -fx-padding: 1 8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-translate-x: 8;
+    -fx-translate-y: -4;
+}
+.ship-screen .part-strip { -fx-padding: 5 8; }
+.ship-screen .parts-dock { -fx-padding: 8 0 0 0; -fx-spacing: 6; }
+.ship-screen .compact-gauge { -fx-padding: 3 10; }
+
+.part-detail { -fx-spacing: 8; }
+.part-picture { -fx-background-color: -navy-950; -fx-background-radius: 14; -fx-padding: 6; }
+.detail-row {
+    -fx-padding: 6 0;
+    -fx-graphic-text-gap: 10;
+    -fx-border-color: transparent transparent rgba(195, 211, 238, 0.25) transparent;
+}
+
+/* ---------- Gauges ---------- */
+.gauge-label { -fx-font-size: 14px; -fx-font-weight: bold; -fx-graphic-text-gap: 7; }
+.gauge-reading { -fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: -cyan-soft; }
+.compact-gauge .gauge-reading { -fx-font-size: 15px; }
+.compact-gauge .gauge-label { -fx-font-size: 13px; }
+.gauge-state { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -good; }
+.gauge-state.state-unknown { -fx-text-fill: -text-soft; }
+.gauge-state.state-tight, .warning { -fx-text-fill: -amber; }
+.gauge-state.state-over { -fx-text-fill: -alert; }
+
+.progress-bar { -fx-pref-height: 10; }
+.progress-bar > .track { -fx-background-color: rgba(5, 14, 38, 0.75); -fx-background-insets: 0; -fx-background-radius: 6; -fx-padding: 0; }
+.progress-bar > .bar { -fx-background-color: -cyan; -fx-background-insets: 0; -fx-background-radius: 6; -fx-padding: 0; }
+.progress-bar.state-tight > .bar {
+    -fx-background-color: linear-gradient(from 0px 0px to 16px 0px, repeat, -amber 0%, -amber 50%, #E9A93A 50%, #E9A93A 100%);
+}
 .progress-bar.state-over > .bar { -fx-background-color: #FF8C83; }
-.warnings { -fx-padding: 5 0 0 0; }
-.warning { -fx-font-size: 13px; }
-.countdown, .score { -fx-text-fill: #86F4FB; -fx-font-size: 46px; -fx-font-weight: bold; }
+.progress-bar.state-over > .track { -fx-border-color: #FF8C83; -fx-border-radius: 6; }
+
+.live-readings { -fx-border-color: -world-line; }
+.live-readings .gauge-label { -fx-text-fill: -text; }
+
+/* ---------- Warnings ---------- */
+.warnings { -fx-padding: 4 0 0 0; -fx-spacing: 8; }
+.warning {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-graphic-text-gap: 9;
+    -fx-background-color: rgba(5, 14, 38, 0.5);
+    -fx-background-radius: 12;
+    -fx-padding: 8 12;
+}
+
+/* ---------- Supplies ---------- */
+.supplies-tabs { -fx-tab-min-height: 44; }
+.supplies-tabs > .tab-header-area { -fx-padding: 0 0 8 0; }
+.supplies-tabs > .tab-header-area > .tab-header-background { -fx-background-color: transparent; }
+.supplies-tabs > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: rgba(5, 14, 38, 0.5);
+    -fx-background-radius: 14;
+    -fx-padding: 8 20;
+    -fx-background-insets: 0 4 0 0;
+}
+.supplies-tabs > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -cyan, -card;
+    -fx-background-insets: 0 4 0 0, 0 4 4 0;
+}
+.supplies-tabs .tab .tab-label { -fx-text-fill: -text; -fx-font-weight: bold; -fx-font-size: 17px; }
+.supplies-tabs .tab:selected .tab-label { -fx-text-fill: -card-ink; }
+.supplies-tabs .tab:focused .focus-indicator {
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+    -fx-border-radius: 14;
+}
+.supplies-tabs > .tab-content-area { -fx-background-color: transparent; -fx-padding: 0; }
+
+.instrument-preview { -fx-padding: 4 8 10 12; }
+.instrument-preview .section-title { -fx-text-fill: -card-ink; }
+.preview-card {
+    -fx-background-color: -card;
+    -fx-background-radius: 20;
+    -fx-padding: 14;
+}
+.preview-card .label, .preview-card .section-title { -fx-text-fill: -card-ink; }
+.preview-card .muted, .preview-card .body-text { -fx-text-fill: -card-soft; }
+.preview-card .reading-value { -fx-text-fill: #0B6F7A; }
+.preview-card .discover-label { -fx-text-fill: #0B6F7A; -fx-font-size: 13px; -fx-font-weight: bold; }
+
+/* ---------- Launch, flight and report ---------- */
+.countdown, .score { -fx-text-fill: -cyan-soft; -fx-font-size: 54px; -fx-font-weight: bold; }
 .launch-pad {
-    -fx-background-color: #091833;
+    -fx-background-color: -navy-950;
     -fx-background-image: url("../models/hangar.png");
     -fx-background-size: cover;
     -fx-background-position: center;
-    -fx-border-color: -hangar-border;
+    -fx-background-radius: 22;
+    -fx-border-color: -world-line;
+    -fx-border-width: 3;
+    -fx-border-radius: 22;
 }
-.score-panel { -fx-border-color: #39B9C9; }
-.telemetry { -fx-font-size: 16px; -fx-line-spacing: 6; }
-.list-view { -fx-background-color: -hangar-dark; -fx-border-color: -hangar-border; }
-.list-cell:filled { -fx-text-fill: -hangar-text; -fx-background-color: -hangar-panel; }
-.list-cell:filled:odd { -fx-background-color: #122A52; }
-.list-cell:filled:selected { -fx-background-color: #265383; }
-.list-cell:empty { -fx-background-color: -hangar-dark; }
-.tooltip { -fx-font-size: 13px; }
+.status-text { -fx-font-size: 22px; -fx-font-weight: bold; -fx-line-spacing: 3; }
+
+.telemetry { -fx-font-size: 18px; -fx-line-spacing: 8; -fx-font-weight: bold; }
+.flight-time { -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: -world-accent; }
+
+.list-view {
+    -fx-background-color: rgba(5, 14, 38, 0.55);
+    -fx-background-radius: 14;
+    -fx-border-color: -world-line;
+    -fx-border-radius: 14;
+    -fx-padding: 6;
+}
+.list-view:focused { -fx-border-color: -cyan; -fx-border-width: 3; }
+.list-cell { -fx-font-size: 16px; -fx-padding: 8 10; }
+.list-cell:filled { -fx-text-fill: -text; -fx-background-color: transparent; }
+.list-cell:filled:odd { -fx-background-color: rgba(255, 255, 255, 0.05); }
+.list-cell:filled:selected { -fx-background-color: -navy-600; }
+.list-cell:empty { -fx-background-color: transparent; }
+
+.score-panel { -fx-border-color: -world-accent; -fx-border-width: 2; }
+.score-panel .eyebrow {
+    -fx-background-color: -card;
+    -fx-text-fill: -card-ink;
+    -fx-background-radius: 999;
+    -fx-padding: 6 14;
+    -fx-font-size: 15px;
+}
+
+.report-card {
+    -fx-background-color: -report-accent, -card;
+    -fx-background-insets: 0, 8 0 0 0;
+    -fx-background-radius: 22, 0 0 22 22;
+    -fx-padding: 22 20 20 20;
+    -fx-spacing: 10;
+}
+.report-card .label { -fx-text-fill: -card-ink; }
+.report-card .section-title { -fx-graphic-text-gap: 10; }
+.report-card .muted { -fx-text-fill: -card-soft; }
+.report-card.worked { -report-accent: #3E9B52; }
+.report-card.broke { -report-accent: #D9822B; }
+.report-card.try { -report-accent: #3B6FD1; }
+
+/* ---------- Sources ---------- */
+.source-card {
+    -fx-background-color: -card;
+    -fx-background-radius: 18;
+    -fx-padding: 14 16;
+    -fx-spacing: 6;
+}
+.source-card .label, .source-card .section-title { -fx-text-fill: -card-ink; }
+.source-card .muted { -fx-text-fill: -card-soft; }
+.source-card .body-text { -fx-text-fill: #1E2E4F; -fx-font-size: 16px; }
+.source-card .hyperlink { -fx-text-fill: #1D4F8C; }
+.link-status { -fx-padding: 10 4 0 4; }
+
+/* ---------- Mission goal, fix-it hints and builder status ---------- */
+.mission-goal {
+    -fx-background-color: -card-picked;
+    -fx-background-radius: 14;
+    -fx-border-color: -card-ring;
+    -fx-border-width: 2;
+    -fx-border-radius: 14;
+    -fx-padding: 10 14;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-line-spacing: 3;
+}
+
+.warning-card, .flight-alert {
+    -fx-background-color: rgba(5, 14, 38, 0.6);
+    -fx-background-radius: 14;
+    -fx-border-color: -amber;
+    -fx-border-width: 2;
+    -fx-border-radius: 14;
+    -fx-padding: 10 12;
+    -fx-alignment: top-left;
+}
+.warning-card .warning {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-text-fill: -amber;
+}
+.flight-alert { -fx-text-fill: -amber; -fx-font-weight: bold; -fx-font-size: 15px; }
+.warning-action { -fx-text-fill: -text; -fx-font-size: 14px; }
+
+.builder-status {
+    -fx-text-fill: -amber;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+/* ---------- Flight and landing scenes ---------- */
+.flight-viewport {
+    -fx-background-color: -navy-950;
+    -fx-border-color: -world-line;
+    -fx-border-width: 3;
+}
+.flight-caption {
+    -fx-background-color: rgba(7, 19, 48, 0.88);
+    -fx-background-radius: 0 0 18 0;
+    -fx-padding: 10 16;
+    -fx-spacing: 2;
+}
+.flight-caption .eyebrow { -fx-text-fill: -world-accent; }
+.flight-caption .section-title { -fx-font-size: 22px; }
+.flight-console { -fx-spacing: 10; }
+.flight-console .section-title { -fx-text-fill: -world-accent; -fx-font-size: 22px; }
+.flight-console .telemetry { -fx-font-size: 15px; -fx-line-spacing: 4; }
+.flight-console .eyebrow { -fx-text-fill: -world-soft; }
+
+/* ---------- Cockpit ---------- */
+.cockpit-panel {
+    -fx-padding: 12 16;
+    -fx-spacing: 10;
+    -fx-background-color: -world-panel;
+    -fx-background-radius: 20;
+    -fx-border-color: -world-line;
+    -fx-border-radius: 20;
+}
+.cockpit-panel .eyebrow { -fx-max-width: Infinity; -fx-alignment: center; -fx-font-size: 15px; }
+.cockpit-panel .button { -fx-min-height: 44; }
+
+/* The flight screen keeps its bottom bar visible at the smallest window size. */
+.fly-screen .page-content { -fx-padding: 10 2 4 2; }
+.fly-screen .screen-heading { -fx-font-size: 34px; }
+.fly-screen .flight-console { -fx-spacing: 6; -fx-padding: 14 16; }
+.fly-screen .flight-console .telemetry { -fx-font-size: 14px; -fx-line-spacing: 1; }
+.fly-screen .flight-alert { -fx-font-size: 14px; -fx-padding: 6 10; }
+.fly-screen .list-cell { -fx-padding: 5 10; -fx-font-size: 15px; }
+.fly-screen .supplies-tabs > .tab-header-area { -fx-padding: 0 0 6 0; }

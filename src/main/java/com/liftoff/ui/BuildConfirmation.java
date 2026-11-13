@@ -24,7 +24,8 @@ final class BuildConfirmation {
     void refresh(GameSession session, UiText text) {
         var report = session.buildReport();
         var messages = new ArrayList<String>();
-        report.issues().forEach(issue -> messages.add(WarningList.describe(text, issue)));
+        report.issues().forEach(issue -> messages.add(WarningList.describe(text, issue) + "\n"
+                + text.get("fix.try", text.get("fix.build." + issue.kind()))));
         session.reasonLocked(MissionStep.REVIEW).map(text::get).ifPresent(messages::add);
         String reasons = String.join("\n", messages);
         button.setDisable(!report.canConfirm() || !session.isUnlocked(MissionStep.REVIEW));

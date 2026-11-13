@@ -1,7 +1,12 @@
 package com.liftoff.ui;
 
 import com.liftoff.engine.sim.SimulationResult;
+import com.liftoff.render3d.FlightView;
+import com.liftoff.model.ModuleSlot;
+import com.liftoff.session.stub.Mission.Destination;
 import com.liftoff.session.MissionStep;
+import javafx.application.ConditionalFeature;
+import javafx.application.Platform;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -9,11 +14,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Tab;
+import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.EnumMap;
 
 public final class FlyController extends MissionScreen {
+    private static final double STEP_MILLIS = 870;
+
     @FXML private Label time;
     @FXML private Label telemetry;
     @FXML private Label eventSummary;
@@ -22,17 +33,51 @@ public final class FlyController extends MissionScreen {
     @FXML private Button playback;
     @FXML private Button skip;
     @FXML private Button report;
+    @FXML private StackPane viewport;
+    @FXML private Label phase;
+    @FXML private Label route;
+    @FXML private CheckBox calm;
+    @FXML private Tab cabinTab;
     private SimulationResult flight;
     private Timeline timer;
     private int index;
+    private FlightView view;
+    private Destination destination;
+    private int plannedSteps;
+    private CockpitPanel cockpit;
 
     @Override
     protected void setUp() {
         flight = session.simulation().orElseGet(() -> session.fly(ThreadLocalRandom.current().nextLong()));
+        destination = mission().destination();
+        plannedSteps = Math.max(1, mission().steps() > 0 ? mission().steps() : session.design().scienceMonths());
+        calm.setSelected(navigator.reducedMotion());
+        calm.selectedProperty().addListener((property, previous, enabled) -> navigator.setReducedMotion(enabled));
+        route.setText(text.get("flight.route." + destination));
+        cockpit = new CockpitPanel(session, text, true, route.getText());
+        cockpit.addControl(playback);
+        cabinTab.setContent(cockpit);
+        if (Platform.isSupported(ConditionalFeature.SCENE3D)) {
+            var models = new EnumMap<ModuleSlot, String>(ModuleSlot.class);
+            session.build().parts().forEach((slot, part) -> models.put(ModuleSlot.valueOf(slot.name()),
+                    slot.name().equals("SATELLITE") ? PartPreview.modelFor(part) : part.modelId()));
+            view = new FlightView(destination, models);
+            viewport.getChildren().addFirst(view);
+        } else {
+            var artwork = new StackPane();
+            ObjectiveCard.setArtwork(artwork, mission().id(), 260);
+            viewport.getChildren().addFirst(artwork);
+        }
         time.setText(text.get("fly.ready"));
         telemetry.setText(text.get("fly.standby"));
-        timer = new Timeline(new KeyFrame(Duration.millis(430), event -> showNextStep()));
+        timer = new Timeline(new KeyFrame(Duration.millis(STEP_MILLIS), event -> showNextStep()));
         timer.setCycleCount(Timeline.INDEFINITE);
+        timer.currentTimeProperty().addListener((property, previous, current) -> {
+            if (!calm.isSelected() && index < flight.timeline().size() && current.lessThan(timer.getCycleDuration())) {
+                showFlight((index + current.toMillis() / STEP_MILLIS) / plannedSteps);
+            }
+        });
+        showFlight(0);
         if (flight.timeline().isEmpty()) {
             finish();
         } else {
@@ -50,17 +95,34 @@ public final class FlyController extends MissionScreen {
             readings += "\n" + text.get("fly.crew", step.suppliesLeftKg());
         }
         telemetry.setText(readings);
+        cockpit.telemetry(text.get("cockpit.science", step.dataSentGbit(), step.storageUsedGbit(), step.powerShortfallW()));
         flightLog.getItems().add(text.get("fly.entry", label, step.dataSentGbit()));
         flight.events().stream().filter(event -> event.timeIndex() == step.index()).forEach(event -> {
             String message = text.get(event.messageKey());
-            eventSummary.setText(message);
+            eventSummary.setText("⚠ " + message + "\n" + text.get("flight.tip." + event.type()));
+            eventSummary.setVisible(true);
+            eventSummary.setManaged(true);
             flightLog.getItems().add("⚠ " + message);
         });
         flightLog.scrollTo(flightLog.getItems().size() - 1);
-        progress.setProgress((double) ++index / flight.timeline().size());
+        showFlight((double) ++index / plannedSteps);
         if (index == flight.timeline().size()) {
             finish();
         }
+    }
+
+    private void showFlight(double fraction) {
+        progress.setProgress(fraction);
+        String caption = text.get("flight.phase." + FlightView.phase(destination, fraction));
+        if (!caption.equals(phase.getText())) {
+            phase.setText(caption);
+        }
+        if (view != null) {
+            view.showProgress(fraction);
+        }
+        int remaining = Math.max(0, plannedSteps - index);
+        cockpit.update(caption, text.get("cockpit.eta", remaining, text.get("duration." + flight.stepUnit())),
+                fraction, !calm.isSelected() && cabinTab.isSelected());
     }
 
     @FXML
@@ -84,6 +146,10 @@ public final class FlyController extends MissionScreen {
 
     private void finish() {
         timer.stop();
+        if (index < plannedSteps) {
+            phase.setText(text.get("flight.endedEarly"));
+            cockpit.update(phase.getText(), text.get("cockpit.noEta"), (double) index / plannedSteps, false);
+        }
         playback.setDisable(true);
         skip.setDisable(true);
         report.setDisable(!session.isUnlocked(MissionStep.REPORT));

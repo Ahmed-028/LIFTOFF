@@ -4,9 +4,10 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.liftoff.ui.TitleController"
-      alignment="CENTER" spacing="13" styleClass="screen, title-screen">
+      alignment="CENTER" spacing="16" styleClass="screen, title-screen">
     <Label text="%title.name" styleClass="game-title"/>
     <Label text="%title.tagline" styleClass="tagline"/>
-    <StackPane fx:id="artHolder" minHeight="295"/>
+    <Label text="%title.note" styleClass="title-note" wrapText="true"/>
+    <StackPane fx:id="artHolder" minHeight="250"/>
     <Button text="%title.start" onAction="#onStart" defaultButton="true" styleClass="primary, big"/>
 </VBox>

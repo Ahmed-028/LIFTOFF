@@ -5,39 +5,50 @@
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.liftoff.ui.BriefingController" styleClass="screen, mission-screen, briefing-screen">
     <top>
-        <VBox spacing="8" styleClass="mission-header">
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+        <VBox styleClass="mission-header">
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="command-bar">
                 <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
             </HBox>
-            <Label text="%step.BRIEFING" styleClass="eyebrow"/>
-            <Label fx:id="title" styleClass="screen-heading" wrapText="true"/>
+            <VBox spacing="2">
+                <Label text="%briefing.eyebrow" styleClass="eyebrow"/>
+                <Label fx:id="title" styleClass="screen-heading" wrapText="true"/>
+            </VBox>
         </VBox>
     </top>
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
-            <HBox spacing="14" styleClass="page-content">
-                <VBox spacing="12" prefWidth="575" HBox.hgrow="ALWAYS" styleClass="panel">
+            <HBox spacing="22" styleClass="page-content">
+                <VBox spacing="14" prefWidth="560" HBox.hgrow="ALWAYS" styleClass="panel">
                     <StackPane fx:id="artwork"/>
                     <Label fx:id="difficulty" wrapText="true" styleClass="briefing-difficulty"/>
-                    <Label fx:id="question" wrapText="true" styleClass="section-title"/>
+                    <Label fx:id="question" wrapText="true" styleClass="briefing-question"/>
                     <Label fx:id="description" wrapText="true" styleClass="body-text"/>
                     <Label fx:id="inspiration" wrapText="true" styleClass="muted"/>
                 </VBox>
-                <VBox spacing="12" prefWidth="395" HBox.hgrow="ALWAYS" styleClass="panel">
-                    <Label text="%briefing.constraints" styleClass="section-title"/>
-                    <VBox fx:id="limits" spacing="7"/>
-                    <Separator/>
-                    <Label text="%briefing.measurements" styleClass="section-title"/>
-                    <VBox fx:id="measurements" spacing="8"/>
+                <VBox spacing="18" prefWidth="430" HBox.hgrow="ALWAYS">
+                    <VBox styleClass="light-card">
+                        <Label text="%briefing.goal" styleClass="section-title"/>
+                        <Label fx:id="objective" wrapText="true" styleClass="mission-goal"/>
+                        <Label text="%briefing.measurements" styleClass="section-title"/>
+                        <VBox fx:id="measurements" spacing="10"/>
+                    </VBox>
+                    <VBox spacing="12" styleClass="panel">
+                        <Label text="%briefing.constraints" styleClass="section-title"/>
+                        <FlowPane fx:id="limits" hgap="10" vgap="10"/>
+                    </VBox>
                 </VBox>
             </HBox>
         </ScrollPane>
     </center>
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+        <HBox alignment="CENTER_RIGHT" spacing="14" styleClass="action-bar">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
             <Region HBox.hgrow="ALWAYS"/>
+            <Label text="%briefing.nextHint" styleClass="action-hint"/>
             <Button text="%briefing.start" onAction="#onNext" styleClass="primary" />
         </HBox>
     </bottom>

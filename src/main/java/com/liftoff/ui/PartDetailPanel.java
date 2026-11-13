@@ -24,7 +24,8 @@ public final class PartDetailPanel extends VBox {
         }
         var image = new StackPane(preview.thumbnail(part, 190, 90));
         image.getStyleClass().add("part-picture");
-        getChildren().setAll(text.label(part.kidName(), "section-title"), image,
+        getChildren().setAll(text.label(part.kidName(), "section-title"),
+                text.label(part.description(), "body-text"), image,
                 row(text.get("detail.mass", part.massKg()), Icons.mass(17)),
                 row(text.get("detail.power", part.powerSupplyW(), part.powerDrawW()), Icons.power(17)),
                 row(text.get("detail.data", part.dataGbitPerDay()), Icons.data(17)),
@@ -46,7 +47,6 @@ public final class PartDetailPanel extends VBox {
             }
             case POWER -> { }
         }
-        getChildren().add(text.label(part.description(), "muted"));
     }
 
     private void addReading(String key, Object... values) {

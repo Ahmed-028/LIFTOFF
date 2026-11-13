@@ -5,19 +5,20 @@
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.liftoff.ui.MissionSelectController" styleClass="screen, selection-screen">
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="14" styleClass="selection-header">
+        <HBox alignment="CENTER_LEFT" spacing="16" styleClass="selection-header">
             <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
             <Label text="%select.heading" styleClass="screen-heading"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button id="open-sources" text="%sources.heading" onAction="#onSources" styleClass="secondary"/>
+            <Button id="open-sources" text="%select.sources" onAction="#onSources" styleClass="secondary"/>
         </HBox>
     </top>
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
-            <VBox spacing="14" styleClass="selection-content">
-                <HBox fx:id="mainMissions" spacing="14" fillHeight="true"/>
+            <VBox spacing="20" styleClass="selection-content">
+                <Label text="%select.intro" styleClass="intro-text" wrapText="true"/>
+                <HBox fx:id="mainMissions" spacing="22" fillHeight="true"/>
                 <TitledPane text="%select.extra" expanded="false" animated="false">
-                    <HBox fx:id="extraMissions" spacing="14" styleClass="extra-missions"/>
+                    <HBox fx:id="extraMissions" spacing="18" styleClass="extra-missions"/>
                 </TitledPane>
             </VBox>
         </ScrollPane>
