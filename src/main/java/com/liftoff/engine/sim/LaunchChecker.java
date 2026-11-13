@@ -6,6 +6,7 @@ import com.liftoff.engine.ResourceReport;
 import com.liftoff.engine.ResourceType;
 import com.liftoff.engine.ResourceUsage;
 import com.liftoff.engine.sim.LaunchIssue.Kind;
+import com.liftoff.model.LaunchClass;
 import com.liftoff.model.LaunchVehicle;
 import com.liftoff.model.MissionDesign;
 import com.liftoff.model.Orbit;
@@ -38,11 +39,13 @@ public final class LaunchChecker {
         boolean earth = mission.destination() == Mission.Destination.EARTH;
 
         double massKg = resources.get(ResourceType.MASS).used() + (build == null ? 0 : build.totalMassKg());
-        // TODO(Member 2): LaunchClass has no TRANS_LUNAR / TRANS_MARS yet, so no capacity can be
-        // looked up beyond Earth orbit and the rocket is reported as not offered.
-        OptionalDouble capacityKg = rocket != null && orbit != null && earth
-                ? rocket.capacityFor(orbit.launchClass())
-                : OptionalDouble.empty();
+        LaunchClass launchClass = switch (mission.destination()) {
+            case EARTH -> orbit == null ? null : orbit.launchClass();
+            case MOON -> LaunchClass.TRANS_LUNAR;
+            case MARS -> LaunchClass.TRANS_MARS;
+        };
+        OptionalDouble capacityKg = rocket == null || launchClass == null
+                ? OptionalDouble.empty() : rocket.capacityFor(launchClass);
         if (capacityKg.isEmpty()) {
             issues.add(LaunchIssue.of(Kind.ROCKET_NOT_OFFERED, massKg, 0));
         } else if (massKg > capacityKg.getAsDouble()) {

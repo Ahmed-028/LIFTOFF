@@ -21,4 +21,9 @@ public record ShipPart(String id, ModuleSlot slot, String name, String kidName, 
                        double costMusd, ValueBasis costBasis,
                        String modelId,
                        SourceRef source) {
+    public ShipPart {
+        if (missions != null) {
+            missions = List.copyOf(missions);
+        }
+    }
 }

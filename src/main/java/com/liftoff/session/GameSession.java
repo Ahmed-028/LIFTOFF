@@ -1,5 +1,6 @@
 package com.liftoff.session;
 
+import com.liftoff.data.MissionEntry;
 import com.liftoff.engine.ResourceCalculator;
 import com.liftoff.engine.ResourceReport;
 import com.liftoff.engine.score.Report;
@@ -7,17 +8,22 @@ import com.liftoff.engine.score.ReportBuilder;
 import com.liftoff.engine.score.Score;
 import com.liftoff.engine.score.ScoreCalculator;
 import com.liftoff.engine.sim.Difficulty;
+import com.liftoff.engine.sim.EventDeck;
 import com.liftoff.engine.sim.LaunchChecker;
 import com.liftoff.engine.sim.LaunchIssue;
 import com.liftoff.engine.sim.MissionSimulator;
+import com.liftoff.engine.sim.SimExtras;
+import com.liftoff.engine.sim.SimRules;
 import com.liftoff.engine.sim.SimulationResult;
 import com.liftoff.model.Catalog;
 import com.liftoff.model.GroundStation;
+import com.liftoff.model.Instrument;
 import com.liftoff.model.MissionDesign;
 import com.liftoff.model.Objective;
 import com.liftoff.session.stub.BuildCalculator;
 import com.liftoff.session.stub.BuildReport;
 import com.liftoff.session.stub.Mission;
+import com.liftoff.session.stub.ModuleSlot;
 import com.liftoff.session.stub.ShipBuild;
 import com.liftoff.session.stub.ShipPart;
 
@@ -44,6 +50,8 @@ public final class GameSession {
 
     private final Function<String, Optional<ShipPart>> partLookup;
     private Mission mission;
+    private MissionEntry missionEntry;
+    private double crewSuppliesKg;
     private ShipBuild build = ShipBuild.empty();
     private BuildReport buildReport = BuildCalculator.calculate(build, null);
     private MissionFlow flow = newFlow();
@@ -56,11 +64,10 @@ public final class GameSession {
     private Report report;
 
     public GameSession(Catalog catalog) {
-        // TODO(Member 1/2): look parts up in the catalog once it carries ship parts.
-        this(catalog, partId -> Optional.empty());
+        this(catalog, catalog::shipPart);
     }
 
-    /** @param partLookup finds a ship part by id; stands in for the catalog until it carries parts */
+    /** @param partLookup alternate source of ship parts, used by test scenarios */
     public GameSession(Catalog catalog, Function<String, Optional<ShipPart>> partLookup) {
         this(catalog, partLookup, MissionLog.inMemory());
     }
@@ -150,8 +157,14 @@ public final class GameSession {
     /** Puts the part in its own slot and keeps the other slots; un-confirms the build. */
     public void choosePart(String partId) {
         ShipPart part = found(partLookup.apply(partId), "ship part", partId);
+        String missionId = mission == null
+                ? (design.objective() == null ? null : design.objective().id())
+                : mission.id();
+        if (missionId != null && !part.missions().isEmpty() && !part.missions().contains(missionId)) {
+            throw new IllegalArgumentException("Ship part " + partId + " is unavailable for " + missionId);
+        }
         build = build.with(part);
-        buildReport = BuildCalculator.calculate(build, mission);
+        refreshBuildReport();
         flow.partsChanged();
         clearResults();
         notifyListeners();
@@ -170,14 +183,24 @@ public final class GameSession {
 
     /** Starts the mission from its briefing with an empty design and an empty ship. */
     public void selectMission(String missionId) {
-        Objective objective = found(catalog.objective(missionId), "mission", missionId);
-        // TODO(Member 2): use the real Mission and its deltaVRequiredMs once model/Mission is on main;
-        // zero here means "not known yet", it is not a physical value.
-        mission = new Mission(objective.id(), 0);
+        MissionEntry entry = catalog.mission(missionId).orElse(null);
+        Objective objective;
+        if (entry == null) {
+            objective = found(catalog.objective(missionId), "mission", missionId);
+            mission = new Mission(objective.id(), 0);
+        } else {
+            objective = entry.briefing();
+            mission = new Mission(entry.id(), entry.destination(), entry.stepUnit(), entry.steps(),
+                    entry.deltaVRequiredMs() == null ? 0 : entry.deltaVRequiredMs(),
+                    entry.crew(), entry.suppliesKgPerCrewDay(), entry.surfaceDeltaVRequiredMs());
+            difficulty = entry.difficulty();
+        }
+        missionEntry = entry;
+        crewSuppliesKg = 0;
         design = MissionDesign.empty().withObjective(objective).withScienceMonths(objective.minScienceMonths());
         resources = ResourceCalculator.calculate(design);
         build = ShipBuild.empty();
-        buildReport = BuildCalculator.calculate(build, mission);
+        refreshBuildReport();
         flow = newFlow();
         clearResults();
         notifyListeners();
@@ -185,6 +208,15 @@ public final class GameSession {
 
     public MissionStep step() {
         return flow.current();
+    }
+
+    public void setCrewSuppliesKg(double massKg) {
+        if (!Double.isFinite(massKg) || massKg < 0) {
+            throw new IllegalArgumentException("Crew supplies must be a finite, nonnegative mass");
+        }
+        requireOpen(MissionStep.SUPPLIES);
+        crewSuppliesKg = massKg;
+        update(design);
     }
 
     /** @throws IllegalStateException with the reason's message key if the step is locked */
@@ -270,7 +302,16 @@ public final class GameSession {
         if (simulation != null) {
             throw new IllegalStateException(ALREADY_FLOWN);
         }
-        simulation = MissionSimulator.run(design, mission, difficulty, seed);
+        if (deepSpace()) {
+            ShipPart power = build.part(ModuleSlot.POWER).orElseThrow();
+            var link = new MissionSimulator.DeepSpaceLink(buildReport.powerSupplyW()
+                    - powerDrawByShip(), missionEntry.downlinkMbps(), missionEntry.contactMinutesPerDay());
+            boolean solarPowered = power.modelId().equals("body-solar") || power.modelId().equals("deployable-solar");
+            simulation = MissionSimulator.run(design, mission, difficulty, seed, new EventDeck(catalog.events()),
+                    new SimExtras(Double.POSITIVE_INFINITY, crewSuppliesKg, solarPowered), link);
+        } else {
+            simulation = MissionSimulator.run(design, mission, difficulty, seed);
+        }
         score = ScoreCalculator.score(design, resources, buildReport, simulation, mission);
         report = ReportBuilder.build(design, resources, List.of(), simulation, mission);
         flow.markSimulationFinished();
@@ -334,9 +375,32 @@ public final class GameSession {
     private void update(MissionDesign newDesign) {
         design = newDesign;
         resources = ResourceCalculator.calculate(newDesign);
+        refreshBuildReport();
         flow.partsChanged();
         clearResults();
         notifyListeners();
+    }
+
+    private void refreshBuildReport() {
+        if (!deepSpace()) {
+            buildReport = BuildCalculator.calculate(build, mission);
+            return;
+        }
+        double stepDays = mission.stepUnit() == Mission.StepUnit.DAY ? 1 : SimRules.DAYS_PER_MONTH;
+        int steps = mission.steps() > 0 ? mission.steps() : design.scienceMonths();
+        double requiredSupplies = steps * (mission.crew() * mission.suppliesKgPerCrewDay() * stepDays);
+        buildReport = BuildCalculator.calculate(build, mission,
+                design.instruments().stream().mapToDouble(Instrument::massKg).sum(),
+                design.instruments().stream().mapToDouble(Instrument::avgPowerW).sum(),
+                crewSuppliesKg, requiredSupplies);
+    }
+
+    private boolean deepSpace() {
+        return missionEntry != null && missionEntry.destination() != Mission.Destination.EARTH;
+    }
+
+    private double powerDrawByShip() {
+        return build.parts().values().stream().mapToDouble(ShipPart::powerDrawW).sum();
     }
 
     private void notifyListeners() {

@@ -20,7 +20,8 @@
       "title": "NASA Earth Science Reference Handbook (2006)",
       "detail": "Key SORCE Facts and instrument facts, PDF p. 232-235. Bus mass = 315 kg spacecraft minus 66.6 kg of instruments flown.",
       "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
-    }
+    },
+    "storageGbit": null
   },
   {
     "id": "eo1-class",
@@ -41,9 +42,10 @@
     "buildBasis": "GAME_ESTIMATE",
     "source": {
       "title": "NASA Earth Science Reference Handbook (2006)",
-      "detail": "Key EO-1 Facts and instrument facts, PDF p. 142-144. Bus mass = 529 kg spacecraft minus 100.5 kg of instruments (ALI and LAC).",
+      "detail": "Key EO-1 Facts and instrument facts, PDF p. 142-144. Bus mass = 529 kg spacecraft minus 100.5 kg of instruments (ALI and LAC). NASA Earth Observing-1, WARP section: 48 Gbit storage.",
       "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
-    }
+    },
+    "storageGbit": 48
   },
   {
     "id": "landsat7-class",
@@ -64,8 +66,9 @@
     "buildBasis": "GAME_ESTIMATE",
     "source": {
       "title": "NASA Earth Science Reference Handbook (2006)",
-      "detail": "Key Landsat 7 Facts and Key ETM+ Facts, PDF p. 188-190. Bus mass = 1982 kg spacecraft minus the 425 kg ETM+. Downlink is one of its three 150 Mbps links.",
+      "detail": "Key Landsat 7 Facts and Key ETM+ Facts, PDF p. 188-190. Bus mass = 1982 kg spacecraft minus the 425 kg ETM+. Downlink is one of its three 150 Mbps links. PDF p. 190: 380 Gbit recorder.",
       "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
-    }
+    },
+    "storageGbit": 380
   }
 ]

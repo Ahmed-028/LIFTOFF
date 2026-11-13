@@ -8,14 +8,16 @@ import com.liftoff.engine.score.Score;
 import com.liftoff.engine.score.ScoreRules;
 import com.liftoff.engine.sim.Difficulty;
 import com.liftoff.engine.sim.LaunchIssue;
+import com.liftoff.engine.sim.SimEventType;
 import com.liftoff.engine.sim.SimLimit;
 import com.liftoff.model.Catalog;
 import com.liftoff.model.MissionDesign;
 import com.liftoff.session.stub.ModuleSlot;
+import com.liftoff.session.stub.Mission.StepUnit;
+import com.liftoff.session.stub.BuildIssue;
 import com.liftoff.session.stub.ShipBuild;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -30,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Plays Mission 1 from briefing to report through GameSession only, with the real catalog.
- * The five ship modules are test fakes (zero mass and cost): the catalog has no ship parts yet.
+ * Zero-mass test modules isolate the launch, flight and score checks in these scenarios.
  */
 class FullMissionTest {
 
@@ -228,14 +230,74 @@ class FullMissionTest {
     }
 
     @Test
-    @Disabled("Mission 2 (Moon landing) is not on main: needs missions.json, ship parts, TRANS_LUNAR rocket "
-            + "capacity, delta-v and suppliesKgPerCrewDay with sources from Members 1 and 2. No fake data.")
     void missionTwoIsPlayedFromBriefingToReport() {
+        session = new GameSession(catalog, catalog::shipPart, log);
+        assemble("moon-landing", "apollo-service-module", "rl10c-1", "shuttle-fuel-cell",
+                "apollo-11-adapter", "apollo-11-lander");
+        session.addInstrument("lola");
+        session.chooseLaunchVehicle("saturn-v");
+        session.toggleStation("wallops");
+        assertTrue(session.buildReport().issues().stream()
+                .anyMatch(issue -> issue.kind() == BuildIssue.Kind.SUPPLIES_SHORT));
+        session.setCrewSuppliesKg(80);
+
+        finishFlight(SEED);
+
+        var result = session.simulation().orElseThrow();
+        assertEquals(StepUnit.DAY, result.stepUnit());
+        assertEquals(8, result.timeline().size());
+        assertEquals(80 - 8 * 2 * 4.99, result.timeline().getLast().suppliesLeftKg(), 1e-9);
+        assertEquals("moon-landing", log.top(1).getFirst().missionId());
     }
 
     @Test
-    @Disabled("Mission 3 (Mars sample drones) is not on main: needs missions.json, ship parts, TRANS_MARS rocket "
-            + "capacity, delta-v, the solar/nuclear power flag and sourced events from Members 1 and 2. No fake data.")
     void missionThreeIsPlayedFromBriefingToReport() {
+        session = new GameSession(catalog, catalog::shipPart, log);
+        assemble("mars-drones", "curiosity-cruise", "mr-106", "mmrtg", "mars-2020-entry", "perseverance");
+        session.addInstrument("mastcam-z");
+        session.addInstrument("supercam");
+        session.chooseLaunchVehicle("atlas-v-541");
+        session.toggleStation("wallops");
+        session.choosePart("sp1x-solar");
+        assertTrue(session.buildReport().issues().stream()
+                .anyMatch(issue -> issue.kind() == BuildIssue.Kind.POWER_SHORT));
+        session.choosePart("mmrtg");
+
+        // This seed draws the bundled InSight dust-storm card during the six-month flight.
+        finishFlight(23);
+
+        var result = session.simulation().orElseThrow();
+        assertEquals(StepUnit.MONTH, result.stepUnit());
+        assertEquals(6, result.timeline().size());
+        assertTrue(result.events().stream().anyMatch(event -> event.type() == SimEventType.DUST_STORM));
+        assertTrue(result.events().stream().filter(event -> event.type() == SimEventType.DUST_STORM)
+                .allMatch(event -> event.effect().fraction() == 0));
+        assertTrue(result.timeline().stream().allMatch(step -> step.powerShortfallW() == 0));
+        assertEquals("mars-drones", log.top(1).getFirst().missionId());
+    }
+
+    private void assemble(String missionId, String... parts) {
+        session.selectMission(missionId);
+        session.next();
+        for (String part : parts) {
+            session.choosePart(part);
+        }
+        session.next();
+    }
+
+    private void finishFlight(long seed) {
+        session.next();
+        assertTrue(session.buildReport().canConfirm(), () -> session.buildReport().issues().toString());
+        assertTrue(session.buildReport().propellantKg() > 0);
+        assertTrue(session.buildReport().deltaVAvailableMs() >= session.buildReport().deltaVRequiredMs());
+        session.confirmBuild();
+        session.next();
+        assertTrue(session.runLaunchCheck().isEmpty(), () -> session.launchIssues().toString());
+        session.next();
+        assertTrue(session.fly(seed).success());
+        session.next();
+        assertEquals(MissionStep.REPORT, session.step());
+        assertTrue(session.score().orElseThrow().science() > 0);
+        assertTrue(session.report().isPresent());
     }
 }
