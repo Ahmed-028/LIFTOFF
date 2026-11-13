@@ -1,0 +1,42 @@
+[
+  {
+    "id": "fixture-solar-storm",
+    "type": "SOLAR_STORM",
+    "messageKey": "event.solarStorm",
+    "destinations": ["EARTH", "MOON", "MARS"],
+    "realExample": "TEST FIXTURE - not a real event; the real example is pending from Member 1",
+    "source": { "title": "Test fixture", "detail": "made up for tests", "url": "https://example.test" }
+  },
+  {
+    "id": "fixture-station-outage",
+    "type": "STATION_OUTAGE",
+    "messageKey": "event.stationOutage",
+    "destinations": ["EARTH"],
+    "realExample": "TEST FIXTURE - not a real event; the real example is pending from Member 1",
+    "source": { "title": "Test fixture", "detail": "made up for tests", "url": "https://example.test" }
+  },
+  {
+    "id": "fixture-instrument-fault",
+    "type": "INSTRUMENT_FAULT",
+    "messageKey": "event.instrumentFault",
+    "destinations": ["EARTH", "MARS"],
+    "realExample": "TEST FIXTURE - not a real event; the real example is pending from Member 1",
+    "source": { "title": "Test fixture", "detail": "made up for tests", "url": "https://example.test" }
+  },
+  {
+    "id": "fixture-launch-slip",
+    "type": "LAUNCH_SLIP",
+    "messageKey": "event.launchSlip",
+    "destinations": ["EARTH", "MOON", "MARS"],
+    "realExample": "TEST FIXTURE - not a real event; the real example is pending from Member 1",
+    "source": { "title": "Test fixture", "detail": "made up for tests", "url": "https://example.test" }
+  },
+  {
+    "id": "fixture-dust-storm",
+    "type": "DUST_STORM",
+    "messageKey": "event.dustStorm",
+    "destinations": ["MARS"],
+    "realExample": "TEST FIXTURE - not a real event; the real example is pending from Member 1",
+    "source": { "title": "Test fixture", "detail": "made up for tests", "url": "https://example.test" }
+  }
+]
