@@ -6,6 +6,8 @@ import com.liftoff.engine.ResourceLevel;
 import com.liftoff.engine.ResourceReport;
 import com.liftoff.engine.ResourceType;
 import com.liftoff.model.Catalog;
+import com.liftoff.session.stub.ModuleSlot;
+import com.liftoff.session.stub.ShipBuild;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -158,6 +160,159 @@ class GameSessionTest {
         // 248.4 + 48.6 = 297.0 kg against Electron's 300 kg
         assertEquals(297.0, session.resources().get(ResourceType.MASS).used(), 1e-9);
         assertEquals(ResourceLevel.TIGHT, session.resources().get(ResourceType.MASS).level());
+    }
+
+    // ---- ship build and mission flow (parts are test fakes until the real catalog has them) ----
+
+    private GameSession sessionWithParts() {
+        return new GameSession(catalog, FakeParts.lookup());
+    }
+
+    private static void chooseAllParts(GameSession game, String suffix) {
+        for (ModuleSlot slot : ModuleSlot.values()) {
+            game.choosePart(FakeParts.idOf(slot, suffix));
+        }
+    }
+
+    @Test
+    void aNewSessionStartsAtTheBriefingWithAnEmptyBuild() {
+        assertEquals(MissionStep.BRIEFING, session.step());
+        assertFalse(session.build().isComplete());
+        assertFalse(session.buildReport().canConfirm());
+    }
+
+    @Test
+    void choosingAPartSwapsOnlyItsSlot() {
+        GameSession game = sessionWithParts();
+        chooseAllParts(game, "a");
+
+        game.choosePart("power-b");
+
+        assertEquals("power-b", game.build().part(ModuleSlot.POWER).orElseThrow().id());
+        for (ModuleSlot slot : ModuleSlot.values()) {
+            if (slot != ModuleSlot.POWER) {
+                assertEquals(FakeParts.idOf(slot, "a"), game.build().part(slot).orElseThrow().id());
+            }
+        }
+    }
+
+    @Test
+    void choosingAPartRecalculatesTheBuildReport() {
+        GameSession game = sessionWithParts();
+        assertEquals(ModuleSlot.values().length, game.buildReport().issues().size());
+
+        game.choosePart("airframe-a");
+
+        assertEquals(ModuleSlot.values().length - 1, game.buildReport().issues().size());
+    }
+
+    @Test
+    void anUnknownPartIsRejected() {
+        assertThrows(IllegalArgumentException.class, () -> sessionWithParts().choosePart("warp-core"));
+    }
+
+    @Test
+    void confirmBuildThrowsWhileIssuesExist() {
+        GameSession game = sessionWithParts();
+        game.choosePart("airframe-a");
+
+        assertFalse(game.buildReport().canConfirm());
+        assertThrows(IllegalStateException.class, game::confirmBuild);
+    }
+
+    @Test
+    void aConfirmedBuildOpensLaunchAndChangingAPartLocksItAgain() {
+        GameSession game = sessionWithParts();
+        game.next();
+        chooseAllParts(game, "a");
+        game.next();
+        game.next();
+        game.confirmBuild();
+        assertTrue(game.isUnlocked(MissionStep.LAUNCH));
+
+        game.goTo(MissionStep.SHIP);
+        game.choosePart("cargo-bay-b");
+
+        assertFalse(game.isUnlocked(MissionStep.LAUNCH));
+    }
+
+    @Test
+    void goToALockedStepThrowsWithTheReason() {
+        IllegalStateException refused =
+                assertThrows(IllegalStateException.class, () -> session.goTo(MissionStep.SUPPLIES));
+
+        assertEquals(session.reasonLocked(MissionStep.SUPPLIES).orElseThrow(), refused.getMessage());
+        assertEquals(MissionStep.BRIEFING, session.step());
+    }
+
+    @Test
+    void listenersFireExactlyOncePerBuildOrFlowChange() {
+        GameSession game = sessionWithParts();
+        AtomicInteger calls = new AtomicInteger();
+        game.addListener(calls::incrementAndGet);
+
+        game.selectMission("farm-watch");                  // 1
+        game.next();                                       // 2
+        chooseAllParts(game, "a");                         // 2 + one per slot
+        game.goTo(MissionStep.SUPPLIES);
+        game.next();
+        game.confirmBuild();
+        game.back();
+
+        assertEquals(2 + ModuleSlot.values().length + 4, calls.get());
+    }
+
+    @Test
+    void aRefusedChangeDoesNotTellListeners() {
+        AtomicInteger calls = new AtomicInteger();
+        session.addListener(calls::incrementAndGet);
+
+        assertThrows(IllegalStateException.class, () -> session.goTo(MissionStep.LAUNCH));
+        assertThrows(IllegalStateException.class, session::confirmBuild);
+        assertThrows(IllegalArgumentException.class, () -> session.choosePart("warp-core"));
+        session.back();
+
+        assertEquals(0, calls.get());
+    }
+
+    @Test
+    void selectingAMissionResetsTheFlowAndTheDesign() {
+        GameSession game = sessionWithParts();
+        game.next();
+        chooseAllParts(game, "a");
+        game.next();
+        game.addInstrument("modis");
+
+        game.selectMission("ice-patrol");
+
+        assertEquals(MissionStep.BRIEFING, game.step());
+        assertFalse(game.isUnlocked(MissionStep.SHIP));
+        assertEquals(ShipBuild.empty(), game.build());
+        assertEquals("ice-patrol", game.design().objective().id());
+        assertTrue(game.design().instruments().isEmpty());
+        assertThrows(IllegalArgumentException.class, () -> game.selectMission("find-aliens"));
+    }
+
+    @Test
+    void redesignFromTheReportKeepsTheParts() {
+        GameSession game = sessionWithParts();
+        game.next();
+        chooseAllParts(game, "a");
+        game.next();
+        game.next();
+        game.confirmBuild();
+        game.next();
+        game.markLaunchPassed();
+        game.next();
+        game.markSimulationFinished();
+        game.next();
+        ShipBuild before = game.build();
+
+        game.redesign();
+
+        assertEquals(MissionStep.SHIP, game.step());
+        assertEquals(before, game.build());
+        assertFalse(game.isUnlocked(MissionStep.LAUNCH));
     }
 
     @Test
