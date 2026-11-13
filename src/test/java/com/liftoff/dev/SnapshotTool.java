@@ -134,6 +134,7 @@ public final class SnapshotTool {
                 require(session.launchIssues().stream().anyMatch(issue ->
                                 issue.kind() == com.liftoff.engine.sim.LaunchIssue.Kind.MASS_OVER_CAPACITY),
                         "Launch did not show the inadequate rocket warning");
+                require(lookup(scene, ".warning-action") != null, "Launch warning has no next action");
                 button(scene, ".action-bar .secondary").fire();
                 button(scene, ".action-bar .secondary").fire();
                 rocket = (ChoiceBox<?>) lookup(scene, "#rocket");
@@ -148,6 +149,7 @@ public final class SnapshotTool {
                 require(session.launchIssues().isEmpty(), "Launch failed: " + session.launchIssues());
                 after(3200, () -> {
                     require(session.step() == MissionStep.FLY, "Countdown did not open flight");
+                    require(lookup(scene, "#flight-phase") != null, "Flight has no phase caption");
                     button(scene, "#skip-playback").fire();
                     save(scene, output.resolve("08-fly.png"));
                     button(scene, "#report").fire();
@@ -234,12 +236,26 @@ public final class SnapshotTool {
         button(scene, "#check").fire();
         require(session.launchIssues().isEmpty(), "Launch failed: " + session.launchIssues());
         after(3200, () -> {
-            button(scene, "#skip-playback").fire();
-            button(scene, "#report").fire();
-            require(session.step() == MissionStep.REPORT && session.simulation().orElseThrow().success(),
-                    "Mission did not fly through to its report");
-            next.run();
+            boolean moon = session.design().objective().id().equals("moon-landing");
+            waitForSurface(scene, 50, () -> {
+                save(scene, folder.resolve("1280x660/" + (moon ? "12-moon-surface.png" : "13-mars-surface.png")));
+                button(scene, "#skip-playback").fire();
+                button(scene, "#report").fire();
+                require(session.step() == MissionStep.REPORT && session.simulation().orElseThrow().success(),
+                        "Mission did not fly through to its report");
+                next.run();
+            });
         });
+    }
+
+    private void waitForSurface(Scene scene, int attempts, CheckedAction action) throws Exception {
+        var phase = (javafx.scene.control.Label) lookup(scene, "#flight-phase");
+        if (phase.getText().equals("Exploring the surface")) {
+            action.run();
+        } else {
+            require(attempts > 0, "Expected surface scene, saw " + phase.getText());
+            after(160, () -> waitForSurface(scene, attempts - 1, action));
+        }
     }
 
     private void after(int milliseconds, CheckedAction action) {

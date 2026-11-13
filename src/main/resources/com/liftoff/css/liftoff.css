@@ -246,3 +246,27 @@
 .list-cell:filled:selected { -fx-background-color: #265383; }
 .list-cell:empty { -fx-background-color: -hangar-dark; }
 .tooltip { -fx-font-size: 13px; }
+.mission-goal {
+    -fx-padding: 10 12;
+    -fx-background-color: #144D58;
+    -fx-background-radius: 9;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+.warning-card, .flight-alert {
+    -fx-background-color: #342D31;
+    -fx-background-radius: 8;
+    -fx-border-color: #B88749;
+    -fx-border-radius: 8;
+    -fx-padding: 8;
+}
+.warning-card .warning, .flight-alert { -fx-text-fill: #FFD897; -fx-font-weight: bold; }
+.warning-action { -fx-text-fill: #F3F8FF; -fx-font-size: 13px; }
+.flight-viewport { -fx-background-color: #050C20; -fx-border-color: #3AAEC8; }
+.flight-caption {
+    -fx-background-color: rgba(7, 18, 43, .90);
+    -fx-padding: 9 13;
+    -fx-background-radius: 0 0 10 0;
+}
+.flight-console .telemetry { -fx-font-size: 14px; -fx-line-spacing: 2; }
+.builder-status { -fx-text-fill: #FFD897; -fx-font-weight: bold; }

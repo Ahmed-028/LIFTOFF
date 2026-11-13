@@ -26,6 +26,8 @@
                     <Label fx:id="inspiration" wrapText="true" styleClass="muted"/>
                 </VBox>
                 <VBox spacing="12" prefWidth="395" HBox.hgrow="ALWAYS" styleClass="panel">
+                    <Label text="%briefing.goal" styleClass="section-title"/>
+                    <Label fx:id="objective" wrapText="true" styleClass="mission-goal"/>
                     <Label text="%briefing.constraints" styleClass="section-title"/>
                     <VBox fx:id="limits" spacing="7"/>
                     <Separator/>

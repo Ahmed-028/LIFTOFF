@@ -6,6 +6,7 @@ import com.liftoff.render.Icons;
 import com.liftoff.session.stub.BuildIssue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -32,22 +33,26 @@ public final class WarningList extends VBox {
 
     void showBuild(List<BuildIssue> issues) {
         getChildren().setAll(issues.stream()
-                .map(issue -> warning(describe(text, issue), Icons.forWarning(issue.kind(), 18))).toList());
+                .map(issue -> warning(describe(text, issue), text.get("fix.build." + issue.kind()),
+                        Icons.forWarning(issue.kind(), 23))).toList());
     }
 
     void addDesign(List<DesignIssue> issues) {
-        issues.forEach(issue -> getChildren().add(warning(describe(text, issue), Icons.warning(18))));
+        issues.forEach(issue -> getChildren().add(warning(describe(text, issue),
+                text.get("fix.design." + issue.kind()), Icons.warning(23))));
     }
 
     void showLaunch(List<LaunchIssue> issues) {
         getChildren().setAll(issues.stream().map(issue ->
-                warning(text.get(issue.messageKey(), issue.needed(), issue.available()), Icons.warning(18))).toList());
+                warning(text.get(issue.messageKey(), issue.needed(), issue.available()),
+                        text.get("fix.launch." + issue.kind()), Icons.warning(23))).toList());
     }
 
-    private Label warning(String content, Node icon) {
+    private HBox warning(String content, String action, Node icon) {
         var label = text.label(content, "warning");
-        label.setGraphic(icon);
-        label.setAccessibleText(text.get("warning.accessible", content));
-        return label;
+        var hint = text.label(text.get("fix.try", action), "warning-action");
+        var row = new HBox(8, icon, new VBox(4, label, hint));
+        row.getStyleClass().add("warning-card");
+        return row;
     }
 }

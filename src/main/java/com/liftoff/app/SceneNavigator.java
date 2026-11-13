@@ -1,9 +1,11 @@
 package com.liftoff.app;
 
 import com.liftoff.session.GameSession;
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -22,6 +24,8 @@ public final class SceneNavigator {
     private final ResourceBundle messages;
     private final Consumer<String> openDocument;
     private ScreenController current;
+    private FadeTransition entrance;
+    private boolean reducedMotion;
 
     public SceneNavigator(Scene scene, GameSession session, ResourceBundle messages) {
         this(scene, session, messages, url -> {});
@@ -51,7 +55,28 @@ public final class SceneNavigator {
         }
         current = loader.getController();
         current.attach(this, session, messages);
+        if (entrance != null) {
+            entrance.stop();
+        }
         scene.setRoot(root);
+        if (!reducedMotion) {
+            entrance = new FadeTransition(Duration.millis(180), root);
+            entrance.setFromValue(.72);
+            entrance.setToValue(1);
+            entrance.play();
+        }
+    }
+
+    public boolean reducedMotion() {
+        return reducedMotion;
+    }
+
+    public void setReducedMotion(boolean reducedMotion) {
+        this.reducedMotion = reducedMotion;
+        if (reducedMotion && entrance != null) {
+            entrance.stop();
+            scene.getRoot().setOpacity(1);
+        }
     }
 
     public void showMissionStep() {

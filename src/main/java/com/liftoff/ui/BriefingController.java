@@ -14,6 +14,7 @@ public final class BriefingController extends MissionScreen {
     @FXML private Label description;
     @FXML private VBox limits;
     @FXML private Label difficulty;
+    @FXML private Label objective;
     @FXML private Label inspiration;
     @FXML private VBox measurements;
     @FXML private StackPane artwork;
@@ -23,6 +24,8 @@ public final class BriefingController extends MissionScreen {
         var mission = mission();
         var goal = mission.briefing();
         title.setText(goal.title());
+        String goalKey = "goal." + mission.id();
+        objective.setText(text.bundle().containsKey(goalKey) ? text.get(goalKey) : goal.description());
         question.setText(goal.question());
         description.setText(goal.description());
         difficulty.setText(text.get("mission.difficulty." + mission.difficulty()) + "  ·  "

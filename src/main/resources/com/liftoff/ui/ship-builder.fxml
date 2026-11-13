@@ -43,6 +43,7 @@
     <bottom>
         <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
             <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
+            <Label fx:id="buildStatus" wrapText="true" maxWidth="480" styleClass="builder-status"/>
             <Region HBox.hgrow="ALWAYS"/>
             <StackPane fx:id="confirmGate" pickOnBounds="true">
                 <Button fx:id="confirm" text="%review.confirm" onAction="#onConfirm" styleClass="secondary"/>
