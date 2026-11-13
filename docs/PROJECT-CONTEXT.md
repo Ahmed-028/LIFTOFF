@@ -93,8 +93,8 @@ a Python text extractor.
 
 ## 8. Still open
 
-1. Whether the main body changes per mission (spaceplane for Earth, capsule for
-   the Moon, cruise stage for Mars). The v2 spec assumes yes.
+1. (Settled: the main body changes per mission — spaceplane for Earth, capsule
+   for the Moon, cruise stage for Mars.)
 2. Real cost figures for buses and instruments, if a source exists.
 3. All Moon and Mars figures, and the spaceplane, thruster and power options:
    listed row by row in `06-team-work-split.md`, section 3.

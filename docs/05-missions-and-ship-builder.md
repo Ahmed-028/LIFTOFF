@@ -221,9 +221,10 @@ Taken from the two reference pictures in `docs/reference/`.
 
 ## 9. Open decisions
 
-1. A winged spaceplane fits Mission 1. For the Moon and Mars the "main body"
-   should be a capsule or cruise stage, or the game would teach something false.
-   This document assumes the body type changes per mission. Confirm.
+1. **Decided (2026-11-13): the main body changes per mission.** Mission 1 uses
+   a winged spaceplane, Mission 2 a crew capsule with service module, Mission 3
+   a cruise stage with aeroshell. The five tabs stay the same; the Airframe tab
+   offers only the bodies that suit the chosen mission.
 2. Whether to add a third-party 3D model loader, or write a small loader of our
    own (the brief says no unnecessary dependencies; the plan assumes our own).
 3. Whether costs stay as the labelled per-kilogram estimate.
