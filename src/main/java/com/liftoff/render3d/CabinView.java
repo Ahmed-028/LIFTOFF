@@ -23,24 +23,24 @@ public final class CabinView extends StackPane {
         var room = new Group();
         room.getChildren().addAll(box(8, .2, 11, 0, 2, 1, "#354458"),
                 box(8, .2, 11, 0, -3, 1, "#5B677A"),
-                box(.2, 5, 11, -4, -.5, 1, "#ADB9C8"),
-                box(.2, 5, 11, 4, -.5, 1, "#ADB9C8"),
-                box(8, 5, .2, 0, -.5, 6.5, "#728397"));
+                box(.2, 5, 11, -4, -.5, 1, "#6F7F99"),
+                box(.2, 5, 11, 4, -.5, 1, "#6F7F99"),
+                box(8, 5, .2, 0, -.5, 6.5, "#4B5C78"));
         for (int side : new int[]{-1, 1}) {
-            var ceilingShoulder = box(2.1, .2, 10.7, side * 3.25, -2.43, 1, "#73849C");
+            var ceilingShoulder = box(2.1, .2, 10.7, side * 3.25, -2.43, 1, "#8C9AB0");
             ceilingShoulder.setRotationAxis(Rotate.Z_AXIS);
             ceilingShoulder.setRotate(side * 38);
-            var lowerPanel = box(.11, 1.4, 10.8, side * 3.86, 1.15, 1, "#263A55");
+            var lowerPanel = box(.11, 1.4, 10.8, side * 3.86, 1.15, 1, "#16305E");
             room.getChildren().addAll(ceilingShoulder, lowerPanel);
         }
         for (int z = -3; z <= 6; z += 3) {
             for (int side : new int[]{-1, 1}) {
-                room.getChildren().add(box(.3, 4.8, .24, 3.86 * side, -.5, z, "#52657B"));
+                room.getChildren().add(box(.3, 4.8, .24, 3.86 * side, -.5, z, "#33609A"));
                 room.getChildren().add(lamp(.13, .09, 1.7, 3.65 * side, -2.45, z, "#FFB457"));
             }
         }
 
-        room.getChildren().add(box(3.8, .7, 1.1, 0, .45, 4.1, "#303B4B"));
+        room.getChildren().add(box(3.8, .7, 1.1, 0, .45, 4.1, "#2A3040"));
         var instrument = lamp(2.4, .5, .1, 0, .1, 3.53, "#154259");
         instrument.setRotationAxis(Rotate.X_AXIS);
         instrument.setRotate(-20);
@@ -58,7 +58,7 @@ public final class CabinView extends StackPane {
         rim.setRotate(90);
         rim.setTranslateY(-1.36);
         rim.setTranslateZ(6.24);
-        rim.setMaterial(ModelLibrary.surface("#223550"));
+        rim.setMaterial(ModelLibrary.lit("#22E3F2", "#0B6F7A"));
         room.getChildren().add(rim);
         var window = new Cylinder(1.43, .19, 64);
         window.setRotationAxis(Rotate.X_AXIS);
@@ -83,7 +83,7 @@ public final class CabinView extends StackPane {
         pilot.getChildren().addAll(box(1.23, .29, 1.12, 0, 1.3, 1.1, "#1B314E"),
                 box(1.23, 1.5, .27, 0, .62, .51, "#263E5E"),
                 box(.91, .90, .47, 0, .56, 1.05, "#E8E8DF"),
-                box(.94, .16, .5, 0, .45, 1.05, "#F39C38"),
+                box(.94, .16, .5, 0, .45, 1.05, "#FF7A1A"),
                 box(.27, .26, .9, -.26, 1.09, 1.58, "#C4CDD6"),
                 box(.27, .26, .9, .26, 1.09, 1.58, "#C4CDD6"));
         var helmet = new Sphere(.42, 24);
@@ -108,7 +108,7 @@ public final class CabinView extends StackPane {
         var scene = new SubScene(world, 1, 1, true, SceneAntialiasing.BALANCED);
         scene.setMouseTransparent(true);
         scene.setCamera(camera);
-        scene.setFill(Color.web("#101C2F"));
+        scene.setFill(Color.web("#071330"));
         scene.widthProperty().bind(widthProperty());
         scene.heightProperty().bind(heightProperty());
         getChildren().add(scene);

@@ -25,6 +25,7 @@ public final class ReviewController extends MissionScreen {
         warnings = new WarningList(text);
         confirmation = new BuildConfirmation(confirmGate, confirm);
         inspection.getChildren().addAll(gauges, warnings);
+        BuiltShipView.create(session, text, 260).ifPresent(selectedParts.getChildren()::add);
         for (var slot : ModuleSlot.values()) {
             String name = session.build().part(slot).map(ShipPart::kidName).orElse(text.get("ship.empty"));
             var label = text.label(text.get("step.accessible", text.get("slot." + slot), name), "detail-row");

@@ -49,19 +49,21 @@ public final class ModelLibrary {
     }
 
     private static PhongMaterial paint(String material) {
+        // Friendly NASA-inspired finishes: clean white panels, dark thermal tiles, bright blue cells,
+        // restrained orange safety marks and softly glowing cyan glass and sensors.
         return switch (material) {
-            case "tiles" -> surface("#273850");
-            case "edge" -> surface("#7389A4");
-            case "metal" -> surface("#9CAEBF");
-            case "glass" -> surface("#163F61");
-            case "solar" -> surface("#264DA7");
-            case "gold" -> surface("#D3A656");
-            case "orange" -> surface("#EC802B");
-            case "rubber" -> surface("#141C2A");
-            case "aperture" -> surface("#0B1829");
-            case "cyan" -> lit("#24DCF1", "#086372");
+            case "tiles" -> surface("#2A3040");
+            case "edge" -> surface("#A9B8CC");
+            case "metal" -> surface("#BAC6D4");
+            case "glass" -> lit("#1D6F8A", "#0A4E5E");
+            case "solar" -> lit("#2F64CF", "#0B2154");
+            case "gold" -> surface("#D9AE5E");
+            case "orange" -> surface("#FF7A1A");
+            case "rubber" -> surface("#1A2232");
+            case "aperture" -> lit("#0B2A3A", "#06414F");
+            case "cyan" -> lit("#2BE6F5", "#0B7D8C");
             case "nozzle" -> lit("#FFAA52", "#702806");
-            default -> surface("#E3E9F1");
+            default -> surface("#F2F5FA");
         };
     }
 

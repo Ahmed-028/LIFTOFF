@@ -10,8 +10,11 @@ import com.liftoff.session.MissionStep;
 import com.liftoff.session.stub.Mission;
 import com.liftoff.session.stub.ModuleSlot;
 import com.liftoff.session.stub.ShipPart;
+import com.liftoff.render.Icons;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -22,11 +25,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
 import javafx.util.StringConverter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public final class SuppliesController extends MissionScreen {
     private final PartPreview previews = new PartPreview();
@@ -121,14 +124,30 @@ public final class SuppliesController extends MissionScreen {
                     showInstrument(instrument);
                 }
             });
-            option.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showInstrument(instrument));
-            option.setWrapText(true);
-            String measurements = instrument.capabilities().stream()
-                    .map(capability -> text.get("measurement." + capability.type()))
-                    .distinct().collect(Collectors.joining(" · "));
-            instruments.getChildren().addAll(option, text.label(measurements, "body-text"),
-                    text.label(text.get("supplies.instrumentStats", instrument.massKg(), instrument.avgPowerW(),
-                            instrument.dataGbitPerDay(), text.cost(instrument.costMusd(), instrument.costBasis())), "muted"));
+            var card = new ChoiceCard(option, text.get("supplies.picked"), text.get("supplies.pick"));
+            card.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showInstrument(instrument));
+            Tooltip.install(card, new Tooltip(instrument.name()));
+            var tags = new ArrayList<Node>();
+            int priority = measurementPriority(instrument, goal);
+            if (priority < 2) {
+                tags.add(ChoiceCard.chip(text.get(priority == 0 ? "supplies.goal.required" : "supplies.goal.bonus"),
+                        null, "goal-tag"));
+                tags.getLast().getStyleClass().add(priority == 0 ? "required" : "bonus");
+            }
+            instrument.capabilities().stream().map(capability -> text.get("measurement." + capability.type()))
+                    .distinct().forEach(name -> tags.add(ChoiceCard.chip(name, null, "goal-tag")));
+            String origin = instrument.flewOn() == null ? instrument.name()
+                    : text.get("supplies.flewOn", instrument.name(), instrument.flewOn());
+            card.add(text.label(origin, "muted"),
+                    text.label(text.get("supplies.discover"), "discover-label"),
+                    text.label(instrument.description(), "body-text"),
+                    ChoiceCard.chips(tags.toArray(Node[]::new)),
+                    ChoiceCard.chips(
+                            ChoiceCard.chip(text.get("supplies.stat.mass", instrument.massKg()), Icons.mass(16), "stat-chip"),
+                            ChoiceCard.chip(text.get("supplies.stat.power", instrument.avgPowerW()), Icons.power(16), "stat-chip"),
+                            ChoiceCard.chip(text.get("supplies.stat.data", instrument.dataGbitPerDay()), Icons.data(16), "stat-chip"),
+                            ChoiceCard.chip(text.cost(instrument.costMusd(), instrument.costBasis()), Icons.coin(16), "stat-chip")));
+            instruments.getChildren().add(card);
         }
         if (!options.isEmpty()) {
             showInstrument(session.design().instruments().stream().findFirst().orElse(options.getFirst()));
@@ -152,8 +171,12 @@ public final class SuppliesController extends MissionScreen {
             option.setId("station-" + station.id());
             option.setSelected(session.design().hasStation(station.id()));
             option.setOnAction(event -> session.toggleStation(station.id()));
-            stations.getChildren().addAll(option, text.label(text.get("supplies.stationStats", station.bands(),
-                    text.cost(station.costMusdPerMonth(), station.costBasis())), "muted"));
+            var card = new ChoiceCard(option, text.get("supplies.picked"), text.get("supplies.pick"));
+            Tooltip.install(card, new Tooltip(station.name()));
+            card.add(text.label(station.name(), "muted"),
+                    ChoiceCard.chips(ChoiceCard.chip(text.get("supplies.stationStats", station.bands(),
+                            text.cost(station.costMusdPerMonth(), station.costBasis())), Icons.coin(16), "stat-chip")));
+            stations.getChildren().add(card);
         }
 
         gauges = new BuildGauges(text, true);
@@ -165,7 +188,8 @@ public final class SuppliesController extends MissionScreen {
     private void showInstrument(Instrument instrument) {
         String model = InstrumentVisual.model(instrument);
         boolean renderModel = model != null && javafx.application.Platform.isSupported(javafx.application.ConditionalFeature.SCENE3D);
-        instrumentPreview.getChildren().setAll(text.label(instrument.name(), "section-title"),
+        instrumentPreview.getChildren().setAll(text.label(text.get("supplies.closerLook"), "discover-label"),
+                text.label(instrument.kidName(), "section-title"), text.label(instrument.name(), "muted"),
                 renderModel ? previews.thumbnail(model, 240, 126) : InstrumentVisual.diagram(instrument),
                 text.label(text.get(renderModel ? "supplies.nasaInstrument" : "supplies.schematic"), "muted"),
                 text.label(text.get("supplies.instrumentStats", instrument.massKg(), instrument.avgPowerW(),

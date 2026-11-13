@@ -5,6 +5,7 @@ import com.liftoff.session.stub.ModuleSlot;
 import com.liftoff.session.stub.ShipBuild;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
@@ -26,6 +27,7 @@ public final class ModuleTabs extends VBox {
             button.setToggleGroup(group);
             button.setMaxWidth(Double.MAX_VALUE);
             button.getStyleClass().add("module-tab");
+            button.setTooltip(new Tooltip(text.get("slot.help." + slot)));
             button.setOnAction(event -> {
                 button.setSelected(true);
                 onSelect.accept(slot);

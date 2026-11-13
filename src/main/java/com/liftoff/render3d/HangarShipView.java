@@ -40,7 +40,7 @@ public final class HangarShipView implements ShipView {
         container.setMinSize(0, 0);
 
         var world = new Group(pad(), ship.node(), camera.rig(),
-                new AmbientLight(Color.web("#7787A8")),
+                new AmbientLight(Color.web("#8796B6")),
                 light("#BDB6AA", -3, -8, -6),
                 light("#527DA8", 6, -5, 4));
         var viewport = new SubScene(world, 1, 1, true, SceneAntialiasing.BALANCED);

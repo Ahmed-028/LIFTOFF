@@ -4,7 +4,12 @@ import com.liftoff.session.stub.Mission;
 import com.liftoff.render.Icons;
 import com.liftoff.engine.sim.SimRules;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -12,7 +17,7 @@ public final class BriefingController extends MissionScreen {
     @FXML private Label title;
     @FXML private Label question;
     @FXML private Label description;
-    @FXML private VBox limits;
+    @FXML private FlowPane limits;
     @FXML private Label difficulty;
     @FXML private Label objective;
     @FXML private Label inspiration;
@@ -28,7 +33,8 @@ public final class BriefingController extends MissionScreen {
         objective.setText(text.bundle().containsKey(goalKey) ? text.get(goalKey) : goal.description());
         question.setText(goal.question());
         description.setText(goal.description());
-        difficulty.setText(text.get("mission.difficulty." + mission.difficulty()) + "  ·  "
+        difficulty.setText(text.get("mission.stars." + mission.difficulty()) + "  "
+                + text.get("mission.difficulty." + mission.difficulty()) + "  ·  "
                 + text.get("briefing.eventChance", SimRules.eventChancePerStep(mission.difficulty())));
         String duration = mission.steps() == 0 ? text.get("briefing.minimum", goal.minScienceMonths())
                 : text.get("briefing.duration", mission.steps(), text.get("duration." + mission.stepUnit()));
@@ -42,18 +48,30 @@ public final class BriefingController extends MissionScreen {
         }
         inspiration.setText(text.get("briefing.basedOn", goal.basedOn()));
         goal.required().forEach(requirement ->
-                measurements.getChildren().add(text.label("• " + text.requirement(requirement), "briefing-target")));
-        if (!goal.bonus().isEmpty()) {
-            measurements.getChildren().add(text.label(text.get("briefing.bonus"), "section-title"));
-            goal.bonus().forEach(type ->
-                    measurements.getChildren().add(text.label("• " + text.get("measurement." + type), "muted")));
-        }
-        ObjectiveCard.setArtwork(artwork, mission.id(), 230);
+                measurements.getChildren().add(goalRow(text.requirement(requirement), true)));
+        goal.bonus().forEach(type ->
+                measurements.getChildren().add(goalRow(text.get("measurement." + type), false)));
+        ObjectiveCard.setArtwork(artwork, mission.id(), 220);
     }
 
-    private void addLimit(String value, javafx.scene.Node icon) {
+    private Node goalRow(String measurement, boolean required) {
+        var badge = new Label(text.get(required ? "briefing.must" : "briefing.bonusTag"));
+        badge.getStyleClass().add("goal-badge");
+        badge.setMinWidth(Region.USE_PREF_SIZE);
+        var name = text.label(measurement, required ? "briefing-target" : "body-text");
+        HBox.setHgrow(name, Priority.ALWAYS);
+        var row = new HBox(badge, name);
+        row.getStyleClass().add("goal-row");
+        if (!required) {
+            row.getStyleClass().add("bonus");
+        }
+        return row;
+    }
+
+    private void addLimit(String value, Node icon) {
         var tile = text.label(value, "briefing-limit");
         tile.setGraphic(icon);
+        tile.setMaxWidth(Region.USE_PREF_SIZE);
         limits.getChildren().add(tile);
     }
 }

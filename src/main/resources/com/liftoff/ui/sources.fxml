@@ -3,19 +3,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.liftoff.ui.SourcesController" styleClass="screen">
+            fx:controller="com.liftoff.ui.SourcesController" styleClass="screen, selection-screen">
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="14" styleClass="selection-header">
+        <HBox alignment="CENTER_LEFT" spacing="16" styleClass="selection-header">
             <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
             <Label text="%sources.heading" styleClass="screen-heading"/>
         </HBox>
     </top>
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
-            <VBox fx:id="categories" spacing="10" styleClass="page-content"/>
+            <VBox spacing="12" styleClass="page-content">
+                <Label text="%sources.intro" styleClass="intro-text" wrapText="true"/>
+                <VBox fx:id="categories" spacing="12"/>
+            </VBox>
         </ScrollPane>
     </center>
     <bottom>
-        <Label fx:id="linkStatus" styleClass="muted" wrapText="true"/>
+        <Label fx:id="linkStatus" styleClass="muted, link-status" wrapText="true"/>
     </bottom>
 </BorderPane>

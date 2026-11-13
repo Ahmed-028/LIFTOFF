@@ -3,7 +3,10 @@ package com.liftoff.ui;
 import com.liftoff.render.Icons;
 import com.liftoff.session.stub.ShipPart;
 import javafx.scene.control.Button;
+import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.TransferMode;
@@ -13,6 +16,7 @@ public final class PartCard extends Button {
 
     private final ShipPart part;
     private final UiText text;
+    private final Label fitted = new Label();
 
     PartCard(ShipPart part, UiText text, PartPreview preview, Runnable choose, Runnable endDrag) {
         this.part = part;
@@ -20,7 +24,10 @@ public final class PartCard extends Button {
         setId("part-" + part.id());
         getStyleClass().add("part-card");
         setContentDisplay(ContentDisplay.TOP);
-        setGraphic(preview.thumbnail(part, 100, 46));
+        fitted.setText(text.get("ship.selected"));
+        fitted.getStyleClass().add("fitted-badge");
+        StackPane.setAlignment(fitted, Pos.TOP_RIGHT);
+        setGraphic(new StackPane(preview.thumbnail(part, 100, 46), fitted));
         setWrapText(true);
         setOnAction(event -> choose.run());
         setOnDragDetected(event -> {
@@ -35,7 +42,8 @@ public final class PartCard extends Button {
     }
 
     void markSelected(boolean selected) {
-        setText(part.kidName() + (selected ? "\n" + text.get("ship.selected") : ""));
+        setText(part.kidName());
+        fitted.setVisible(selected);
         getStyleClass().remove("chosen");
         if (selected) {
             getStyleClass().add("chosen");

@@ -6,34 +6,41 @@
             fx:controller="com.liftoff.ui.ShipBuilderController" styleClass="screen, mission-screen, ship-screen">
     <top>
         <VBox spacing="8" styleClass="mission-header">
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="command-bar">
                 <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
             </HBox>
-            <Label text="%ship.heading" styleClass="screen-heading" wrapText="true"/>
+            <HBox alignment="BASELINE_LEFT" spacing="18">
+                <Label text="%ship.heading" styleClass="screen-heading" minWidth="-Infinity"/>
+                <Label text="%ship.subtitle" styleClass="sub-heading" wrapText="true"/>
+            </HBox>
         </VBox>
     </top>
     <center>
         <BorderPane styleClass="builder">
             <left>
-                <VBox spacing="9" prefWidth="168" styleClass="builder-tabs">
-                    <StackPane fx:id="tabsHost"/>
-                    <CheckBox fx:id="calmMode" text="%ship.calm"/>
-                </VBox>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="190" minWidth="170" styleClass="clear-scroll">
+                    <VBox prefWidth="186" styleClass="builder-tabs">
+                        <StackPane fx:id="tabsHost"/>
+                    </VBox>
+                </ScrollPane>
             </left>
             <center>
-                <StackPane fx:id="hangarHost" minHeight="155" minWidth="240" styleClass="hangar-frame">
+                <StackPane fx:id="hangarHost" minHeight="150" minWidth="240" styleClass="hangar-frame">
                     <Label fx:id="hangarHint" text="%ship.hint" mouseTransparent="true" StackPane.alignment="TOP_LEFT" styleClass="hangar-hint"/>
                 </StackPane>
             </center>
             <right>
-                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="287" minWidth="238" styleClass="inspection-scroll">
-                    <VBox fx:id="inspection" spacing="11" styleClass="panel"/>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="300" minWidth="240" styleClass="inspection-scroll">
+                    <VBox fx:id="inspection" spacing="12" styleClass="panel"/>
+                    <BorderPane.margin>
+                        <Insets left="14"/>
+                    </BorderPane.margin>
                 </ScrollPane>
             </right>
             <bottom>
-                <VBox styleClass="parts-dock" spacing="6">
+                <VBox styleClass="parts-dock">
                     <StackPane fx:id="gaugesHost"/>
                     <StackPane fx:id="partsHost"/>
                 </VBox>
@@ -41,9 +48,13 @@
         </BorderPane>
     </center>
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+        <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="action-bar">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
             <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
-            <Label fx:id="buildStatus" wrapText="true" maxWidth="480" styleClass="builder-status"/>
+            <CheckBox fx:id="calmMode" text="%ship.calm"/>
+            <Label fx:id="buildStatus" wrapText="true" maxWidth="420" styleClass="builder-status"/>
             <Region HBox.hgrow="ALWAYS"/>
             <StackPane fx:id="confirmGate" pickOnBounds="true">
                 <Button fx:id="confirm" text="%review.confirm" onAction="#onConfirm" styleClass="secondary"/>

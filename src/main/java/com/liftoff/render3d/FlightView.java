@@ -110,7 +110,7 @@ public final class FlightView extends StackPane {
         light.setTranslateY(-9);
         light.setTranslateZ(-12);
         var world = new Group(earth, target, ship, shadow, payload, camera, light,
-                new AmbientLight(Color.web("#68758F")));
+                new AmbientLight(Color.web("#7B89A6")));
         var scene = new SubScene(world, 1, 1, true, SceneAntialiasing.BALANCED);
         scene.setMouseTransparent(true);
         scene.setFill(Color.TRANSPARENT);

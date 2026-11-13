@@ -7,6 +7,9 @@ import com.liftoff.data.MissionEntry;
 import com.liftoff.session.GameSession;
 import com.liftoff.session.MissionStep;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
 import java.util.ResourceBundle;
@@ -28,6 +31,14 @@ public abstract class MissionScreen implements ScreenController {
         text = new UiText(messages);
         stepper = new StepperBar(session, text, this::onStep);
         stepperHost.getChildren().setAll(stepper);
+        var entry = mission();
+        MissionWorld.apply(stepperHost, entry.destination());
+        if (stepperHost.getParent() instanceof HBox commandBar && !commandBar.getChildren().isEmpty()) {
+            var chip = new Label(entry.briefing().title());
+            chip.getStyleClass().add("mission-chip");
+            chip.setMinWidth(Region.USE_PREF_SIZE);
+            commandBar.getChildren().add(1, chip);
+        }
         setUp();
         refresh();
         session.addListener(onSessionChange);
