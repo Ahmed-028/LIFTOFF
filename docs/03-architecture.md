@@ -99,8 +99,28 @@ record ResourceUsage(ResourceType type, double used, OptionalDouble capacity,
                      ResourceLevel level);      // OK, TIGHT, OVER, UNKNOWN
 ```
 
-Arriving in later milestones, same style: `DesignValidator` (M2),
-`LaunchChecker`, `MissionSimulator` (M3), `ScoreCalculator`, `ReportBuilder` (M4).
+Arriving in later milestones, same style: `LaunchChecker`, `MissionSimulator`
+(M3), `ScoreCalculator`, `ReportBuilder` (M4).
+
+**engine, v2 additions (ship builder rules)** — built:
+
+```java
+final class FuelMath {            // rocket equation, g0 = 9.80665 m/s^2
+    static double propellantKg(double dryMassKg, double deltaVMs, double specificImpulseS);
+    static double deltaVMs(double dryMassKg, double propellantKg, double specificImpulseS);
+}
+final class FitRules {
+    static List<BuildIssue> payloadFits(ShipPart bay, ShipPart payload);
+    static Optional<BuildIssue> airframeCarries(ShipPart airframe, double cargoKg);
+}
+final class BuildCalculator { static BuildReport calculate(ShipBuild build, Mission mission); }
+final class DesignValidator { static List<DesignIssue> validate(MissionDesign design); }
+```
+
+`MissionDesign` now also holds `mission` and `build` (a `ShipBuild`, never
+null) beside the v1 `objective` and `bus`, which stay until the session and
+loader move to missions and ship parts. `ResourceCalculator` counts the ship's
+parts and the trip's propellant when they are present.
 
 **session** — the only object the UI talks to:
 
