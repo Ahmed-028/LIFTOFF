@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 /** Round-number designs and the event fixture for the simulation tests. Nothing here is real data. */
-final class SimFixtures {
+public final class SimFixtures {
 
-    static final Mission EARTH = new Mission("test-earth", 0);
+    public static final Mission EARTH = new Mission("test-earth", 0);
 
     private SimFixtures() {
     }
 
-    static Objective objective(double targetLatitudeDeg, double budgetCapMusd, int deadlineMonths) {
+    public static Objective objective(double targetLatitudeDeg, double budgetCapMusd, int deadlineMonths) {
         return new Objective("goal", "goal", "", "", "", targetLatitudeDeg, false, List.of(), List.of(),
                 budgetCapMusd, deadlineMonths, 12, TestParts.SOURCE);
     }
@@ -31,7 +31,7 @@ final class SimFixtures {
      * one polar station, a rocket lifting 1000 kg to polar orbit, 12 science months.
      * Budget 10 + 5 + 20 + 1 x 12 = 47; time 12 + 6 + 2 + 12 = 32 months.
      */
-    static MissionDesign design() {
+    public static MissionDesign design() {
         return MissionDesign.empty()
                 .withObjective(objective(80, 1000, 200))
                 .withBus(TestParts.bus("bus", 100, 100, 10, 10, 12))
@@ -42,7 +42,7 @@ final class SimFixtures {
                 .withScienceMonths(12);
     }
 
-    static EventDeck deck() {
+    public static EventDeck deck() {
         try (InputStream in = SimFixtures.class.getResourceAsStream("/com/liftoff/sim/events-fixture.json")) {
             return EventDeck.parse(new String(in.readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException e) {
