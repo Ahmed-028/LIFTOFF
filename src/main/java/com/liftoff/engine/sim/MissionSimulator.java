@@ -148,9 +148,11 @@ public final class MissionSimulator {
             suppliesLeftKg = Math.max(0, suppliesLeftKg - suppliesNeededKg);
 
             if (firstLimit == SimLimit.NONE) {
+                // Fixed order for limits that break in the same step. Lost data implies a backlog,
+                // so the full recorder is named before the downlink that caused it.
                 firstLimit = shortfallW > 0 ? SimLimit.POWER
-                        : backlog > 0 ? SimLimit.DOWNLINK
                         : lost > 0 ? SimLimit.STORAGE
+                        : backlog > 0 ? SimLimit.DOWNLINK
                         : suppliesRanOut ? SimLimit.SUPPLIES
                         : SimLimit.NONE;
                 if (firstLimit != SimLimit.NONE) {

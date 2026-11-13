@@ -2,6 +2,15 @@ package com.liftoff.session;
 
 import com.liftoff.engine.ResourceCalculator;
 import com.liftoff.engine.ResourceReport;
+import com.liftoff.engine.score.Report;
+import com.liftoff.engine.score.ReportBuilder;
+import com.liftoff.engine.score.Score;
+import com.liftoff.engine.score.ScoreCalculator;
+import com.liftoff.engine.sim.Difficulty;
+import com.liftoff.engine.sim.LaunchChecker;
+import com.liftoff.engine.sim.LaunchIssue;
+import com.liftoff.engine.sim.MissionSimulator;
+import com.liftoff.engine.sim.SimulationResult;
 import com.liftoff.model.Catalog;
 import com.liftoff.model.GroundStation;
 import com.liftoff.model.MissionDesign;
@@ -12,6 +21,7 @@ import com.liftoff.session.stub.Mission;
 import com.liftoff.session.stub.ShipBuild;
 import com.liftoff.session.stub.ShipPart;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +32,10 @@ import java.util.function.Function;
  * current design, recalculates the resources after every change and tells listeners.
  */
 public final class GameSession {
+
+    /** Message keys of the reasons a launch or flight is refused. */
+    public static final String NO_MISSION = "flow.noMissionSelected";
+    public static final String ALREADY_FLOWN = "flow.alreadyFlown";
 
     private final Catalog catalog;
     private final List<Runnable> listeners = new ArrayList<>();
@@ -34,6 +48,13 @@ public final class GameSession {
     private BuildReport buildReport = BuildCalculator.calculate(build, null);
     private MissionFlow flow = newFlow();
 
+    private final MissionLog log;
+    private Difficulty difficulty = Difficulty.CADET;
+    private List<LaunchIssue> launchIssues = List.of();
+    private SimulationResult simulation;
+    private Score score;
+    private Report report;
+
     public GameSession(Catalog catalog) {
         // TODO(Member 1/2): look parts up in the catalog once it carries ship parts.
         this(catalog, partId -> Optional.empty());
@@ -41,8 +62,17 @@ public final class GameSession {
 
     /** @param partLookup finds a ship part by id; stands in for the catalog until it carries parts */
     public GameSession(Catalog catalog, Function<String, Optional<ShipPart>> partLookup) {
+        this(catalog, partLookup, MissionLog.inMemory());
+    }
+
+    /**
+     * @param log where finished missions are recorded; the game passes {@code new MissionLog()} to keep
+     *            them in the user's home folder, the shorter constructors keep them in memory only
+     */
+    public GameSession(Catalog catalog, Function<String, Optional<ShipPart>> partLookup, MissionLog log) {
         this.catalog = catalog;
         this.partLookup = partLookup;
+        this.log = log;
     }
 
     public Catalog catalog() {
@@ -123,6 +153,7 @@ public final class GameSession {
         build = build.with(part);
         buildReport = BuildCalculator.calculate(build, mission);
         flow.partsChanged();
+        clearResults();
         notifyListeners();
     }
 
@@ -148,6 +179,7 @@ public final class GameSession {
         build = ShipBuild.empty();
         buildReport = BuildCalculator.calculate(build, mission);
         flow = newFlow();
+        clearResults();
         notifyListeners();
     }
 
@@ -192,7 +224,101 @@ public final class GameSession {
     /** From the report back to the ship step, keeping the design. */
     public void redesign() {
         flow.redesign();
+        clearResults();
         notifyListeners();
+    }
+
+    // ---- launch, flight, score and report ----
+
+    public Difficulty difficulty() {
+        return difficulty;
+    }
+
+    /** Sets how many random events the flight meets. Mission 1 is flown at CADET: none. */
+    public void setDifficulty(Difficulty newDifficulty) {
+        difficulty = newDifficulty;
+        notifyListeners();
+    }
+
+    /**
+     * Runs the launch check on the confirmed build. With no issues the Fly step opens; otherwise
+     * {@link #report()} explains the first one and the design has to change.
+     *
+     * @throws IllegalStateException if no mission is selected or the Launch step is still locked
+     */
+    public List<LaunchIssue> runLaunchCheck() {
+        requireOpen(MissionStep.LAUNCH);
+        launchIssues = LaunchChecker.check(design, buildReport, mission, design.launchVehicle(), design.orbit());
+        if (launchIssues.isEmpty()) {
+            flow.markLaunchPassed();
+            report = null;
+        } else {
+            report = ReportBuilder.build(design, resources, launchIssues, null, mission);
+        }
+        notifyListeners();
+        return launchIssues;
+    }
+
+    /**
+     * Flies the mission once: simulates it, scores it, writes the report, opens the Report step and
+     * records the mission in the log. The same seed replays the same flight.
+     *
+     * @throws IllegalStateException if the launch check has not passed, or the mission was already flown
+     */
+    public SimulationResult fly(long seed) {
+        requireOpen(MissionStep.FLY);
+        if (simulation != null) {
+            throw new IllegalStateException(ALREADY_FLOWN);
+        }
+        simulation = MissionSimulator.run(design, mission, difficulty, seed);
+        score = ScoreCalculator.score(design, resources, buildReport, simulation, mission);
+        report = ReportBuilder.build(design, resources, List.of(), simulation, mission);
+        flow.markSimulationFinished();
+        log.add(new MissionLog.Entry(mission.id(), difficulty, score.total(), score.stars(),
+                Instant.now().toString()));
+        notifyListeners();
+        return simulation;
+    }
+
+    /** What the last launch check found; empty when it passed or has not run. */
+    public List<LaunchIssue> launchIssues() {
+        return launchIssues;
+    }
+
+    /** The flight, once flown. */
+    public Optional<SimulationResult> simulation() {
+        return Optional.ofNullable(simulation);
+    }
+
+    /** The score, once flown. */
+    public Optional<Score> score() {
+        return Optional.ofNullable(score);
+    }
+
+    /** The report: after a flight, or after a launch check that failed. */
+    public Optional<Report> report() {
+        return Optional.ofNullable(report);
+    }
+
+    public MissionLog missionLog() {
+        return log;
+    }
+
+    private void requireOpen(MissionStep step) {
+        if (mission == null) {
+            throw new IllegalStateException(NO_MISSION);
+        }
+        Optional<String> reason = flow.reasonLocked(step);
+        if (reason.isPresent()) {
+            throw new IllegalStateException(reason.get());
+        }
+    }
+
+    private void clearResults() {
+        launchIssues = List.of();
+        simulation = null;
+        score = null;
+        report = null;
     }
 
     private MissionFlow newFlow() {
@@ -209,6 +335,7 @@ public final class GameSession {
         design = newDesign;
         resources = ResourceCalculator.calculate(newDesign);
         flow.partsChanged();
+        clearResults();
         notifyListeners();
     }
 
