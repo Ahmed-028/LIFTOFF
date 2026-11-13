@@ -65,7 +65,7 @@ public final class SourcesController implements ScreenController {
 
     private VBox card(String name) {
         var card = new VBox(5, text.label(name, "section-title"));
-        card.getStyleClass().add("panel");
+        card.getStyleClass().add("source-card");
         return card;
     }
 

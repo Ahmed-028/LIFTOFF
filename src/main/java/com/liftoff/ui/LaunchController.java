@@ -27,7 +27,10 @@ public final class LaunchController extends MissionScreen {
     protected void setUp() {
         warnings = new WarningList(text);
         issues.getChildren().add(warnings);
-        rocketArt.getChildren().add(RocketArt.create(190));
+        BuiltShipView.create(session, text, 320).ifPresentOrElse(ship -> {
+            rocketArt.getStyleClass().remove("launch-pad");
+            rocketArt.getChildren().add(ship);
+        }, () -> rocketArt.getChildren().add(RocketArt.create(190)));
         cockpit = new CockpitPanel(session, text, false, text.get("flight.route." + mission().destination()));
         cockpit.addControl(check);
         cabinTab.setContent(cockpit);

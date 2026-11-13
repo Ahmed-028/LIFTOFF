@@ -6,7 +6,7 @@
             fx:controller="com.liftoff.ui.ReviewController" styleClass="screen, mission-screen">
     <top>
         <VBox spacing="8" styleClass="mission-header">
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="command-bar">
                 <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
@@ -16,19 +16,22 @@
     </top>
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
-            <HBox spacing="14" styleClass="page-content">
-                <VBox fx:id="selectedParts" spacing="10" prefWidth="450" HBox.hgrow="ALWAYS" styleClass="panel">
+            <HBox spacing="22" styleClass="page-content">
+                <VBox fx:id="selectedParts" spacing="10" prefWidth="460" HBox.hgrow="ALWAYS" styleClass="panel">
                     <Label text="%review.parts" styleClass="section-title"/>
                     <Label text="%review.instructions" wrapText="true" styleClass="muted"/>
                 </VBox>
-                <VBox fx:id="inspection" spacing="10" prefWidth="540" HBox.hgrow="ALWAYS" styleClass="panel">
+                <VBox fx:id="inspection" spacing="12" prefWidth="540" HBox.hgrow="ALWAYS" styleClass="panel">
                     <Label text="%review.gauges" styleClass="section-title"/>
                 </VBox>
             </HBox>
         </ScrollPane>
     </center>
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+        <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="action-bar">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
             <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
             <Region HBox.hgrow="ALWAYS"/>
             <StackPane fx:id="confirmGate" pickOnBounds="true">

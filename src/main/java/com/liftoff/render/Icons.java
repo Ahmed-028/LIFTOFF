@@ -88,6 +88,11 @@ public final class Icons {
         };
     }
 
+    /** Next step: an arrow. */
+    public static Node next(double size) {
+        return badge("→", Palette.SKY, size);
+    }
+
     public static Node warning(double size) {
         return badge("!", Palette.POWER, size);
     }

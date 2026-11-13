@@ -6,7 +6,7 @@
             fx:controller="com.liftoff.ui.ReportController" styleClass="screen, mission-screen">
     <top>
         <VBox spacing="8" styleClass="mission-header">
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="command-bar">
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="command-bar">
                 <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
@@ -16,22 +16,22 @@
     </top>
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
-            <VBox spacing="14" styleClass="page-content">
-                <VBox spacing="8" styleClass="panel, score-panel">
+            <VBox spacing="18" styleClass="page-content">
+                <VBox spacing="10" styleClass="panel, score-panel">
                     <Label fx:id="result" styleClass="eyebrow"/>
                     <Label fx:id="score" styleClass="score"/>
                     <Label fx:id="totals" wrapText="true" styleClass="body-text"/>
                 </VBox>
-                <HBox spacing="14">
-                    <VBox fx:id="worked" spacing="8" prefWidth="360" HBox.hgrow="ALWAYS" styleClass="panel">
-                        <Label text="%report.worked" styleClass="section-title"/>
+                <HBox spacing="18">
+                    <VBox fx:id="worked" prefWidth="360" HBox.hgrow="ALWAYS" styleClass="report-card, worked">
+                        <Label fx:id="workedTitle" text="%report.worked" styleClass="section-title"/>
                     </VBox>
-                    <VBox spacing="8" prefWidth="360" HBox.hgrow="ALWAYS" styleClass="panel">
-                        <Label text="%report.broke" styleClass="section-title"/>
+                    <VBox prefWidth="360" HBox.hgrow="ALWAYS" styleClass="report-card, broke">
+                        <Label fx:id="brokeTitle" text="%report.broke" styleClass="section-title"/>
                         <Label fx:id="broke" wrapText="true" styleClass="body-text"/>
                     </VBox>
-                    <VBox spacing="8" prefWidth="360" HBox.hgrow="ALWAYS" styleClass="panel">
-                        <Label text="%report.try" styleClass="section-title"/>
+                    <VBox prefWidth="360" HBox.hgrow="ALWAYS" styleClass="report-card, try">
+                        <Label fx:id="tryTitle" text="%report.try" styleClass="section-title"/>
                         <Label fx:id="next" wrapText="true" styleClass="body-text"/>
                     </VBox>
                 </HBox>
@@ -39,8 +39,12 @@
         </ScrollPane>
     </center>
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">
+        <HBox alignment="CENTER_RIGHT" spacing="14" styleClass="action-bar">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
             <Region HBox.hgrow="ALWAYS"/>
+            <Label text="%report.nextHint" styleClass="action-hint"/>
             <Button text="%report.redesign" onAction="#onRedesign" styleClass="primary" />
         </HBox>
     </bottom>
