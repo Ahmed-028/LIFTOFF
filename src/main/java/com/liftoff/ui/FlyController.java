@@ -52,7 +52,12 @@ public final class FlyController extends MissionScreen {
         destination = mission().destination();
         plannedSteps = Math.max(1, mission().steps() > 0 ? mission().steps() : session.design().scienceMonths());
         calm.setSelected(navigator.reducedMotion());
-        calm.selectedProperty().addListener((property, previous, enabled) -> navigator.setReducedMotion(enabled));
+        calm.selectedProperty().addListener((property, previous, enabled) -> {
+            navigator.setReducedMotion(enabled);
+            if (view != null) {
+                view.setCalm(enabled);
+            }
+        });
         route.setText(text.get("flight.route." + destination));
         cockpit = new CockpitPanel(session, text, true, route.getText());
         cockpit.addControl(playback);
@@ -62,6 +67,7 @@ public final class FlyController extends MissionScreen {
             session.build().parts().forEach((slot, part) -> models.put(ModuleSlot.valueOf(slot.name()),
                     slot.name().equals("SATELLITE") ? PartPreview.modelFor(part) : part.modelId()));
             view = new FlightView(destination, models);
+            view.setCalm(calm.isSelected());
             viewport.getChildren().addFirst(view);
         } else {
             var artwork = new StackPane();
