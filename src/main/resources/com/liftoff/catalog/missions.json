@@ -1,0 +1,256 @@
+[
+  {
+    "briefing": {
+      "id": "farm-watch",
+      "title": "Farm Watch",
+      "question": "How healthy are the crops of the Nile Delta, and how much water do they use?",
+      "description": "Farmers need to know which fields are thriving and which are thirsty. Build a spacecraft that can see single fields from space.",
+      "basedOn": "Landsat and EO-1",
+      "targetLatitudeDeg": 31,
+      "prefersSunSynchronous": true,
+      "required": [
+        {
+          "type": "LAND_IMAGING",
+          "maxResolutionM": 30
+        }
+      ],
+      "bonus": [
+        "THERMAL_IMAGING"
+      ],
+      "budgetCapMusd": 450,
+      "deadlineMonths": 78,
+      "minScienceMonths": 24,
+      "source": {
+        "title": "NASA Landsat Science, Operational Land Imager",
+        "detail": "30 m imagery is described as sufficient to distinguish features such as urban centres, farms and forests. Budget, deadline and duration are scenario settings.",
+        "url": "https://landsat.gsfc.nasa.gov/satellites/landsat-8/spacecraft-instruments/operational-land-imager/"
+      }
+    },
+    "difficulty": "CADET",
+    "destination": "EARTH",
+    "ladder": true,
+    "stepUnit": "MONTH",
+    "steps": 0,
+    "crew": 0,
+    "suppliesKgPerCrewDay": 0,
+    "suppliesSource": null,
+    "deltaVRequiredMs": 0,
+    "deltaVBasis": "GAME_ESTIMATE",
+    "deltaVSource": {
+      "title": "NASA Basics of Space Flight, Chapter 14",
+      "detail": "Game assumes direct launcher insertion into the selected Earth science orbit. It budgets zero post-separation maneuver delta-v and omits orbit maintenance.",
+      "url": "https://science.nasa.gov/learn/basics-of-space-flight/chapter14-1/"
+    },
+    "surfaceDeltaVRequiredMs": 0,
+    "downlinkMbps": 0,
+    "contactMinutesPerDay": 0,
+    "downlinkSource": null
+  },
+  {
+    "briefing": {
+      "id": "moon-landing",
+      "title": "Moon Landing",
+      "question": "What can we learn from the Moon's terrain?",
+      "description": "Take a crew to the Moon, study the terrain, and bring the crew home.",
+      "basedOn": "Artemis and Apollo",
+      "targetLatitudeDeg": 0,
+      "prefersSunSynchronous": false,
+      "required": [
+        {
+          "type": "LUNAR_TOPOGRAPHY",
+          "maxResolutionM": null
+        }
+      ],
+      "bonus": [
+        "LUNAR_SEISMOLOGY",
+        "LUNAR_THERMAL_MAPPING"
+      ],
+      "budgetCapMusd": 6000,
+      "deadlineMonths": 108,
+      "minScienceMonths": 1,
+      "source": {
+        "title": "NASA Orion Reference Guide",
+        "detail": "Orion exploration mission and crew module. Crew of two on the surface follows Apollo. Budget, deadline, and game duration are scenario settings.",
+        "url": "https://www.nasa.gov/reference/orion-spacecraft/"
+      }
+    },
+    "difficulty": "ENGINEER",
+    "destination": "MOON",
+    "ladder": true,
+    "stepUnit": "DAY",
+    "steps": 8,
+    "crew": 2,
+    "suppliesKgPerCrewDay": 4.99,
+    "suppliesSource": {
+      "title": "NASA/TM-2004-212940",
+      "detail": "Fig. 1 metabolic inputs: 0.84 oxygen + 0.62 dry food + 1.15 water in food + 0.76 meal preparation water + 1.62 drinking water. Excludes hygiene and recycling.",
+      "url": "https://ntrs.nasa.gov/api/citations/20040035652/downloads/20040035652.pdf"
+    },
+    "deltaVRequiredMs": 6035,
+    "deltaVBasis": "DERIVED",
+    "deltaVSource": {
+      "title": "Lunar Operations Delta V Budget",
+      "detail": "Table 3, p. 24. Derived spacecraft burns: 60 outbound correction + 915 lunar insertion + 2165 descent + 1920 ascent + 915 Earth return injection + 60 return correction. Launcher provides translunar injection. Atmospheric return to Earth omits circularization and station rendezvous.",
+      "url": "https://ntrs.nasa.gov/api/citations/19850008679/downloads/19850008679.pdf"
+    },
+    "surfaceDeltaVRequiredMs": 4085,
+    "downlinkMbps": 80,
+    "contactMinutesPerDay": 30,
+    "downlinkSource": {
+      "title": "NASA Optical Communications for Artemis II Crewed Mission",
+      "detail": "Mission Objectives table: nominal 80 Mbps return. The game assumes 30 minutes per day of usable contact.",
+      "url": "https://ntrs.nasa.gov/api/citations/20250009875/downloads/Optical%20Comm%20for%20Artemis%20II%20Crewed%20Mission.pdf"
+    }
+  },
+  {
+    "briefing": {
+      "id": "mars-drones",
+      "title": "Mars Sample Drones",
+      "question": "Where should a rover and scout look for samples?",
+      "description": "Land a rover or drone, scout for interesting terrain, and investigate possible sample sites.",
+      "basedOn": "Perseverance and Ingenuity",
+      "targetLatitudeDeg": 0,
+      "prefersSunSynchronous": false,
+      "required": [
+        {
+          "type": "MARS_SURFACE_IMAGING",
+          "maxResolutionM": null
+        },
+        {
+          "type": "MARS_SURFACE_COMPOSITION",
+          "maxResolutionM": null
+        }
+      ],
+      "bonus": [
+        "MARS_SUBSURFACE_RADAR",
+        "MARS_WEATHER"
+      ],
+      "budgetCapMusd": 950,
+      "deadlineMonths": 96,
+      "minScienceMonths": 6,
+      "source": {
+        "title": "JPL Mars 2020 Launch Press Kit",
+        "detail": "Quick Facts, rover and helicopter. Budget, deadline, and game duration are scenario settings.",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/launch/quick_facts/"
+      }
+    },
+    "difficulty": "MISSION_DIRECTOR",
+    "destination": "MARS",
+    "ladder": true,
+    "stepUnit": "MONTH",
+    "steps": 6,
+    "crew": 0,
+    "suppliesKgPerCrewDay": 0,
+    "suppliesSource": null,
+    "deltaVRequiredMs": 100,
+    "deltaVBasis": "GAME_ESTIMATE",
+    "deltaVSource": {
+      "title": "NASA Mars Helicopter Attached to Perseverance",
+      "detail": "Powered descent minimum: 80 - 0.75 = 79.25 m/s, rounded up to 80. Add a 20 m/s game allowance for cruise corrections based on Spirit's 14.3 m/s first correction (JPL, June 20, 2003). Omits gravity losses, divert and flyaway. Launcher provides transfer injection.",
+      "url": "https://www.nasa.gov/missions/mars-2020-perseverance/mars-helicopter-attached-to-nasas-perseverance-rover/"
+    },
+    "surfaceDeltaVRequiredMs": 80,
+    "downlinkMbps": 2,
+    "contactMinutesPerDay": 30,
+    "downlinkSource": {
+      "title": "NASA Mars Relay Network",
+      "detail": "The rover-to-orbiter link operates at up to 2 Mbps. The game assumes 30 minutes per day of usable relay contact.",
+      "url": "https://science.nasa.gov/mars/mars-relay-network/"
+    }
+  },
+  {
+    "briefing": {
+      "id": "storm-chasers",
+      "title": "Storm Chasers",
+      "question": "How much rain falls inside tropical storms?",
+      "description": "Tropical storms bring floods. Build a spacecraft that can measure rain from above, even through thick cloud.",
+      "basedOn": "TRMM",
+      "targetLatitudeDeg": 35,
+      "prefersSunSynchronous": false,
+      "required": [
+        {
+          "type": "RAIN_MICROWAVE",
+          "maxResolutionM": null
+        }
+      ],
+      "bonus": [
+        "LIGHTNING",
+        "CLOUD_IMAGING"
+      ],
+      "budgetCapMusd": 200,
+      "deadlineMonths": 60,
+      "minScienceMonths": 12,
+      "source": {
+        "title": "NASA Earth Science Reference Handbook (2006)",
+        "detail": "TRMM mission and instruments, PDF p. 256-261. Budget, deadline and duration are scenario settings.",
+        "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+      }
+    },
+    "difficulty": "ENGINEER",
+    "destination": "EARTH",
+    "ladder": false,
+    "stepUnit": "MONTH",
+    "steps": 0,
+    "crew": 0,
+    "suppliesKgPerCrewDay": 0,
+    "suppliesSource": null,
+    "deltaVRequiredMs": 0,
+    "deltaVBasis": "GAME_ESTIMATE",
+    "deltaVSource": {
+      "title": "NASA Basics of Space Flight, Chapter 14",
+      "detail": "Game assumes direct launcher insertion into the selected Earth science orbit. It budgets zero post-separation maneuver delta-v and omits orbit maintenance.",
+      "url": "https://science.nasa.gov/learn/basics-of-space-flight/chapter14-1/"
+    },
+    "surfaceDeltaVRequiredMs": 0,
+    "downlinkMbps": 0,
+    "contactMinutesPerDay": 0,
+    "downlinkSource": null
+  },
+  {
+    "briefing": {
+      "id": "ice-patrol",
+      "title": "Ice Patrol",
+      "question": "Are the polar ice sheets getting thinner?",
+      "description": "The great ice sheets sit near the poles. Build a spacecraft that can measure the height of the ice, year after year.",
+      "basedOn": "ICESat",
+      "targetLatitudeDeg": 86,
+      "prefersSunSynchronous": false,
+      "required": [
+        {
+          "type": "ICE_HEIGHT_LASER",
+          "maxResolutionM": null
+        }
+      ],
+      "bonus": [
+        "SEA_ICE_MICROWAVE"
+      ],
+      "budgetCapMusd": 600,
+      "deadlineMonths": 108,
+      "minScienceMonths": 36,
+      "source": {
+        "title": "NASA Earth Science Reference Handbook (2006)",
+        "detail": "ICESat mission and GLAS, PDF p. 176-177. ICESat's 94 degree orbit reaches latitude 86 degrees. Budget, deadline and duration are scenario settings.",
+        "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
+      }
+    },
+    "difficulty": "ENGINEER",
+    "destination": "EARTH",
+    "ladder": false,
+    "stepUnit": "MONTH",
+    "steps": 0,
+    "crew": 0,
+    "suppliesKgPerCrewDay": 0,
+    "suppliesSource": null,
+    "deltaVRequiredMs": 0,
+    "deltaVBasis": "GAME_ESTIMATE",
+    "deltaVSource": {
+      "title": "NASA Basics of Space Flight, Chapter 14",
+      "detail": "Game assumes direct launcher insertion into the selected Earth science orbit. It budgets zero post-separation maneuver delta-v and omits orbit maintenance.",
+      "url": "https://science.nasa.gov/learn/basics-of-space-flight/chapter14-1/"
+    },
+    "surfaceDeltaVRequiredMs": 0,
+    "downlinkMbps": 0,
+    "contactMinutesPerDay": 0,
+    "downlinkSource": null
+  }
+]

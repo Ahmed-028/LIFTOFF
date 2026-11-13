@@ -1,9 +1,8 @@
 package com.liftoff.engine.sim;
 
 /**
- * Inputs the simulator needs that the model does not carry yet.
- * TODO(Member 1/2): replace with Bus.storageGbit (data-sources "still to source" 3), the chosen
- * supplies of the Supplies step, and the kind of the POWER part, once those exist.
+ * Flight inputs for explicit simulation scenarios. The default simulator uses the selected bus's recorder.
+ * Crew supplies and power source can be supplied once the builder exposes those choices.
  *
  * @param storageGbit  size of the data recorder; infinite means "no figure yet, not limited"
  * @param suppliesKg   crew supplies loaded at launch

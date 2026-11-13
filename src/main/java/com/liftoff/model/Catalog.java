@@ -1,5 +1,10 @@
 package com.liftoff.model;
 
+import com.liftoff.data.MissionEntry;
+import com.liftoff.engine.sim.EventCard;
+import com.liftoff.session.stub.ModuleSlot;
+import com.liftoff.session.stub.ShipPart;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -11,7 +16,16 @@ public record Catalog(
         List<Bus> buses,
         List<Orbit> orbits,
         List<GroundStation> groundStations,
-        List<LaunchVehicle> launchVehicles) {
+        List<LaunchVehicle> launchVehicles,
+        List<MissionEntry> missions,
+        List<ShipPart> shipParts,
+        List<EventCard> events) {
+
+    public Catalog(List<Objective> objectives, List<Instrument> instruments, List<Bus> buses,
+                   List<Orbit> orbits, List<GroundStation> groundStations, List<LaunchVehicle> launchVehicles) {
+        this(objectives, instruments, buses, orbits, groundStations, launchVehicles,
+                List.of(), List.of(), List.of());
+    }
 
     public Catalog {
         objectives = List.copyOf(objectives);
@@ -20,6 +34,23 @@ public record Catalog(
         orbits = List.copyOf(orbits);
         groundStations = List.copyOf(groundStations);
         launchVehicles = List.copyOf(launchVehicles);
+        missions = List.copyOf(missions);
+        shipParts = List.copyOf(shipParts);
+        events = List.copyOf(events);
+    }
+
+    public Optional<MissionEntry> mission(String id) {
+        return find(missions, MissionEntry::id, id);
+    }
+
+    public Optional<ShipPart> shipPart(String id) {
+        return find(shipParts, ShipPart::id, id);
+    }
+
+    public List<ShipPart> partsFor(String missionId, ModuleSlot slot) {
+        return shipParts.stream()
+                .filter(part -> part.slot() == slot && part.missions().contains(missionId))
+                .toList();
     }
 
     public Optional<Objective> objective(String id) {

@@ -26,11 +26,22 @@ public final class MissionSimulator {
 
     /** Flies with the events bundled in the catalog and no inputs beyond the design. */
     public static SimulationResult run(MissionDesign design, Mission mission, Difficulty difficulty, long seed) {
-        return run(design, mission, difficulty, seed, EventDeck.fromClasspath(), SimExtras.none());
+        Bus bus = design.bus();
+        double storageGbit = bus == null || bus.storageGbit() == null
+                ? Double.POSITIVE_INFINITY : bus.storageGbit();
+        return run(design, mission, difficulty, seed, EventDeck.fromClasspath(), new SimExtras(storageGbit, 0, true));
     }
 
     public static SimulationResult run(MissionDesign design, Mission mission, Difficulty difficulty, long seed,
                                        EventDeck deck, SimExtras extras) {
+        return run(design, mission, difficulty, seed, deck, extras, null);
+    }
+
+    /** A destination's radio and contact window, with power from the selected ship. */
+    public record DeepSpaceLink(double powerW, double downlinkMbps, double contactMinutesPerDay) {}
+
+    public static SimulationResult run(MissionDesign design, Mission mission, Difficulty difficulty, long seed,
+                                       EventDeck deck, SimExtras extras, DeepSpaceLink link) {
         double stepDays = mission.stepUnit() == Mission.StepUnit.DAY ? 1 : SimRules.DAYS_PER_MONTH;
         int steps = mission.steps() > 0 ? mission.steps() : design.scienceMonths();
         EventDeck offered = deck.forDestination(mission.destination());
@@ -38,22 +49,23 @@ public final class MissionSimulator {
         List<Instrument> instruments = design.instruments();
         List<GroundStation> stations = design.stations();
         Bus bus = design.bus();
-        double supplyW = bus == null ? 0 : bus.payloadPowerW();
+        double supplyW = link == null ? (bus == null ? 0 : bus.payloadPowerW()) : link.powerW();
         double drawW = instruments.stream().mapToDouble(Instrument::avgPowerW).sum();
-        double downlinkMbps = bus == null ? 0 : bus.downlinkMbps();
+        double downlinkMbps = link == null ? (bus == null ? 0 : bus.downlinkMbps()) : link.downlinkMbps();
 
         // Share of each instrument's data still coming through (1 until a fault hits it).
         double[] output = new double[instruments.size()];
         java.util.Arrays.fill(output, 1);
         double[] contactMinutesPerDay = new double[stations.size()];
         for (int i = 0; i < contactMinutesPerDay.length; i++) {
-            contactMinutesPerDay[i] = design.orbit() == null
-                    ? 0
-                    : OrbitMath.contactMinutesPerDay(design.orbit(), stations.get(i).latitudeDeg());
+            if (link != null) {
+                contactMinutesPerDay[i] = link.contactMinutesPerDay() / stations.size();
+            } else if (design.orbit() != null) {
+                contactMinutesPerDay[i] = OrbitMath.contactMinutesPerDay(design.orbit(), stations.get(i).latitudeDeg());
+            }
         }
 
         double storedGbit = 0;
-        double suppliesLeftKg = extras.suppliesKg();
         double safeModeDays = 0;
         double dustDays = 0;
         double outageDays = 0;
@@ -144,8 +156,9 @@ public final class MissionSimulator {
             storedGbit = backlog - lost;
 
             double suppliesNeededKg = mission.crew() * mission.suppliesKgPerCrewDay() * stepDays;
-            suppliesRanOut = suppliesNeededKg > suppliesLeftKg;
-            suppliesLeftKg = Math.max(0, suppliesLeftKg - suppliesNeededKg);
+            double suppliesUsedKg = (step + 1) * suppliesNeededKg;
+            suppliesRanOut = suppliesUsedKg > extras.suppliesKg();
+            double suppliesLeftKg = Math.max(0, extras.suppliesKg() - suppliesUsedKg);
 
             if (firstLimit == SimLimit.NONE) {
                 // Fixed order for limits that break in the same step. Lost data implies a backlog,

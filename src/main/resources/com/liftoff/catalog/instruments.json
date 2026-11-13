@@ -243,5 +243,248 @@
       "detail": "Key CERES Facts, PDF p. 96. Figures are for one scanner.",
       "url": "https://assets.science.nasa.gov/content/dam/science/missions/a-train/publications/2006ReferenceHandbook.pdf"
     }
+  },
+  {
+    "id": "gecko-pan-ms",
+    "name": "Gecko PAN/MS",
+    "kidName": "Gecko PAN/MS",
+    "description": "A CubeSat imager for seeing individual fields.",
+    "flewOn": "Gecko family, nSight-1 heritage",
+    "massKg": 0.5,
+    "avgPowerW": 3.5,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 1.556481481,
+    "dataBasis": "GAME_ESTIMATE",
+    "capabilities": [
+      {
+        "type": "LAND_IMAGING",
+        "resolutionM": 10
+      }
+    ],
+    "costMusd": 0.25,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "SCS & Space Advisory Company Gecko Imager datasheet",
+      "detail": "Technical Specifications, PAN/MS column: 0.5 kg, under 3.5 W imaging, 10 m PAN at 500 km, 41 km swath, 8-bit mode. Game scenario assumes one uncompressed square PAN image per Earth day.",
+      "url": "https://satcatalog.s3.amazonaws.com/components/761/SatCatalog_-_SCS_Space_-_Gecko_Imager_PAN__4_MS_-_Datasheet.pdf"
+    }
+  },
+  {
+    "id": "lola",
+    "name": "LOLA",
+    "kidName": "LOLA",
+    "description": "A laser altimeter that maps the shape of the Moon.",
+    "flewOn": "Lunar Reconnaissance Orbiter",
+    "massKg": 9.6,
+    "avgPowerW": 26.2,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 10,
+    "dataBasis": "PUBLISHED",
+    "capabilities": [
+      {
+        "type": "LUNAR_TOPOGRAPHY",
+        "resolutionM": null
+      }
+    ],
+    "costMusd": 4.8,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA LOLA Fact Sheet",
+      "detail": "Technical specifications: mass, power and nominal data rate.",
+      "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lola-fact-sheet.pdf"
+    }
+  },
+  {
+    "id": "diviner",
+    "name": "Diviner",
+    "kidName": "Diviner",
+    "description": "Maps changes in lunar surface temperature.",
+    "flewOn": "Lunar Reconnaissance Orbiter",
+    "massKg": 11.9,
+    "avgPowerW": 21.6,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 24.0,
+    "dataBasis": "DERIVED",
+    "capabilities": [
+      {
+        "type": "LUNAR_THERMAL_MAPPING",
+        "resolutionM": null
+      }
+    ],
+    "costMusd": 5.95,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "LRO Instrument Suite and Mission, Table 7",
+      "detail": "Mass and orbit-average power allocations. NASA PDS LRO-L-DLRE-2-EDR-V1.0: 16 sets of 192 measurements at 16 bits every 2.048 s. Excludes engineering overhead.",
+      "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lro-space-science-paper.pdf"
+    }
+  },
+  {
+    "id": "apollo-psep",
+    "name": "Apollo passive seismic package",
+    "kidName": "Apollo passive seismic package",
+    "description": "Detects vibrations in the lunar ground.",
+    "flewOn": "Apollo 11",
+    "massKg": 48,
+    "avgPowerW": 46,
+    "powerBasis": "GAME_ESTIMATE",
+    "avgDataRateKbps": 1.06,
+    "dataBasis": "GAME_ESTIMATE",
+    "capabilities": [
+      {
+        "type": "LUNAR_SEISMOLOGY",
+        "resolutionM": null
+      }
+    ],
+    "costMusd": 24.0,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Apollo 11 Preliminary Science Report",
+      "detail": "Passive Seismic Experiment: package mass. Apollo 11 Mission Report section A.4.3: 46 W upper solar supply used as a conservative power proxy. NASA ALSEP telemetry normal downlink of 1060 bit/s used as a game proxy.",
+      "url": "https://www.nasa.gov/wp-content/uploads/static/history/alsj/a11/as11psr.pdf"
+    }
+  },
+  {
+    "id": "mastcam-z",
+    "name": "Mastcam-Z",
+    "kidName": "Mastcam-Z",
+    "description": "Studies the environment at a Mars sample site.",
+    "flewOn": "Perseverance",
+    "massKg": 4,
+    "avgPowerW": 17.4,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 1.667136018,
+    "dataBasis": "DERIVED",
+    "capabilities": [
+      {
+        "type": "MARS_SURFACE_IMAGING",
+        "resolutionM": null
+      }
+    ],
+    "costMusd": 2.0,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Perseverance Science Instruments",
+      "detail": "Mastcam-Z Tech Specs. 148 Mbit per sol divided by 88775 seconds.",
+      "url": "https://science.nasa.gov/mission/mars-2020-perseverance/science-instruments/"
+    }
+  },
+  {
+    "id": "supercam",
+    "name": "SuperCam",
+    "kidName": "SuperCam",
+    "description": "Studies the environment at a Mars sample site.",
+    "flewOn": "Perseverance",
+    "massKg": 10.6,
+    "avgPowerW": 17.9,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 0.048611111,
+    "dataBasis": "DERIVED",
+    "capabilities": [
+      {
+        "type": "MARS_SURFACE_COMPOSITION",
+        "resolutionM": null
+      }
+    ],
+    "costMusd": 5.3,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Perseverance Science Instruments",
+      "detail": "SuperCam Tech Specs. Mass = 5.6 + 4.8 + 0.2 kg. Data = 4.2 Mbit/day divided by 86400 seconds.",
+      "url": "https://science.nasa.gov/mission/mars-2020-perseverance/science-instruments/"
+    }
+  },
+  {
+    "id": "pixl",
+    "name": "PIXL",
+    "kidName": "PIXL",
+    "description": "Studies the environment at a Mars sample site.",
+    "flewOn": "Perseverance",
+    "massKg": 6.915,
+    "avgPowerW": 25,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 0.185185185,
+    "dataBasis": "DERIVED",
+    "capabilities": [
+      {
+        "type": "MARS_SURFACE_COMPOSITION",
+        "resolutionM": null
+      }
+    ],
+    "costMusd": 3.4575,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Perseverance Science Instruments",
+      "detail": "PIXL Tech Specs. Mass = 4.3 + 2.6 + 0.015 kg. Data = 2 MB/day times 8 divided by 86400 seconds.",
+      "url": "https://science.nasa.gov/mission/mars-2020-perseverance/science-instruments/"
+    }
+  },
+  {
+    "id": "rimfax",
+    "name": "RIMFAX",
+    "kidName": "RIMFAX",
+    "description": "Studies the environment at a Mars sample site.",
+    "flewOn": "Perseverance",
+    "massKg": 3,
+    "avgPowerW": 10,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 0.09011546,
+    "dataBasis": "GAME_ESTIMATE",
+    "capabilities": [
+      {
+        "type": "MARS_SUBSURFACE_RADAR",
+        "resolutionM": null
+      }
+    ],
+    "costMusd": 1.5,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Perseverance Science Instruments",
+      "detail": "RIMFAX Tech Specs. Uses upper published bounds for mass, power and data per sounding. Game assumes 100 soundings per sol at 10 kB each.",
+      "url": "https://science.nasa.gov/mission/mars-2020-perseverance/science-instruments/"
+    }
+  },
+  {
+    "id": "meda",
+    "name": "MEDA",
+    "kidName": "MEDA",
+    "description": "Studies the environment at a Mars sample site.",
+    "flewOn": "Perseverance",
+    "massKg": 5.5,
+    "avgPowerW": 17,
+    "powerBasis": "PUBLISHED",
+    "avgDataRateKbps": 0.991270065,
+    "dataBasis": "GAME_ESTIMATE",
+    "capabilities": [
+      {
+        "type": "MARS_WEATHER",
+        "resolutionM": null
+      }
+    ],
+    "costMusd": 2.75,
+    "costBasis": "GAME_ESTIMATE",
+    "buildMonths": 18,
+    "buildBasis": "GAME_ESTIMATE",
+    "source": {
+      "title": "NASA Perseverance Science Instruments",
+      "detail": "MEDA Tech Specs. Uses published peak power. Game treats the 11 MB data-return figure as one batch per sol.",
+      "url": "https://science.nasa.gov/mission/mars-2020-perseverance/science-instruments/"
+    }
   }
 ]

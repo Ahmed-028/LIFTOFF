@@ -6,10 +6,16 @@ package com.liftoff.session.stub;
  *
  * @param steps                how many time steps the flight lasts; 0 means "the design's science months"
  * @param crew                 people on board; 0 for a robotic mission
- * @param suppliesKgPerCrewDay TODO(Member 1): comes from missions.json with its source; no value is assumed here
+ * @param suppliesKgPerCrewDay sourced daily supply mass for each crew member
  */
 public record Mission(String id, Destination destination, StepUnit stepUnit, int steps,
-                      double deltaVRequiredMs, int crew, double suppliesKgPerCrewDay) {
+                      double deltaVRequiredMs, int crew, double suppliesKgPerCrewDay,
+                      double surfaceDeltaVRequiredMs) {
+
+    public Mission(String id, Destination destination, StepUnit stepUnit, int steps,
+                   double deltaVRequiredMs, int crew, double suppliesKgPerCrewDay) {
+        this(id, destination, stepUnit, steps, deltaVRequiredMs, crew, suppliesKgPerCrewDay, 0);
+    }
 
     public enum Destination { EARTH, MOON, MARS }
 

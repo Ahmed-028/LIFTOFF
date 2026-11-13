@@ -58,13 +58,27 @@ class LaunchCheckerTest {
     }
 
     @Test
-    void noRocketCapacityIsKnownYetForTheMoonOrMars() {
+    void aRocketWithOnlyEarthCapacityCannotLaunchToTheMoon() {
         MissionDesign design = SimFixtures.design();
         Mission moon = new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 0, 0);
 
         List<Kind> kinds = kinds(LaunchChecker.check(design, moon, design.launchVehicle(), design.orbit()));
 
         assertTrue(kinds.contains(Kind.ROCKET_NOT_OFFERED));
+    }
+
+    @Test
+    void transferCapacityComesFromTheMissionDestinationWithoutAnEarthOrbit() {
+        MissionDesign design = SimFixtures.design();
+        Mission moon = new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 0, 0);
+        Mission mars = new Mission("mars", Mission.Destination.MARS, Mission.StepUnit.MONTH, 6, 0, 0, 0);
+        var rocket = TestParts.rocket("transfer", Map.of(LaunchClass.TRANS_LUNAR, 200.0,
+                LaunchClass.TRANS_MARS, 100.0), 20);
+
+        assertEquals(List.of(), LaunchChecker.check(design, moon, rocket, null));
+        var issues = LaunchChecker.check(design, mars, rocket, null);
+        assertEquals(List.of(Kind.MASS_OVER_CAPACITY), kinds(issues));
+        assertEquals(100, issues.getFirst().available());
     }
 
     @Test

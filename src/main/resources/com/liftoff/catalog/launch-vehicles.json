@@ -18,13 +18,16 @@
     "name": "Pegasus XL",
     "kidName": "Sky Dart",
     "description": "A winged rocket dropped from an aeroplane. It carries small satellites to low orbit.",
-    "capacityKg": { "LOW_INCLINATION": 453.59 },
+    "capacityKg": {
+      "LOW_INCLINATION": 453.59,
+      "POLAR": 221
+    },
     "costMusd": 56.3,
     "costBasis": "PUBLISHED",
     "source": {
-      "title": "NASA Launch Services Program Rockets; NASA launch services contract release for ICON",
-      "detail": "Up to 1,000 pounds (453.59 kg) into low Earth orbit. Cost is NASA's total cost to launch ICON. No polar figure has been sourced yet.",
-      "url": "https://www.nasa.gov/launch-services-program-rockets"
+      "title": "Northrop Grumman Pegasus User's Guide",
+      "detail": "Fig. 3-1: 221 kg at 741 km circular, 90 degrees without HAPS. NASA LSP gives low-inclination capacity; NASA ICON release gives launch cost.",
+      "url": "https://cdn.northropgrumman.com/-/media/wp-content/uploads/Pegasus-User-Guide-1.pdf"
     }
   },
   {
@@ -32,13 +35,17 @@
     "name": "Falcon 9",
     "kidName": "Heavy Hauler",
     "description": "A large rocket that can lift very heavy spacecraft to low orbit.",
-    "capacityKg": { "LOW_INCLINATION": 22800 },
+    "capacityKg": {
+      "LOW_INCLINATION": 22800,
+      "POLAR": 1700,
+      "TRANS_MARS": 4020
+    },
     "costMusd": 80.4,
     "costBasis": "PUBLISHED",
     "source": {
-      "title": "SpaceX Falcon 9 capacity (as quoted by Wikipedia); NASA launch services contract release for PACE",
-      "detail": "22,800 kg to low Earth orbit at 28.5 degrees, expendable. Cost is NASA's total cost to launch PACE. No polar figure has been sourced yet.",
-      "url": "https://www.nasa.gov/news-release/nasa-awards-launch-services-contract-for-earth-science-mission/"
+      "title": "NASA PACE Spacecraft and SpaceX Falcon 9",
+      "detail": "NASA PACE spacecraft facts: 3748 lb fully fueled, about 1700 kg, flown on Falcon 9 to a 676 km sun-synchronous orbit. The game uses this demonstrated reference load. SpaceX lists 22800 kg to LEO and 4020 kg to Mars. Cost is NASA PACE launch contract.",
+      "url": "https://science.nasa.gov/blogs/pace/2024/02/08/meet-nasas-pace-spacecraft-science-instruments/"
     }
   },
   {
@@ -53,6 +60,54 @@
       "title": "United Launch Alliance, Atlas V performance; NASA launch services contract release for Landsat 9",
       "detail": "401 configuration: 9,800 kg to LEO at 28.7 degrees, 8,080 kg to LEO at 90 degrees. Cost is NASA's total cost to launch Landsat 9.",
       "url": "https://www.ulalaunch.com/rockets/atlas-v"
+    }
+  },
+  {
+    "id": "sls-block-1",
+    "name": "SLS Block 1",
+    "kidName": "Moon Lifter",
+    "description": "Sends heavy spacecraft toward the Moon.",
+    "capacityKg": {
+      "TRANS_LUNAR": 27000
+    },
+    "costMusd": 2200,
+    "costBasis": "PUBLISHED",
+    "source": {
+      "title": "NASA Space Launch System Reference",
+      "detail": "Block 1 sends more than 27 t toward the Moon. The game uses the published lower bound. $2200M is the NASA OIG IG-22-003 p. 23 production estimate for one SLS, excluding Orion and ground systems.",
+      "url": "https://www.nasa.gov/reference/space-launch-system/"
+    }
+  },
+  {
+    "id": "atlas-v-541",
+    "name": "Atlas V 541",
+    "kidName": "Mars Lifter",
+    "description": "A proven launcher for Mars rovers.",
+    "capacityKg": {
+      "TRANS_MARS": 3893
+    },
+    "costMusd": 243,
+    "costBasis": "PUBLISHED",
+    "source": {
+      "title": "JPL Mars Science Laboratory Landing Press Kit",
+      "detail": "Quick Facts, p. 6: the Atlas V 541 launched a 3893 kg spacecraft toward Mars. This is a demonstrated lower bound at the Curiosity trajectory, not the maximum. $243M from NASA Mars 2020 launch services award.",
+      "url": "https://mars.nasa.gov/internal_resources/823/"
+    }
+  },
+  {
+    "id": "saturn-v",
+    "name": "Saturn V",
+    "kidName": "Apollo Moon Rocket",
+    "description": "The launcher that sent the Apollo spacecraft and lunar lander toward the Moon.",
+    "capacityKg": {
+      "TRANS_LUNAR": 43500
+    },
+    "costMusd": 185,
+    "costBasis": "PUBLISHED",
+    "source": {
+      "title": "NASA What Was the Saturn V?",
+      "detail": "About 43,500 kg toward the Moon. Apollo 15 Press Kit gives a $185M launch-vehicle estimate in 1971 dollars.",
+      "url": "https://www.nasa.gov/learning-resources/for-kids-and-students/what-was-the-saturn-v-grades-5-8/"
     }
   }
 ]

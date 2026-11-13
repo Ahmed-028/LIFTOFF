@@ -2,17 +2,29 @@ package com.liftoff.data;
 
 import com.liftoff.TestParts;
 import com.liftoff.engine.OrbitMath;
+import com.liftoff.engine.sim.Difficulty;
+import com.liftoff.engine.sim.EventDeck;
+import com.liftoff.engine.sim.MissionSimulator;
+import com.liftoff.engine.sim.SimEventType;
+import com.liftoff.engine.sim.SimLimit;
 import com.liftoff.model.Bus;
 import com.liftoff.model.Capability;
 import com.liftoff.model.Catalog;
 import com.liftoff.model.GroundStation;
 import com.liftoff.model.Instrument;
+import com.liftoff.model.LaunchClass;
 import com.liftoff.model.LaunchVehicle;
+import com.liftoff.model.MissionDesign;
 import com.liftoff.model.Objective;
 import com.liftoff.model.Orbit;
 import com.liftoff.model.Requirement;
 import com.liftoff.model.SourceRef;
 import com.liftoff.model.ValueBasis;
+import com.liftoff.session.GameSession;
+import com.liftoff.session.MissionStep;
+import com.liftoff.session.stub.Mission;
+import com.liftoff.session.stub.ModuleSlot;
+import com.liftoff.session.stub.ShipPart;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -37,13 +49,140 @@ class CatalogLoaderTest {
     }
 
     @Test
-    void allSixCatalogsLoad() {
+    void allBundledCatalogsLoad() {
         assertEquals(3, catalog.objectives().size());
-        assertEquals(10, catalog.instruments().size());
+        assertTrue(catalog.instruments().size() > 10);
         assertEquals(3, catalog.buses().size());
         assertEquals(3, catalog.orbits().size());
         assertEquals(6, catalog.groundStations().size());
-        assertEquals(4, catalog.launchVehicles().size());
+        assertEquals(5, catalog.missions().size());
+        assertEquals(List.of("farm-watch", "moon-landing", "mars-drones"), catalog.missions().stream()
+                .filter(MissionEntry::ladder).map(MissionEntry::id).toList());
+        for (MissionEntry mission : catalog.missions()) {
+            for (ModuleSlot slot : ModuleSlot.values()) {
+                assertTrue(catalog.partsFor(mission.id(), slot).size() >= 4, mission.id() + " / " + slot);
+            }
+        }
+        assertTrue(catalog.launchVehicle("sls-block-1").orElseThrow().capacityFor(LaunchClass.TRANS_LUNAR).isPresent());
+        assertTrue(catalog.launchVehicle("atlas-v-541").orElseThrow().capacityFor(LaunchClass.TRANS_MARS).isPresent());
+        assertEquals(catalog.events(), EventDeck.fromClasspath().cards());
+        for (SimEventType type : SimEventType.values()) {
+            assertTrue(catalog.events().stream().anyMatch(card -> card.type() == type), type.name());
+        }
+    }
+
+    @Test
+    void validationRejectsTooFewPartsForAMissionSlot() {
+        List<ShipPart> parts = catalog.shipParts().stream()
+                .filter(part -> part.slot() != ModuleSlot.THRUSTERS).toList();
+        assertTrue(assertThrows(CatalogException.class, () -> CatalogLoader.validate(withParts(parts)))
+                .getMessage().contains("THRUSTERS"));
+    }
+
+    @Test
+    void bundledShipPartsCanFlyFarmWatchThroughTheGameSession() {
+        GameSession session = new GameSession(catalog);
+        session.selectMission("farm-watch");
+        session.next();
+        session.choosePart("eo1-class");
+        session.choosePart("mr-103");
+        session.choosePart("sp6x-wings");
+        session.choosePart("bay-3u");
+        session.choosePart("cubesat-3u");
+        assertEquals(catalog.shipPart("cubesat-3u"), session.build().part(ModuleSlot.SATELLITE));
+        session.next();
+        session.chooseBus("eo1-class");
+        session.addInstrument("ali");
+        session.chooseOrbit("sso-705");
+        session.toggleStation("svalbard");
+        session.toggleStation("fairbanks");
+        session.chooseLaunchVehicle("atlas-v-401");
+        session.next();
+        session.confirmBuild();
+        session.next();
+
+        assertTrue(session.runLaunchCheck().isEmpty());
+        session.next();
+        assertTrue(session.fly(2026).success());
+        session.next();
+        assertEquals(MissionStep.REPORT, session.step());
+    }
+
+    @Test
+    void busRecorderCapacitiesAreAvailableWhereSourced() {
+        assertEquals(380.0, catalog.bus("landsat7-class").orElseThrow().storageGbit());
+        assertEquals(48.0, catalog.bus("eo1-class").orElseThrow().storageGbit());
+    }
+
+    @Test
+    void defaultSimulationUsesTheCatalogRecorderCapacity() {
+        Bus bus = catalog.bus("eo1-class").orElseThrow();
+        MissionDesign design = MissionDesign.empty().withBus(bus)
+                .plusInstrument(catalog.instrument("ali").orElseThrow()).withScienceMonths(1);
+        var result = MissionSimulator.run(design, new Mission("farm-watch", 0), Difficulty.CADET, 1);
+
+        assertEquals(48, result.storedAtEndGbit(), 1e-9);
+        assertEquals(result.totalProducedGbit() - 48, result.totalLostGbit(), 1e-9);
+        assertEquals(SimLimit.STORAGE, result.firstLimit());
+    }
+
+    @Test
+    void sessionUsesTheCatalogBriefingAndFlightSettings() {
+        GameSession session = new GameSession(catalog);
+        for (String id : List.of("moon-landing", "mars-drones", "farm-watch")) {
+            MissionEntry entry = catalog.mission(id).orElseThrow();
+            session.selectMission(id);
+
+            assertEquals(entry.briefing(), session.design().objective());
+            assertEquals(entry.difficulty(), session.difficulty());
+            assertEquals(entry.deltaVRequiredMs(), session.buildReport().deltaVRequiredMs());
+        }
+    }
+
+    @Test
+    void sessionRejectsPartsForAnotherMissionWithoutChangingTheBuild() {
+        GameSession session = new GameSession(catalog);
+        session.selectMission("farm-watch");
+        session.choosePart("cubesat-3u");
+
+        assertThrows(IllegalArgumentException.class, () -> session.choosePart("perseverance"));
+        assertEquals(catalog.shipPart("cubesat-3u"), session.build().part(ModuleSlot.SATELLITE));
+    }
+
+    @Test
+    void cubeSatBaysUseThePublishedDeployerMass() {
+        assertEquals(2, catalog.shipPart("bay-3u").orElseThrow().massKg());
+        assertEquals(4.5, catalog.shipPart("bay-6u").orElseThrow().massKg());
+        assertEquals(7.5, catalog.shipPart("bay-12u").orElseThrow().massKg());
+    }
+
+    @Test
+    void validationRejectsABlankModelId() {
+        assertInvalidPart(ModuleSlot.POWER, " ", 1, "modelId");
+    }
+
+    @Test
+    void validationRejectsNonpositiveDimensionsWhereUsed() {
+        assertInvalidPart(ModuleSlot.CARGO_BAY, "model", 0, "bay length");
+        assertInvalidPart(ModuleSlot.SATELLITE, "model", -1, "payload length");
+    }
+
+    private static void assertInvalidPart(ModuleSlot slot, String modelId, double length, String problem) {
+        List<ShipPart> parts = new ArrayList<>(catalog.shipParts());
+        ShipPart template = catalog.partsFor("farm-watch", slot).getFirst();
+        parts.set(parts.indexOf(template), new ShipPart(template.id(), slot, template.name(), template.kidName(),
+                template.description(), template.basedOn(), template.missions(), template.massKg(),
+                template.powerSupplyW(), template.powerDrawW(), template.payloadMassKg(), length,
+                template.bayDiameterM(), length, template.diameterM(), template.thrustN(),
+                template.specificImpulseS(), template.propellantCapacityKg(), template.dataGbitPerDay(),
+                template.costMusd(), template.costBasis(), modelId, template.source()));
+        assertTrue(assertThrows(CatalogException.class, () -> CatalogLoader.validate(withParts(parts)))
+                .getMessage().contains(problem));
+    }
+
+    private static Catalog withParts(List<ShipPart> parts) {
+        return new Catalog(catalog.objectives(), catalog.instruments(), catalog.buses(), catalog.orbits(),
+                catalog.groundStations(), catalog.launchVehicles(), catalog.missions(), parts, catalog.events());
     }
 
     @Test
