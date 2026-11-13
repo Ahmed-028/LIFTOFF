@@ -19,7 +19,6 @@ import java.util.List;
 
 final class CockpitPanel extends VBox {
     private static final List<String> STATIONS = List.of("aisle", "seat", "console", "viewport");
-    private static final int[] GRAVITY_LEVELS = {1, 10, 50, 100};
     private static final List<String> LIGHT_MODES = List.of("normal", "night", "warp");
 
     private final CabinView cabin;
@@ -31,9 +30,7 @@ final class CockpitPanel extends VBox {
     private final Label telemetry;
     private final Button back;
     private final Button forward;
-    private final Button gravityButton;
     private final Button lightsButton;
-    private final Button radarButton;
 
     private final double plannedFuel;
     private final double massKg;
@@ -42,7 +39,6 @@ final class CockpitPanel extends VBox {
     private final double powerSupplyW;
 
     private int station;
-    private int gravityIndex;
     private int lightIndex;
     private String lastPhase = "";
     private String lastTimeLeft = "";
@@ -75,41 +71,28 @@ final class CockpitPanel extends VBox {
         back.setOnAction(event -> move(-1));
         forward.setOnAction(event -> move(1));
 
+        lightsButton = new Button();
+        lightsButton.setMinWidth(Region.USE_PREF_SIZE);
+        lightsButton.setOnAction(event -> cycleLights());
+
         var tips = text.label(text.get("cockpit.tips"), "muted");
         tips.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(tips, Priority.ALWAYS);
 
-        var controls = new HBox(8, back, stationLabel, forward, tips);
+        var controls = new HBox(8, back, stationLabel, forward, lightsButton, tips);
         controls.setAlignment(Pos.CENTER_LEFT);
         getChildren().add(controls);
 
         if (Platform.isSupported(ConditionalFeature.SCENE3D)) {
             cabin = new CabinView(inFlight);
-            cabin.setMinHeight(140);
-            cabin.setPrefHeight(210);
+            cabin.setMinHeight(155);
+            cabin.setPrefHeight(245);
             VBox.setVgrow(cabin, Priority.ALWAYS);
             getChildren().add(cabin);
         } else {
             cabin = null;
             getChildren().add(text.label(text.get("cockpit.fallback"), "muted"));
         }
-
-        gravityButton = new Button();
-        gravityButton.setMinWidth(Region.USE_PREF_SIZE);
-        gravityButton.setOnAction(event -> cycleGravity());
-        lightsButton = new Button();
-        lightsButton.setMinWidth(Region.USE_PREF_SIZE);
-        lightsButton.setOnAction(event -> cycleLights());
-        radarButton = new Button(text.get("cockpit.scan"));
-        radarButton.setMinWidth(Region.USE_PREF_SIZE);
-        radarButton.setOnAction(event -> scanSector());
-        var hornButton = new Button(text.get("cockpit.horn"));
-        hornButton.setMinWidth(Region.USE_PREF_SIZE);
-        hornButton.setOnAction(event -> sendChime());
-
-        var consoleBar = new HBox(8, gravityButton, lightsButton, radarButton, hornButton);
-        consoleBar.setAlignment(Pos.CENTER_LEFT);
-        getChildren().add(consoleBar);
 
         status = text.label("", "section-title");
         fuel = text.label("", "reading-value");
@@ -140,7 +123,7 @@ final class CockpitPanel extends VBox {
             }
         });
 
-        refreshInteractiveLabels();
+        refreshLightLabel();
         move(0);
     }
 
@@ -158,38 +141,15 @@ final class CockpitPanel extends VBox {
         }
     }
 
-    private void cycleGravity() {
-        gravityIndex = (gravityIndex + 1) % GRAVITY_LEVELS.length;
-        refreshInteractiveLabels();
-        syncConsoleDisplay();
-    }
-
     private void cycleLights() {
         lightIndex = (lightIndex + 1) % LIGHT_MODES.size();
-        refreshInteractiveLabels();
+        refreshLightLabel();
         if (cabin != null) {
             cabin.setLightMode(lightIndex);
         }
     }
 
-    private void scanSector() {
-        lastTelemetryNote = text.get("cockpit.scanPing");
-        telemetry.setText(lastTelemetryNote);
-        if (cabin != null) {
-            cabin.triggerRadarPing();
-        }
-        syncConsoleDisplay();
-    }
-
-    private void sendChime() {
-        lastTelemetryNote = text.get("cockpit.hornBeep");
-        telemetry.setText(lastTelemetryNote);
-        syncConsoleDisplay();
-    }
-
-    private void refreshInteractiveLabels() {
-        String gravityDesc = text.get("cockpit.gravity." + GRAVITY_LEVELS[gravityIndex]);
-        gravityButton.setText(text.get("cockpit.gravity", gravityDesc));
+    private void refreshLightLabel() {
         String lightDesc = text.get("cockpit.lights." + LIGHT_MODES.get(lightIndex));
         lightsButton.setText(text.get("cockpit.lights", lightDesc));
     }
@@ -224,10 +184,8 @@ final class CockpitPanel extends VBox {
         }
         double used = plannedFuel * Math.clamp(lastProgress, 0, 1);
         double left = Math.max(0, plannedFuel - used);
-        String gravityDesc = text.get("cockpit.gravity." + GRAVITY_LEVELS[gravityIndex]);
         cabin.updateConsole(route, lastPhase, lastTimeLeft, used, left, plannedFuel,
-                powerDrawW, powerSupplyW, massKg, budgetMusd,
-                "Gravity: " + gravityDesc, lastTelemetryNote, lastProgress);
+                powerDrawW, powerSupplyW, massKg, budgetMusd, lastTelemetryNote, lastProgress);
     }
 
     void addControl(Button action) {

@@ -66,7 +66,6 @@ public final class CabinView extends StackPane {
 
     private String lastSignature = "";
     private double radarSweep;
-    private double radarPingAlpha;
     private int lightMode;
 
     public CabinView(boolean inFlight) {
@@ -101,7 +100,7 @@ public final class CabinView extends StackPane {
 
         setLightMode(0);
         updateConsole("Earth -> Orbit", inFlight ? "Cruising" : "On the launch pad", "Standby",
-                0, 0, 0, 0, 0, 0, 0, "1G (Normal)", "Systems initializing...", 0);
+                0, 0, 0, 0, 0, 0, 0, "Systems initializing...", 0);
         station(0);
     }
 
@@ -501,14 +500,9 @@ public final class CabinView extends StackPane {
         }
     }
 
-    public void triggerRadarPing() {
-        radarPingAlpha = 1.0;
-    }
-
     public void update(double progress) {
         double p = Math.clamp(progress, 0, 1);
         radarSweep = (radarSweep + 0.14) % Math.TAU;
-        radarPingAlpha = Math.max(0, radarPingAlpha - 0.08);
 
         // Gentle breathing & head turn for the rider.
         double breath = Math.sin(p * 42) * .022;
@@ -556,11 +550,12 @@ public final class CabinView extends StackPane {
                               double fuelUsedKg, double fuelLeftKg, double plannedFuelKg,
                               double powerDrawW, double powerSupplyW,
                               double massKg, double budgetMusd,
-                              String gravityLabel, String telemetryNote, double progress) {
+                              String telemetryNote, double progress) {
+        double p = Math.clamp(progress, 0, 1);
         String signature = route + "|" + phase + "|" + eta + "|"
                 + Math.round(fuelUsedKg) + "|" + Math.round(fuelLeftKg) + "|"
                 + Math.round(powerDrawW) + "|" + Math.round(powerSupplyW) + "|"
-                + gravityLabel + "|" + telemetryNote + "|" + Math.round(radarPingAlpha * 10);
+                + telemetryNote + "|" + Math.round(p * 100);
         if (signature.equals(lastSignature)) {
             return;
         }
@@ -580,7 +575,7 @@ public final class CabinView extends StackPane {
         }
 
         drawConsoleCanvas(route, phase, eta, fuelUsedKg, fuelLeftKg, plannedFuelKg,
-                powerDrawW, powerSupplyW, massKg, budgetMusd, gravityLabel, telemetryNote);
+                powerDrawW, powerSupplyW, massKg, budgetMusd, telemetryNote, p);
         if (Platform.isFxApplicationThread()) {
             screenCanvas.snapshot(null, screenImage);
         }
@@ -590,7 +585,7 @@ public final class CabinView extends StackPane {
                                    double fuelUsedKg, double fuelLeftKg, double plannedFuelKg,
                                    double powerDrawW, double powerSupplyW,
                                    double massKg, double budgetMusd,
-                                   String gravityLabel, String telemetryNote) {
+                                   String telemetryNote, double progress) {
         GraphicsContext g = screenCanvas.getGraphicsContext2D();
         g.setFill(Color.web("#08192C"));
         g.fillRect(0, 0, SCREEN_W, SCREEN_H);
@@ -682,14 +677,11 @@ public final class CabinView extends StackPane {
         g.setFill(Color.WHITE);
         g.fillText(String.format("Mass: %.0f kg", massKg), 276, 144);
         g.fillText(String.format("Budget: $%.1fM", budgetMusd), 276, 168);
-        g.setFill(Color.web("#FFCB69"));
-        g.fillText(truncate(gravityLabel, 24), 276, 196);
-
         g.setFill(Color.web("#9FE8FF"));
         g.setFont(Font.font("System", FontWeight.NORMAL, 12));
-        drawWrapped(g, telemetryNote, 276, 224, 198);
+        drawWrapped(g, telemetryNote, 276, 204, 198);
 
-        // Right radar circle.
+        // Right orbital flight progress ring.
         drawPanel(g, 500, 52, 126, 234, "#5DF29A");
         double rcx = 563;
         double rcy = 138;
@@ -701,30 +693,25 @@ public final class CabinView extends StackPane {
         g.strokeLine(rcx - rr, rcy, rcx + rr, rcy);
         g.strokeLine(rcx, rcy - rr, rcx, rcy + rr);
 
-        // Sweeping radar beam.
+        // Sweeping navigation indicator.
         g.setStroke(Color.web("#5DF29A"));
         g.setLineWidth(2.4);
         g.strokeLine(rcx, rcy, rcx + Math.cos(radarSweep) * rr, rcy + Math.sin(radarSweep) * rr);
 
-        if (radarPingAlpha > 0) {
-            g.setStroke(Color.color(.4, 1, .7, radarPingAlpha));
-            g.strokeOval(rcx - rr * (1.1 - radarPingAlpha * .4), rcy - rr * (1.1 - radarPingAlpha * .4),
-                    rr * 2 * (1.1 - radarPingAlpha * .4), rr * 2 * (1.1 - radarPingAlpha * .4));
-        }
-
-        // Blips for nearby NASA craft & space pods.
         g.setFill(Color.web("#FFD273"));
         g.fillOval(rcx + 18, rcy - 22, 6, 6);
         g.setFill(Color.web("#24E0F0"));
         g.fillOval(rcx - 24, rcy + 14, 6, 6);
 
         g.setFill(Color.web("#5DF29A"));
+        g.setFont(Font.font("System", FontWeight.BOLD, 11));
+        g.fillText("FLIGHT PROGRESS", 512, 216);
+        g.setFill(Color.WHITE);
         g.setFont(Font.font("System", FontWeight.BOLD, 12));
-        g.fillText("SECTOR RADAR", 516, 216);
+        g.fillText(String.format("Progress: %.0f%%", progress * 100), 518, 238);
         g.setFill(Color.web("#B9C7E6"));
         g.setFont(Font.font("System", FontWeight.NORMAL, 11));
-        g.fillText("Pods & Satellites", 515, 236);
-        g.fillText("Tracked Live", 528, 252);
+        g.fillText("Status: Nominal", 520, 256);
     }
 
     private static void drawPanel(GraphicsContext g, double x, double y, double w, double h, String borderHex) {
