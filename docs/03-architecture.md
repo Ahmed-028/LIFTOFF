@@ -102,8 +102,7 @@ record ResourceUsage(ResourceType type, double used, OptionalDouble capacity,
 Arriving in later milestones, same style: `LaunchChecker`, `MissionSimulator`
 (M3), `ScoreCalculator`, `ReportBuilder` (M4).
 
-**engine, v2 additions (ship builder rules)** — built; details and decisions in
-`member-2-guide.md`:
+**engine, v2 additions (ship builder rules)** — built:
 
 ```java
 final class FuelMath {            // rocket equation, g0 = 9.80665 m/s^2
