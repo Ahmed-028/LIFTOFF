@@ -15,6 +15,8 @@
         </VBox>
     </top>
     <center>
+        <TabPane id="launch-views" tabClosingPolicy="UNAVAILABLE" styleClass="supplies-tabs">
+            <Tab text="%cockpit.pad">
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
             <HBox spacing="14" styleClass="page-content">
                 <StackPane fx:id="rocketArt" minWidth="260" minHeight="270" styleClass="launch-pad"/>
@@ -24,6 +26,9 @@
                 </VBox>
             </HBox>
         </ScrollPane>
+            </Tab>
+            <Tab fx:id="cabinTab" text="%cockpit.tab"/>
+        </TabPane>
     </center>
     <bottom>
         <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="action-bar">

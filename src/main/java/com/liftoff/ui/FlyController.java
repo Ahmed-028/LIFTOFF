@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Tab;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
@@ -36,12 +37,14 @@ public final class FlyController extends MissionScreen {
     @FXML private Label phase;
     @FXML private Label route;
     @FXML private CheckBox calm;
+    @FXML private Tab cabinTab;
     private SimulationResult flight;
     private Timeline timer;
     private int index;
     private FlightView view;
     private Destination destination;
     private int plannedSteps;
+    private CockpitPanel cockpit;
 
     @Override
     protected void setUp() {
@@ -51,6 +54,9 @@ public final class FlyController extends MissionScreen {
         calm.setSelected(navigator.reducedMotion());
         calm.selectedProperty().addListener((property, previous, enabled) -> navigator.setReducedMotion(enabled));
         route.setText(text.get("flight.route." + destination));
+        cockpit = new CockpitPanel(session, text, true, route.getText());
+        cockpit.addControl(playback);
+        cabinTab.setContent(cockpit);
         if (Platform.isSupported(ConditionalFeature.SCENE3D)) {
             var models = new EnumMap<ModuleSlot, String>(ModuleSlot.class);
             session.build().parts().forEach((slot, part) -> models.put(ModuleSlot.valueOf(slot.name()),
@@ -89,6 +95,7 @@ public final class FlyController extends MissionScreen {
             readings += "\n" + text.get("fly.crew", step.suppliesLeftKg());
         }
         telemetry.setText(readings);
+        cockpit.telemetry(text.get("cockpit.science", step.dataSentGbit(), step.storageUsedGbit(), step.powerShortfallW()));
         flightLog.getItems().add(text.get("fly.entry", label, step.dataSentGbit()));
         flight.events().stream().filter(event -> event.timeIndex() == step.index()).forEach(event -> {
             String message = text.get(event.messageKey());
@@ -113,6 +120,9 @@ public final class FlyController extends MissionScreen {
         if (view != null) {
             view.showProgress(fraction);
         }
+        int remaining = Math.max(0, plannedSteps - index);
+        cockpit.update(caption, text.get("cockpit.eta", remaining, text.get("duration." + flight.stepUnit())),
+                fraction, !calm.isSelected() && cabinTab.isSelected());
     }
 
     @FXML
@@ -138,6 +148,7 @@ public final class FlyController extends MissionScreen {
         timer.stop();
         if (index < plannedSteps) {
             phase.setText(text.get("flight.endedEarly"));
+            cockpit.update(phase.getText(), text.get("cockpit.noEta"), (double) index / plannedSteps, false);
         }
         playback.setDisable(true);
         skip.setDisable(true);

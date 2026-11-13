@@ -145,11 +145,16 @@ public final class SnapshotTool {
                 require(!button(scene, "#confirm").isDisabled(), "Valid build has issues: " + session.buildReport());
                 button(scene, "#confirm").fire();
                 save(scene, output.resolve("07-launch.png"));
+                verifyCabin(scene, "#launch-views");
+                save(scene, output.resolve("14-launch-cabin.png"));
                 button(scene, "#check").fire();
                 require(session.launchIssues().isEmpty(), "Launch failed: " + session.launchIssues());
                 after(3200, () -> {
                     require(session.step() == MissionStep.FLY, "Countdown did not open flight");
                     require(lookup(scene, "#flight-phase") != null, "Flight has no phase caption");
+                    var views = verifyCabin(scene, "#flight-views");
+                    save(scene, output.resolve("15-flight-cabin.png"));
+                    views.getSelectionModel().selectFirst();
                     button(scene, "#skip-playback").fire();
                     save(scene, output.resolve("08-fly.png"));
                     button(scene, "#report").fire();
@@ -256,6 +261,15 @@ public final class SnapshotTool {
             require(attempts > 0, "Expected surface scene, saw " + phase.getText());
             after(160, () -> waitForSurface(scene, attempts - 1, action));
         }
+    }
+
+    private static javafx.scene.control.TabPane verifyCabin(Scene scene, String selector) {
+        var views = (javafx.scene.control.TabPane) lookup(scene, selector);
+        views.getSelectionModel().select(1);
+        button(scene, "#cabin-forward").fire();
+        require(((javafx.scene.control.Label) lookup(scene, "#cabin-station")).getText().equals("Pilot seat"),
+                "Cabin camera did not advance to the pilot seat");
+        return views;
     }
 
     private void after(int milliseconds, CheckedAction action) {

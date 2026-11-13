@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -17,14 +18,19 @@ public final class LaunchController extends MissionScreen {
     @FXML private VBox issues;
     @FXML private StackPane rocketArt;
     @FXML private Button check;
+    @FXML private Tab cabinTab;
     private Timeline timer;
     private WarningList warnings;
+    private CockpitPanel cockpit;
 
     @Override
     protected void setUp() {
         warnings = new WarningList(text);
         issues.getChildren().add(warnings);
         rocketArt.getChildren().add(RocketArt.create(190));
+        cockpit = new CockpitPanel(session, text, false, text.get("flight.route." + mission().destination()));
+        cockpit.addControl(check);
+        cabinTab.setContent(cockpit);
     }
 
     @Override
@@ -39,6 +45,10 @@ public final class LaunchController extends MissionScreen {
         } else {
             status.setText(text.get("launch.waiting"));
         }
+        int steps = mission().steps() > 0 ? mission().steps() : session.design().scienceMonths();
+        cockpit.update(text.get("cockpit.onPad"), text.get("cockpit.eta", steps,
+                text.get("duration." + mission().stepUnit())), 0, false);
+        cockpit.telemetry(status.getText());
     }
 
     @FXML

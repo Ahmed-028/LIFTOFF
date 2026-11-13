@@ -16,13 +16,18 @@
     <center>
         <HBox spacing="12" styleClass="page-content">
             <VBox spacing="7" minWidth="380" HBox.hgrow="ALWAYS">
-                <StackPane fx:id="viewport" VBox.vgrow="ALWAYS" styleClass="flight-viewport" minHeight="240">
+                <TabPane id="flight-views" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE" styleClass="supplies-tabs">
+                    <Tab text="%cockpit.exterior">
+                <StackPane fx:id="viewport" styleClass="flight-viewport" minHeight="240">
                     <VBox spacing="3" maxWidth="360" maxHeight="-Infinity" mouseTransparent="true"
                           StackPane.alignment="TOP_LEFT" styleClass="flight-caption">
                         <Label fx:id="route" styleClass="eyebrow" wrapText="true"/>
                         <Label fx:id="phase" id="flight-phase" styleClass="section-title" wrapText="true"/>
                     </VBox>
                 </StackPane>
+                    </Tab>
+                    <Tab fx:id="cabinTab" text="%cockpit.tab"/>
+                </TabPane>
                 <ProgressBar fx:id="progress" progress="0" maxWidth="Infinity" accessibleText="%fly.progress"/>
             </VBox>
             <VBox spacing="9" prefWidth="325" minWidth="285" styleClass="panel, flight-console">

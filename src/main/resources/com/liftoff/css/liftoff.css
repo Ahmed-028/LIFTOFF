@@ -270,3 +270,9 @@
 }
 .flight-console .telemetry { -fx-font-size: 14px; -fx-line-spacing: 2; }
 .builder-status { -fx-text-fill: #FFD897; -fx-font-weight: bold; }
+.cockpit-panel {
+    -fx-padding: 8 12;
+    -fx-background-color: #0E2147;
+    -fx-border-color: #3AAEC8;
+}
+.cockpit-panel .eyebrow { -fx-max-width: Infinity; }
