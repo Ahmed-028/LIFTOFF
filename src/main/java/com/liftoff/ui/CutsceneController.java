@@ -21,10 +21,7 @@ import javafx.scene.layout.StackPane;
 
 import java.util.ResourceBundle;
 
-/**
- * Plays one of the story cutscenes: the opening, the one before each mission, or the ending.
- * They have no sound, so every beat has a caption. Skip, Enter, Space or Escape move straight on.
- */
+
 public final class CutsceneController implements ScreenController {
 
     @FXML private StackPane stage;
@@ -36,14 +33,14 @@ public final class CutsceneController implements ScreenController {
     private UiText text;
     private CutsceneView view;
     private String captionPrefix;
-    /** Where a caption the mission does not have of its own comes from. */
+
     private String captionFallback;
     private double[] captionTimes;
     private Object[] captionValues = new Object[0];
     private long start;
     private boolean finished;
     private int shownCaption = -1;
-    /** Sound cues as (second, effect); each plays once as the cutscene passes it. */
+
     private java.util.List<java.util.Map.Entry<Double, com.liftoff.audio.Sfx>> cues = java.util.List.of();
     private int nextCue;
     private final EventHandler<KeyEvent> keys = this::onKey;
@@ -130,7 +127,7 @@ public final class CutsceneController implements ScreenController {
         clock.start();
     }
 
-    /** Shows the cutscene at the given second. */
+
     public void show(double seconds) {
         if (finished || view == null) {
             return;

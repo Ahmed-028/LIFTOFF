@@ -15,10 +15,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Popup;
 
-/**
- * The gear button in the top right corner of a screen. It opens a small settings menu with the
- * music and sound switches and a way back to the main screen.
- */
+
 final class SettingsMenu {
 
     private static final double ICON_GRID = 24;
@@ -44,7 +41,7 @@ final class SettingsMenu {
         var menu = new VBox(10, title, SoundToggles.create(text), home);
         menu.getStyleClass().add("settings-menu");
 
-        // The press that closes an open menu is used up by the menu, so the gear does not reopen it.
+
         var popup = new Popup();
         popup.setAutoHide(true);
         popup.getContent().add(menu);
@@ -66,7 +63,7 @@ final class SettingsMenu {
         return button;
     }
 
-    /** A gear: a disc with eight teeth and a hole, drawn on a 24 x 24 grid. */
+
     private static Node gear(double size) {
         double centre = ICON_GRID / 2;
         Shape gear = new Circle(centre, centre, 7.4);

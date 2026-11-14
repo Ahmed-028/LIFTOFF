@@ -2,7 +2,7 @@ package com.liftoff.model;
 
 import java.util.List;
 
-/** A science instrument, with the figures of the real instrument it is based on. */
+
 public record Instrument(
         String id,
         String name,
@@ -28,7 +28,7 @@ public record Instrument(
         capabilities = List.copyOf(capabilities);
     }
 
-    /** Data produced in one day at the average rate, in gigabits. */
+
     public double dataGbitPerDay() {
         return avgDataRateKbps * SECONDS_PER_DAY / KILOBITS_PER_GIGABIT;
     }

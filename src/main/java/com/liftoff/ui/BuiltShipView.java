@@ -11,11 +11,11 @@ import javafx.scene.layout.StackPane;
 
 import java.util.Optional;
 
-/** The player's finished ship, shown in the 3D hangar with the same finishes as the builder. */
+
 final class BuiltShipView {
     private BuiltShipView() {}
 
-    /** A framed 3D view of the current build, or empty when this system cannot draw 3D. */
+
     static Optional<StackPane> create(GameSession session, UiText text, double height) {
         if (!Platform.isSupported(ConditionalFeature.SCENE3D)) {
             return Optional.empty();

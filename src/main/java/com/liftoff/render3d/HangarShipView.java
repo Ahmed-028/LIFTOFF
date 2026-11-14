@@ -22,7 +22,7 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 
-/** Resizable JavaFX viewport for embedding in the ship builder. Use on the FX thread. */
+
 public final class HangarShipView implements ShipView {
     private final StackPane container = new StackPane();
     private final OrbitCamera camera = new OrbitCamera();
@@ -79,7 +79,7 @@ public final class HangarShipView implements ShipView {
         return picker.slotAt(sceneX, sceneY);
     }
 
-    /** Stops active snap and door animations and applies subsequent changes immediately. */
+
     public void setCalmMode(boolean calmMode) {
         ship.setCalmMode(calmMode);
     }

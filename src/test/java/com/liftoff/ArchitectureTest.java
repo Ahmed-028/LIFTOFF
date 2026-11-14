@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Guards the rule that game logic never depends on the user-interface toolkit. */
+
 class ArchitectureTest {
 
     private static final Path SOURCES = Path.of("src", "main", "java", "com", "liftoff");

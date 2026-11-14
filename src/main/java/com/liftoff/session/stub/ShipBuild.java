@@ -5,7 +5,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 
-/** TODO(Member 2): stub of model/ShipBuild — what is chosen in each tab; immutable. */
+
 public record ShipBuild(Map<ModuleSlot, ShipPart> parts) {
 
     public ShipBuild {
@@ -18,7 +18,7 @@ public record ShipBuild(Map<ModuleSlot, ShipPart> parts) {
         return new ShipBuild(Map.of());
     }
 
-    /** Replaces the part in that part's slot only. */
+
     public ShipBuild with(ShipPart part) {
         Map<ModuleSlot, ShipPart> changed = new EnumMap<>(ModuleSlot.class);
         changed.putAll(parts);

@@ -4,11 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
-/**
- * Which mission step is current and which steps are open (table in document 05, section 3).
- * A step is open only when its own condition and those of every step before it hold. Going back
- * is always allowed; going forward to a locked step throws with the reason's message key.
- */
+
 public final class MissionFlow {
 
     public static final String BRIEFING_UNREAD = "flow.locked.briefingUnread";
@@ -29,7 +25,7 @@ public final class MissionFlow {
     private boolean launchPassed;
     private boolean simulationFinished;
 
-    /** @param shipComplete answers whether all five module slots are filled right now */
+
     public MissionFlow(BooleanSupplier shipComplete) {
         this.shipComplete = Objects.requireNonNull(shipComplete);
     }
@@ -38,7 +34,7 @@ public final class MissionFlow {
         return current;
     }
 
-    /** Moves one step forward; leaving the briefing marks it read. Stays put on the last step. */
+
     public MissionStep next() {
         if (current == MissionStep.BRIEFING) {
             briefingRead = true;
@@ -49,7 +45,7 @@ public final class MissionFlow {
         return goTo(STEPS[current.ordinal() + 1]);
     }
 
-    /** Moves one step back. Stays put on the first step. */
+
     public MissionStep back() {
         if (current.ordinal() > 0) {
             current = STEPS[current.ordinal() - 1];
@@ -57,7 +53,7 @@ public final class MissionFlow {
         return current;
     }
 
-    /** @throws IllegalStateException with the message key of the reason, if the step is ahead and locked */
+
     public MissionStep goTo(MissionStep step) {
         Objects.requireNonNull(step);
         if (step.ordinal() > current.ordinal()) {
@@ -77,7 +73,7 @@ public final class MissionFlow {
         return reasonLocked(step).isEmpty();
     }
 
-    /** The message key of the first unmet condition on the way to the step; empty if it is open. */
+
     public Optional<String> reasonLocked(MissionStep step) {
         for (MissionStep earlier : STEPS) {
             if (earlier.ordinal() > step.ordinal()) {
@@ -104,10 +100,7 @@ public final class MissionFlow {
         };
     }
 
-    /**
-     * Call after any change to the design: the build is no longer confirmed and Launch onward is
-     * locked again. If the current step is no longer open, falls back to the last one that is.
-     */
+
     public void partsChanged() {
         clearResults();
         while (!isUnlocked(current)) {
@@ -115,7 +108,7 @@ public final class MissionFlow {
         }
     }
 
-    /** Records Confirm Build. The caller checks the build report; the flow checks the review is open. */
+
     public void confirmBuild() {
         require(MissionStep.REVIEW);
         buildConfirmed = true;
@@ -131,7 +124,7 @@ public final class MissionFlow {
         simulationFinished = true;
     }
 
-    /** From the report, back to the ship step: the design stays, the results are cleared. */
+
     public void redesign() {
         if (current != MissionStep.REPORT) {
             throw new IllegalStateException(REDESIGN_ONLY_FROM_REPORT);

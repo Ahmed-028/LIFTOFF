@@ -23,11 +23,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Opens one screen and saves pictures of it after the given delays, for checking new screens.
- * Arguments: output folder, screen, mission id, height, then delays in milliseconds. A screen of
- * ROAD_MAP_TRAVEL shows the road map flying from the briefing to the first mini-game.
- */
+
 public final class ScreenPreview {
 
     public static void main(String[] args) throws Exception {
@@ -59,7 +55,7 @@ public final class ScreenPreview {
                     case "STAR_MATCH", "ASTEROID_DASH" -> {
                         session.next();
                         if (screen.equals("ASTEROID_DASH")) {
-                            // the preview does not need the earlier levels finished
+                            // Previews skip earlier levels.
                         }
                         navigator.show(Screen.valueOf(screen));
                     }
@@ -112,7 +108,7 @@ public final class ScreenPreview {
                 var buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 buffered.setRGB(0, 0, width, height, pixels, 0, width);
                 ImageIO.write(buffered, "png", folder.resolve(name + "-" + index + ".png").toFile());
-                // After the first picture, start a ride if the screen offers one.
+                // Start rides automatically in animated previews.
                 if (scene.lookup("#start-ride") instanceof javafx.scene.control.Button start) {
                     start.fire();
                 }

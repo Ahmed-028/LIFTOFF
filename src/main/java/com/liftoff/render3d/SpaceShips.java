@@ -13,16 +13,12 @@ import javafx.scene.transform.Rotate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Friendly cartoon spacecraft that keep the player company on long trips: a round capsule
- * ship and little round space pods, in the spirit of classic anime space travel.
- * Every model's travel direction is local -Y (its "up"), with the engine underneath.
- */
+
 final class SpaceShips {
     private SpaceShips() {
     }
 
-    /** A model plus the glowing parts that flicker while its engine runs. */
+
     record Craft(Group node, List<Sphere> flames) {
         void flicker(double time, double throttle) {
             for (int i = 0; i < flames.size(); i++) {
@@ -34,7 +30,7 @@ final class SpaceShips {
         }
     }
 
-    /** A big round capsule ship with a ring of windows, landing legs and a bell engine. */
+
     static Craft capsuleShip(String bodyHex, String bandHex) {
         var root = new Group();
         var hull = new Sphere(1, 48);
@@ -62,7 +58,7 @@ final class SpaceShips {
         beacon.setTranslateY(-1.5);
         beacon.setMaterial(ModelLibrary.lit("#FF5A5A", "#D41F1F"));
         root.getChildren().addAll(hatch, mast, beacon);
-        // Bell engine underneath.
+
         var bell = Meshes.view(Meshes.lathe(new double[]{.28, .86, .34, .98, .46, 1.14, .54, 1.24}, 32),
                 ModelLibrary.surface("#3D4656"));
         root.getChildren().add(bell);
@@ -83,7 +79,7 @@ final class SpaceShips {
         return new Craft(root, flames);
     }
 
-    /** A small round one-seat pod with a big front window. Its window faces travel (-Y). */
+
     static Craft pod(String bodyHex, String windowHex) {
         var root = new Group();
         var hull = new Sphere(.62, 40);
@@ -123,7 +119,7 @@ final class SpaceShips {
         return flames;
     }
 
-    /** A lumpy, friendly asteroid. */
+
     static MeshView asteroid(long seed, double size) {
         var rock = Meshes.view(Meshes.rock(seed, 10), ModelLibrary.surface(seed % 2 == 0 ? "#7A6E66" : "#8D8378"));
         rock.setScaleX(size);
@@ -132,7 +128,7 @@ final class SpaceShips {
         return rock;
     }
 
-    /** A pastel giant planet with a flat ring, for the deep background. */
+
     static Group ringedPlanet(double radius) {
         var planet = new Sphere(radius, 64);
         var material = new PhongMaterial(Color.WHITE);

@@ -51,7 +51,7 @@ class BuildReportTest {
 
     @Test
     void budgetIssueBelongsToNoSlot() {
-        // Over budget is about the whole ship, so slot may be null.
+
         BuildIssue overBudget = new BuildIssue(BuildIssue.Kind.OVER_BUDGET, null, 470, 450);
         assertEquals(470, overBudget.needed());
         assertEquals(450, overBudget.available());

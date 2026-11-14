@@ -1,9 +1,6 @@
 package com.liftoff.model;
 
-/**
- * A spacecraft bus: the body that carries, powers and talks for the instruments.
- * Figures come from a real spacecraft; the payload limits are what that spacecraft is known to have carried.
- */
+
 public record Bus(
         String id,
         String name,

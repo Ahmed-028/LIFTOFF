@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Every sound renders to a short, clean, audible buffer; the music tracks are long enough to loop. */
+
 class SoundTest {
 
     @Test

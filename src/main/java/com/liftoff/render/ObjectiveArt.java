@@ -11,7 +11,7 @@ import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 
-/** A picture for each mission objective, drawn on a 120 x 120 grid. */
+
 public final class ObjectiveArt {
 
     private static final double DESIGN_SIZE = 120;
@@ -20,7 +20,7 @@ public final class ObjectiveArt {
     private ObjectiveArt() {
     }
 
-    /** The picture for the objective with this id; a plain planet for ids without their own art. */
+
     public static Node forObjective(String objectiveId, double size) {
         Group art = switch (objectiveId) {
             case "farm-watch" -> farm();

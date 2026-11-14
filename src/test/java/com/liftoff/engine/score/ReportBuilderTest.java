@@ -57,7 +57,7 @@ class ReportBuilderTest {
 
         assertEquals("report.broke.nothing", report.brokeFirst().messageKey());
         assertEquals("report.try.thinnestMargin", report.tryNext().messageKey());
-        // 50 W of 100 W is the fullest gauge of the fixture design.
+
         assertEquals(List.of("POWER", 50.0, 100.0, "W"), report.tryNext().params());
         assertTrue(keys(report.worked()).containsAll(List.of("report.worked.launch",
                 "report.worked.dataReturned", "report.worked.noDataLost", "report.worked.powerEnough")));
@@ -129,7 +129,7 @@ class ReportBuilderTest {
 
     @Test
     void aPowerShortfallIsNamedWithItsSizeAndTheSuggestionIsMorePower() {
-        // 25 W supplied against 50 W drawn.
+
         Report report = flown(SimFixtures.design().withBus(TestParts.bus("weak", 100, 25, 10, 10, 12)));
 
         assertEquals("report.broke.power", report.brokeFirst().messageKey());
@@ -167,7 +167,7 @@ class ReportBuilderTest {
 
     @Test
     void runningOutOfSuppliesNamesTheDayAndSuggestsMore() {
-        // 2 people x 5 kg a day with 60 kg on board: day 7 is the first without supplies.
+
         Mission moon = new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 2, 5);
 
         Report report = flown(SimFixtures.design(), moon, new SimExtras(Double.POSITIVE_INFINITY, 60, true));

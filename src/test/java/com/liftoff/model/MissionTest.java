@@ -75,7 +75,7 @@ class MissionTest {
 
     @Test
     void rejectsNegativeTripAndBudgetFigures() {
-        // budget cap, delta-v, crew supplies: none can be below zero
+
         assertThrows(IllegalArgumentException.class, () -> new Mission("m", "", "", "", "",
                 Difficulty.EASY, Destination.EARTH_ORBIT, true, 0, false, List.of(), List.of(),
                 -1, 24, 12, 1000, 0, TestParts.SOURCE));

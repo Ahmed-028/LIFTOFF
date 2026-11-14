@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-/** Reads the JSON catalogs and checks them. */
+
 public final class CatalogLoader {
 
     private static final String CATALOG_FOLDER = "/com/liftoff/catalog/";
 
-    /** Strict on purpose: a typo in a catalog file must stop the game, not silently become a zero. */
+    // Reject malformed data instead of silently substituting zeroes.
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
@@ -39,7 +39,7 @@ public final class CatalogLoader {
     private CatalogLoader() {
     }
 
-    /** Loads and validates the catalogs bundled with the game. */
+
     public static Catalog loadFromClasspath() {
         List<MissionEntry> missions = parseList(readResource("missions.json"), MissionEntry.class);
         Catalog catalog = new Catalog(
@@ -59,7 +59,7 @@ public final class CatalogLoader {
         return catalog;
     }
 
-    /** Parses a JSON array into a list of catalog entries. Unknown or missing fields are an error. */
+
     public static <T> List<T> parseList(String json, Class<T> entryType) {
         try {
             List<T> entries = MAPPER.readValue(json,
@@ -73,7 +73,7 @@ public final class CatalogLoader {
         }
     }
 
-    /** Checks the catalog rules: unique ids, a source on every entry, sensible physical values. */
+
     public static void validate(Catalog catalog) {
         checkEntries("objective", catalog.objectives(), Objective::id, Objective::source);
         checkEntries("instrument", catalog.instruments(), Instrument::id, Instrument::source);

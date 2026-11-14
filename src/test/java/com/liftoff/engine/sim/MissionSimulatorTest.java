@@ -31,7 +31,7 @@ class MissionSimulatorTest {
                 SimExtras.none());
     }
 
-    /** The fixture design's contact-limited downlink in gigabits per day, worked out from OrbitMath. */
+
     private static double downlinkGbitPerDay(MissionDesign design) {
         double contactMinutes = OrbitMath.contactMinutesPerDay(design.orbit(), design.stations().get(0).latitudeDeg());
         return design.bus().downlinkMbps() * contactMinutes * 60 / 1000;
@@ -53,7 +53,7 @@ class MissionSimulatorTest {
         assertEquals(List.of(), LaunchChecker.check(design, mission, design.launchVehicle(), design.orbit()));
         SimulationResult result = MissionSimulator.run(design, mission, Difficulty.CADET, 2026);
 
-        // Independent of the simulator: kbps x 86,400 / 1e6 produced, Mbps x contact minutes x 60 / 1000 sent.
+
         double producedPerDay = catalog.instrument("ali").orElseThrow().avgDataRateKbps() * 86_400 / 1e6;
         double contactMinutes = OrbitMath.contactMinutesPerDay(catalog.orbit("sso-705").orElseThrow(),
                 catalog.groundStation("svalbard").orElseThrow().latitudeDeg());
@@ -141,7 +141,7 @@ class MissionSimulatorTest {
     @Test
     void aPowerShortfallReducesTheDataButDoesNotZeroIt() {
         SimulationResult full = quiet(SimFixtures.design());
-        // 25 W supplied against 50 W drawn: the instrument is on half the time.
+
         SimulationResult starved = quiet(SimFixtures.design().withBus(TestParts.bus("weak", 100, 25, 10, 10, 12)));
 
         assertEquals(full.totalProducedGbit() / 2, starved.totalProducedGbit(), 1e-9);
@@ -166,7 +166,7 @@ class MissionSimulatorTest {
 
     @Test
     void aMoonMissionIsSteppedInDaysAndFailsOnTheDayTheSuppliesRunOut() {
-        // 2 people x 5 kg a day = 10 kg a day; 60 kg lasts days 0 to 5.
+
         Mission moon = new Mission("moon", Mission.Destination.MOON, Mission.StepUnit.DAY, 10, 0, 2, 5);
 
         SimulationResult shortOf = MissionSimulator.run(SimFixtures.design(), moon, Difficulty.CADET, 1,
@@ -191,7 +191,7 @@ class MissionSimulatorTest {
         Mission mars = new Mission("mars", Mission.Destination.MARS, Mission.StepUnit.MONTH, 24, 0, 0, 0);
         EventDeck dustOnly = new EventDeck(deck.cards().stream()
                 .filter(card -> card.type() == SimEventType.DUST_STORM).toList());
-        // 50 W supplied, 50 W drawn: any loss of supply shows up as lost data.
+
         MissionDesign design = SimFixtures.design().withBus(TestParts.bus("exact", 100, 50, 10, 10, 12));
         SimulationResult calm = MissionSimulator.run(design, mars, Difficulty.CADET, 3, dustOnly, SimExtras.none());
 

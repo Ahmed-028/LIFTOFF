@@ -10,12 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Plays the game's music and sound effects through one audio line, mixing them on a background
- * thread. Sounds are made by the synthesiser on first use (also on a background thread), so
- * nothing blocks the screens. If the computer has no sound device, or the system property
- * {@code liftoff.sound} is {@code off} (used by the automated screen tools), everything is silent.
- */
+
 public final class Audio {
 
     private static final Audio INSTANCE = new Audio();
@@ -47,7 +42,7 @@ public final class Audio {
         return INSTANCE;
     }
 
-    /** Prepares the sounds in the background so the first ones play without a pause. */
+
     public void preload() {
         if (!available) {
             return;
@@ -82,7 +77,7 @@ public final class Audio {
         }
     }
 
-    /** Plays a sound effect once. */
+
     public void play(Sfx sfx) {
         if (!available || !soundOn) {
             return;
@@ -97,7 +92,7 @@ public final class Audio {
         }
     }
 
-    /** Switches the background music to this track, fading from the one before. */
+
     public void music(Track track) {
         if (!available || track == wanted) {
             return;
@@ -166,7 +161,7 @@ public final class Audio {
                 }
             }
             for (int i = 0; i < CHUNK; i++) {
-                // A soft limiter keeps loud moments from crackling.
+                // Limit peaks to prevent clipping.
                 double sample = Math.tanh(mix[i] * 1.1);
                 int value = (int) Math.round(sample * 32_000);
                 bytes[i * 2] = (byte) value;
@@ -176,7 +171,7 @@ public final class Audio {
         }
     }
 
-    /** One playing sound: a position in its samples and a volume that can fade. */
+
     private static final class Voice {
         private final Track track;
         private final float[] samples;

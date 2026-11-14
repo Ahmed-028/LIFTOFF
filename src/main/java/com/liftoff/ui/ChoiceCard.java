@@ -17,10 +17,7 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.function.Supplier;
 
-/**
- * A rounded, bright card around a check box. The whole card toggles the choice, the check box keeps
- * keyboard focus and its accessible state, and the picked state shows a tick, a word and a colour.
- */
+
 final class ChoiceCard extends VBox {
     private final CheckBox option;
     private final Label badge = new Label();
@@ -63,10 +60,7 @@ final class ChoiceCard extends VBox {
         getChildren().addAll(nodes);
     }
 
-    /**
-     * Adds a small "More details" link that opens the rest of the card in place. The content is
-     * built the first time the card opens, so heavy pictures only load when asked for.
-     */
+
     void addDetails(String id, String moreText, String lessText, Supplier<List<Node>> content) {
         var details = new VBox(10);
         details.getStyleClass().add("card-details");
@@ -116,7 +110,7 @@ final class ChoiceCard extends VBox {
         }
     }
 
-    /** Clicks on a link or button inside the card do their own job instead of picking the card. */
+
     private boolean onOtherButton(Object target) {
         for (var node = target instanceof Node start ? start : null; node != null && node != this; node = node.getParent()) {
             if (node instanceof ButtonBase && node != option) {

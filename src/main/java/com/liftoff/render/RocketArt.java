@@ -8,7 +8,7 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineJoin;
 
-/** The LIFTOFF rocket in the hangar theme colours, drawn on a 200 x 310 grid and scaled to the size asked for. */
+
 public final class RocketArt {
 
     private static final double DESIGN_HEIGHT = 310;
@@ -61,7 +61,7 @@ public final class RocketArt {
         double scale = height / DESIGN_HEIGHT;
         rocket.setScaleX(scale);
         rocket.setScaleY(scale);
-        // A Group wrapper makes layout use the scaled size instead of the design size.
+
         return new Group(rocket);
     }
 }

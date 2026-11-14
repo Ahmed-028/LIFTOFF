@@ -31,7 +31,7 @@ public final class WarningList extends VBox {
         return text.get(key, measurement, issue.needed(), issue.available());
     }
 
-    /** Build warnings that have no gauge of their own (the gauges explain power, fuel and budget). */
+
     void showBuildWithoutGauges(List<BuildIssue> issues) {
         showBuild(issues.stream().filter(issue -> switch (issue.kind()) {
             case POWER_SHORT, FUEL_SHORT, OVER_BUDGET -> false;

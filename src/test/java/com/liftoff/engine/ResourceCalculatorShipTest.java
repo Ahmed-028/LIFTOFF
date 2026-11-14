@@ -13,20 +13,16 @@ import java.util.OptionalDouble;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * The six gauges once the ship is built from parts (v2). Same round numbers as BuildCalculatorTest:
- * ship dry mass 1300 kg, cost $185M, parts draw 150 W, power system gives 200 W, Isp 300 s.
- * The mission's delta-v is Isp x g0 x ln 2, so propellant equals dry mass.
- */
+// delta-v = Isp * g0 * ln(2), so propellant equals dry mass.
 class ResourceCalculatorShipTest {
 
     private static final double TINY = 1e-6;
     private static final double ISP = 300;
     private static final double DELTA_V = ISP * 9.80665 * Math.log(2);
 
-    private static final Mission MISSION = TestParts.mission("trip", 400, DELTA_V);   // deadline 36 months
+    private static final Mission MISSION = TestParts.mission("trip", 400, DELTA_V);
 
-    /** 100 kg, 30 W, no data, $40M, 10 build months. */
+
     private static final Instrument CAMERA = TestParts.instrument("camera", 100, 30, 0, 40, 10);
 
     private static ShipBuild ship() {
@@ -48,13 +44,13 @@ class ResourceCalculatorShipTest {
 
     @Test
     void massIsShipPartsPlusPropellant() {
-        // dry 1300 + propellant 1300
+
         assertEquals(2600, usage(shipDesign(), ResourceType.MASS).used(), TINY);
     }
 
     @Test
     void anInstrumentAddsItsMassAndTheFuelToCarryIt() {
-        // dry 1300 + 100 = 1400, propellant 1400: 100 kg of camera costs 200 kg on the gauge.
+
         assertEquals(2800, usage(shipDesign().plusInstrument(CAMERA), ResourceType.MASS).used(), TINY);
     }
 
@@ -82,7 +78,7 @@ class ResourceCalculatorShipTest {
 
     @Test
     void instrumentsDrawFromTheSamePowerSystem() {
-        // 150 W of parts + 30 W of camera = 180 W of 200 W: inside, but under 15 % margin.
+
         ResourceUsage power = usage(shipDesign().plusInstrument(CAMERA), ResourceType.POWER);
         assertEquals(180, power.used(), TINY);
         assertEquals(ResourceLevel.TIGHT, power.level());
@@ -105,7 +101,7 @@ class ResourceCalculatorShipTest {
 
     @Test
     void budgetAddsTheShipPartsAgainstTheMissionCap() {
-        // parts 185 + camera 40 = 225 of 400
+
         ResourceUsage budget = usage(shipDesign().plusInstrument(CAMERA), ResourceType.BUDGET);
         assertEquals(225, budget.used(), TINY);
         assertEquals(OptionalDouble.of(400), budget.capacity());
@@ -113,7 +109,7 @@ class ResourceCalculatorShipTest {
 
     @Test
     void timeIsMeasuredAgainstTheMissionDeadline() {
-        // camera 10 + integration 6 + 2 per instrument = 18, plus 12 science months = 30 of 36
+
         ResourceUsage time = usage(shipDesign().plusInstrument(CAMERA).withScienceMonths(12), ResourceType.TIME);
         assertEquals(30, time.used(), TINY);
         assertEquals(OptionalDouble.of(36), time.capacity());
@@ -129,7 +125,7 @@ class ResourceCalculatorShipTest {
 
     @Test
     void theSatellitesOwnDataCountsTowardDataPerDay() {
-        // SampleData-style satellite that makes 50 Gbit/day by itself.
+
         var chatty = new com.liftoff.model.ShipPart("chatty", com.liftoff.model.ModuleSlot.SATELLITE, "chatty",
                 "chatty", "", "", java.util.List.of(), 100, 0, 100, 0, 0, 0, 2, 1, 0, 0, 0, 50, 50,
                 com.liftoff.model.ValueBasis.GAME_ESTIMATE, "model-chatty", TestParts.SOURCE);

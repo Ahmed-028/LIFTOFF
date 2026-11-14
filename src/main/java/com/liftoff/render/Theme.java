@@ -9,25 +9,10 @@ import javafx.util.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * The LIFTOFF hangar style guide in code, for anything drawn in Java (canvas games, the road
- * map, the intro cutscene, 3D scenes). The same tokens sit at the top of liftoff.css for
- * styled controls; {@code ThemeTest} fails the build if the two ever disagree. The written
- * guide with the rules behind these values is docs/style-guide.md.
- *
- * <p>Rules that every screen follows:
- * <ul>
- *   <li>A navy hangar shell; each mission recolours it through its {@link World}.</li>
- *   <li>Cyan shows focus and what is picked. Orange means "go": one orange action per screen.</li>
- *   <li>State is never shown by colour alone: picked, locked, done and warning states also
- *       carry a word or a symbol (tick, lock, star, warning sign).</li>
- *   <li>Short sentences a 7-year-old can read, big targets (at least 44 px), keyboard for everything.</li>
- *   <li>Motion is friendly and short, and calm mode turns it off.</li>
- * </ul>
- */
+
 public final class Theme {
 
-    // ---- Hangar shell ----
+
     public static final Color NAVY_950 = Color.web("#050E26");
     public static final Color NAVY_900 = Color.web("#071330");
     public static final Color NAVY_800 = Color.web("#0D1E42");
@@ -38,20 +23,19 @@ public final class Theme {
     public static final Color TEXT = Color.web("#F3F8FF");
     public static final Color TEXT_SOFT = Color.web("#C3D3EE");
 
-    // ---- Meaning colours ----
-    /** Focus, picked, "you are here". */
+
     public static final Color CYAN = Color.web("#22E3F2");
     public static final Color CYAN_SOFT = Color.web("#7EF4FB");
-    /** The one primary action, and the ship's racing stripe. */
+
     public static final Color ORANGE = Color.web("#FF7A1A");
     public static final Color ORANGE_HIGH = Color.web("#FF9C3D");
     public static final Color ORANGE_INK = Color.web("#1A1206");
-    /** Stars, rewards and gentle warnings. */
+
     public static final Color AMBER = Color.web("#FFCB69");
     public static final Color ALERT = Color.web("#FFACA4");
     public static final Color GOOD = Color.web("#8BE07A");
 
-    // ---- Light cards on dark panels ----
+
     public static final Color CARD = Color.web("#F2F8FF");
     public static final Color CARD_HOVER = Color.web("#FFFFFF");
     public static final Color CARD_INK = Color.web("#0B1A38");
@@ -62,40 +46,40 @@ public final class Theme {
     public static final Color CHIP = Color.web("#DCE8F7");
     public static final Color CHIP_INK = Color.web("#16305E");
 
-    // ---- Friendly ship and character finishes (3D and drawn art) ----
+
     public static final Color HULL_WHITE = Color.web("#F2F5FA");
     public static final Color THERMAL_TILE = Color.web("#2A3040");
     public static final Color SOLAR_BLUE = Color.web("#2F64CF");
     public static final Color GLOW_CYAN = Color.web("#2BE6F5");
 
-    // ---- Type ----
+
     public static final String FONT_BODY = "Barlow";
     public static final String FONT_DISPLAY = "Barlow Condensed";
 
-    // ---- Spacing scale (px) ----
+
     public static final double SPACE_XS = 4;
     public static final double SPACE_S = 8;
     public static final double SPACE_M = 12;
     public static final double SPACE_L = 18;
     public static final double SPACE_XL = 28;
 
-    // ---- Shape ----
+
     public static final double RADIUS_CHIP = 12;
     public static final double RADIUS_CARD = 18;
     public static final double RADIUS_PANEL = 22;
-    /** The smallest click or touch target. */
+
     public static final double MIN_TARGET = 44;
 
-    // ---- Motion ----
+
     public static final Duration MOTION_QUICK = Duration.millis(180);
     public static final Duration MOTION_SOFT = Duration.millis(420);
-    /** How long the ship takes to fly one stop along the road map. */
+
     public static final Duration MOTION_TRAVEL = Duration.millis(1600);
 
     private Theme() {
     }
 
-    /** The colours that tint every mission screen, per destination. */
+
     public enum World {
         HANGAR("", "#12285A", "#071330", "#0D1E42", "#16305E", "#33609A", "#22E3F2", "#C3D3EE"),
         EARTH("world-earth", "#0E6582", "#08303F", "#0B4A5E", "#0F6F86", "#2E9DB4", "#8BE07A", "#CDEFF8"),
@@ -123,7 +107,7 @@ public final class Theme {
             this.soft = Color.web(soft);
         }
 
-        /** The stylesheet class that applies this world, empty for the plain hangar. */
+
         public String styleClass() {
             return styleClass;
         }
@@ -153,10 +137,7 @@ public final class Theme {
         return Color.color(color.getRed(), color.getGreen(), color.getBlue(), opacity);
     }
 
-    /**
-     * The tokens that also live in liftoff.css, by their stylesheet name. The world colours are
-     * listed as {@code <style class>/<token>}.
-     */
+
     public static Map<String, Color> stylesheetTokens() {
         var tokens = new LinkedHashMap<String, Color>();
         tokens.put("-navy-950", NAVY_950);

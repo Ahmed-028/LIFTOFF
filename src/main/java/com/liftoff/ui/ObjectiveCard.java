@@ -18,7 +18,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 
-/** A mission card coloured by its destination, with a full-width image and a keyboard-accessible action. */
+
 public final class ObjectiveCard extends VBox {
     ObjectiveCard(MissionEntry mission, UiText text, Runnable onChoose) {
         var goal = mission.briefing();

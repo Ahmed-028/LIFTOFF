@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FitRulesTest {
 
-    /** A bay 3 m long and 2 m wide inside, that can carry 300 kg. */
+
     private static final ShipPart BAY = TestParts.cargoBay("bay", 50, 300, 3, 2, 5);
 
     @Test

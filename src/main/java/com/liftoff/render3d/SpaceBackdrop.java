@@ -15,11 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SplittableRandom;
 
-/**
- * The deep-space background: a colourful nebula panorama, far stars that turn with the camera,
- * and near stars that stream past as warp streaks. Everything is projected with the same camera
- * as the 3D scene so the streaks always rush out of the direction of travel.
- */
+
 final class SpaceBackdrop extends Canvas {
     private static final Map<String, Image> NEBULAS = new HashMap<>();
     private static final int FAR = 1300;
@@ -72,12 +68,7 @@ final class SpaceBackdrop extends Canvas {
         sunZ = z / length;
     }
 
-    /**
-     * @param flow       how fast space streams past, in world units per second along -Z
-     * @param dt         seconds since the previous frame
-     * @param streakTime how long a star's trail is, in seconds of travel
-     * @param skyFade    0 shows space; 1 hides it behind a daytime sky (used right at launch)
-     */
+
     void draw(CameraRig rig, double flow, double dt, double streakTime, double time, Color skyColor, double skyFade) {
         var g = getGraphicsContext2D();
         double w = getWidth();
@@ -222,7 +213,7 @@ final class SpaceBackdrop extends Canvas {
         return Color.color(1, .66, .82, alpha);
     }
 
-    /** Paints an equirectangular nebula with seamless 3D noise. */
+
     private static Image paintNebula(String palette) {
         Color[] colors = switch (palette) {
             case "mars" -> new Color[]{Color.web("#6A1E5C"), Color.web("#E0533C"), Color.web("#FFB061"), Color.web("#2A2C8F")};

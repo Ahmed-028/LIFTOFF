@@ -2,7 +2,7 @@ package com.liftoff.render;
 
 import javafx.scene.paint.Color;
 
-/** The colours of the visual identity, for drawn art. Mirrors the tokens in liftoff.css. */
+
 public final class Palette {
 
     public static final Color SPACE_900 = Color.web("#0F1535");
@@ -20,7 +20,7 @@ public final class Palette {
     public static final Color COMMS = Color.web("#B388FF");
     public static final Color TIME = Color.web("#FF6B9D");
 
-    /** Outline width for art drawn on a 200-unit design grid. */
+
     public static final double OUTLINE = 6;
 
     private Palette() {

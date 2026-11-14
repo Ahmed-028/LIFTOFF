@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-/** Everything the player can choose from. Loaded once from the JSON catalogs. */
+
 public record Catalog(
         List<Objective> objectives,
         List<Instrument> instruments,

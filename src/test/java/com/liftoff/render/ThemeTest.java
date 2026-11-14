@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-/** Keeps the Java style guide and the stylesheet tokens identical. */
+
 class ThemeTest {
 
     private static final Path STYLESHEET = Path.of("src/main/resources/com/liftoff/css/liftoff.css");

@@ -1,6 +1,6 @@
 package com.liftoff.model;
 
-/** A circular Earth orbit, taken from a real mission. */
+
 public record Orbit(
         String id,
         String name,

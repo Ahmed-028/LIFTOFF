@@ -5,12 +5,12 @@ import static com.liftoff.audio.Synth.Wave.SQUARE;
 import static com.liftoff.audio.Synth.Wave.TRIANGLE;
 import static com.liftoff.audio.Synth.freq;
 
-/** The game's sound effects, each made by the synthesiser when first needed. */
+
 public enum Sfx {
     CLICK, GO, PICK, UNPICK, SNAP, ERROR, WHOOSH, ARRIVE, BEEP, BEEP_HIGH, LIFTOFF,
     SPARKLE, SPARKLE_2, SPARKLE_3, STAR, HIT, WIN, LOSE, POP, CHEER, TYPE, STARTUP;
 
-    /** The samples of this effect, never louder than 0.9. */
+
     public float[] render() {
         return Synth.limit(raw(), .9);
     }

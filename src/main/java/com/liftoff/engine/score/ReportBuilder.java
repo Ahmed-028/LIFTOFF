@@ -17,60 +17,54 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalDouble;
 
-/**
- * Explains a mission: what worked, what broke first, and one thing to try. Pure.
- *
- * <p>"Broke first" is the earliest problem in the life of the mission, in this fixed order: a
- * measurement the design cannot make (wrong from the drawing board), then launch issues in the
- * order of {@link LaunchIssue.Kind}, then the first limit the flight ran into.
- */
+
 public final class ReportBuilder {
 
     public static final String WORKED_MEASUREMENTS = "report.worked.measurements";
     public static final String WORKED_LAUNCH = "report.worked.launch";
-    /** Params: gigabits sent, gigabits produced. */
+
     public static final String WORKED_DATA_RETURNED = "report.worked.dataReturned";
     public static final String WORKED_NO_DATA_LOST = "report.worked.noDataLost";
     public static final String WORKED_POWER_ENOUGH = "report.worked.powerEnough";
 
     public static final String BROKE_NOTHING = "report.broke.nothing";
-    /** Params: measurement type. */
+
     public static final String BROKE_REQUIREMENT_MISSING = "report.broke.requirementMissing";
-    /** Params: measurement type, metres needed, metres of the best instrument on board. */
+
     public static final String BROKE_REQUIREMENT_TOO_COARSE = "report.broke.requirementTooCoarse";
-    /** Launch issues. Params: needed, available (kg, m/s, degrees, $M or months). */
+
     public static final String BROKE_MASS_OVER_CAPACITY = "report.broke.massOverCapacity";
     public static final String BROKE_ROCKET_NOT_OFFERED = "report.broke.rocketNotOffered";
     public static final String BROKE_FUEL_SHORT = "report.broke.fuelShort";
     public static final String BROKE_ORBIT_CANNOT_REACH_TARGET = "report.broke.orbitCannotReachTarget";
     public static final String BROKE_OVER_BUDGET = "report.broke.overBudget";
     public static final String BROKE_OVER_DEADLINE = "report.broke.overDeadline";
-    /** Flight limits. Params: step number from 1, step unit (MONTH or DAY), then the amount. */
+
     public static final String BROKE_POWER = "report.broke.power";
     public static final String BROKE_DOWNLINK = "report.broke.downlink";
     public static final String BROKE_STORAGE = "report.broke.storage";
-    /** Params: step number from 1, step unit. */
+
     public static final String BROKE_SUPPLIES = "report.broke.supplies";
     public static final String BROKE_NO_DATA_RETURNED = "report.broke.noDataReturned";
 
-    /** Params: resource type, used, limit, unit. */
+
     public static final String TRY_THINNEST_MARGIN = "report.try.thinnestMargin";
     public static final String TRY_HARDER_MISSION = "report.try.harderMission";
-    /** Params: measurement type. */
+
     public static final String TRY_ADD_INSTRUMENT_FOR = "report.try.addInstrumentFor";
-    /** Params: measurement type, metres needed. */
+
     public static final String TRY_SHARPER_INSTRUMENT = "report.try.sharperInstrument";
-    /** Params: kg to lift. */
+
     public static final String TRY_BIGGER_ROCKET_OR_LIGHTER_SHIP = "report.try.biggerRocketOrLighterShip";
     public static final String TRY_OTHER_ROCKET = "report.try.otherRocket";
     public static final String TRY_MORE_FUEL = "report.try.moreFuel";
-    /** Params: target latitude in degrees. */
+
     public static final String TRY_STEEPER_ORBIT = "report.try.steeperOrbit";
-    /** Params: $M over the cap. */
+
     public static final String TRY_CHEAPER_PARTS = "report.try.cheaperParts";
-    /** Params: months over the deadline. */
+
     public static final String TRY_SHORTER_SCIENCE_OR_FASTER_PARTS = "report.try.shorterScienceOrFasterParts";
-    /** Params: watts short. */
+
     public static final String TRY_MORE_POWER_OR_FEWER_INSTRUMENTS = "report.try.morePowerOrFewerInstruments";
     public static final String TRY_ADD_STATION = "report.try.addStation";
     public static final String TRY_ADD_STATION_OR_FASTER_RADIO = "report.try.addStationOrFasterRadio";
@@ -80,7 +74,7 @@ public final class ReportBuilder {
     private ReportBuilder() {
     }
 
-    /** Every message key a report can carry, for the interface texts. */
+
     public static List<String> messageKeys() {
         return List.of(WORKED_MEASUREMENTS, WORKED_LAUNCH, WORKED_DATA_RETURNED, WORKED_NO_DATA_LOST,
                 WORKED_POWER_ENOUGH, BROKE_NOTHING, BROKE_REQUIREMENT_MISSING, BROKE_REQUIREMENT_TOO_COARSE,
@@ -94,10 +88,7 @@ public final class ReportBuilder {
                 TRY_ADD_INSTRUMENT);
     }
 
-    /**
-     * @param launchIssues what the launch check found; empty when it passed
-     * @param sim          the flight, or null when the mission never left the pad
-     */
+
     public static Report build(MissionDesign design, ResourceReport resources, List<LaunchIssue> launchIssues,
                                SimulationResult sim, Mission mission) {
         List<Requirement> unmet = ScoreCalculator.unmetRequirements(design);
@@ -198,7 +189,7 @@ public final class ReportBuilder {
         };
     }
 
-    /** The resource closest to its limit; ties go to the first in the order of ResourceType. */
+
     private static WhyCard thinnestMargin(ResourceReport resources) {
         ResourceUsage thinnest = null;
         double fullest = -1;

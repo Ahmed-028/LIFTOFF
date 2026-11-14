@@ -1,6 +1,6 @@
 package com.liftoff.app;
 
-/** The screens of the game and the FXML file that lays each one out. */
+
 public enum Screen {
     CUTSCENE("cutscene.fxml"),
     TITLE("title.fxml"),

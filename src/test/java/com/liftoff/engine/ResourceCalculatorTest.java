@@ -19,10 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResourceCalculatorTest {
 
-    // Round numbers so every expected value can be checked by hand.
+
     private final Bus bus = TestParts.bus("bus", 400, 200, 10, 60, 30);
-    private final Instrument camera = TestParts.instrument("camera", 50, 80, 1000, 25, 18);   // 86.4 Gbit/day
-    private final Instrument radar = TestParts.instrument("radar", 40, 100, 500, 20, 36);     // 43.2 Gbit/day
+    private final Instrument camera = TestParts.instrument("camera", 50, 80, 1000, 25, 18);
+    private final Instrument radar = TestParts.instrument("radar", 40, 100, 500, 20, 36);
     private final Orbit polarOrbit = TestParts.orbit("polar", 705, 90, LaunchClass.POLAR);
     private final GroundStation poleStation = TestParts.station("pole", 90, 0.5);
     private final GroundStation arcticStation = TestParts.station("arctic", 78, 0.5);
@@ -67,7 +67,7 @@ class ResourceCalculatorTest {
         ResourceUsage mass = usage(fullDesign(), ResourceType.MASS);
 
         assertEquals(500.0, mass.capacity().orElseThrow(), 1e-9);
-        assertEquals(ResourceLevel.TIGHT, mass.level()); // 490 of 500
+        assertEquals(ResourceLevel.TIGHT, mass.level());
     }
 
     @Test
@@ -86,7 +86,7 @@ class ResourceCalculatorTest {
 
         assertEquals(180.0, power.used(), 1e-9);
         assertEquals(200.0, power.capacity().orElseThrow(), 1e-9);
-        assertEquals(ResourceLevel.TIGHT, power.level()); // 180 of 200
+        assertEquals(ResourceLevel.TIGHT, power.level());
     }
 
     @Test
@@ -101,7 +101,7 @@ class ResourceCalculatorTest {
 
     @Test
     void budgetAddsBusInstrumentsRocketAndStationsForEveryScienceMonth() {
-        // 60 + 25 + 20 + 100 + (2 stations x 0.5 x 24 months) = 229
+
         ResourceUsage budget = usage(fullDesign(), ResourceType.BUDGET);
 
         assertEquals(229.0, budget.used(), 1e-9);
@@ -118,7 +118,7 @@ class ResourceCalculatorTest {
     void dataLimitIsTheDownlinkRateTimesTheDailyContactTime() {
         double contactMinutes = OrbitMath.contactMinutesPerDay(polarOrbit, 90)
                 + OrbitMath.contactMinutesPerDay(polarOrbit, 78);
-        // 10 Mbit/s x 60 s x minutes = Mbit; / 1000 = Gbit
+
         double expectedGbit = 10 * 60 * contactMinutes / 1000;
 
         assertEquals(expectedGbit, usage(fullDesign(), ResourceType.DATA).capacity().orElseThrow(), 1e-6);
@@ -136,7 +136,7 @@ class ResourceCalculatorTest {
 
     @Test
     void commsNeededIsTheMinutesToSendTheDailyDataAtTheDownlinkRate() {
-        // 129.6 Gbit = 129 600 Mbit; at 10 Mbit/s that is 12 960 s = 216 minutes
+
         assertEquals(216.0, usage(fullDesign(), ResourceType.COMMS).used(), 1e-9);
     }
 
@@ -150,12 +150,12 @@ class ResourceCalculatorTest {
 
     @Test
     void timeIsTheSlowestPartPlusIntegrationPlusTheScienceDuration() {
-        // slowest part 36, integration 6 + 2 per instrument (2) = 10, science 24: total 70
+
         ResourceUsage time = usage(fullDesign(), ResourceType.TIME);
 
         assertEquals(70.0, time.used(), 1e-9);
         assertEquals(80.0, time.capacity().orElseThrow(), 1e-9);
-        assertEquals(ResourceLevel.TIGHT, time.level()); // 70 of 80
+        assertEquals(ResourceLevel.TIGHT, time.level());
     }
 
     @Test

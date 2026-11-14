@@ -17,21 +17,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
-/** The checks run on the launch pad. Returns every reason the mission cannot fly, not just the first. */
+
 public final class LaunchChecker {
 
     private LaunchChecker() {
     }
 
-    /** Checks a design that has no modular ship (no propellant, no fuel check). */
+
     public static List<LaunchIssue> check(MissionDesign design, Mission mission, LaunchVehicle rocket, Orbit orbit) {
         return check(design, null, mission, rocket, orbit);
     }
 
-    /**
-     * @param build the ship's report, or null when the design has no modular ship; its total mass
-     *              (propellant included) and cost are added to the design's
-     */
+
     public static List<LaunchIssue> check(MissionDesign design, BuildReport build, Mission mission,
                                           LaunchVehicle rocket, Orbit orbit) {
         List<LaunchIssue> issues = new ArrayList<>();

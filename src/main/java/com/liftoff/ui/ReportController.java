@@ -40,7 +40,7 @@ public final class ReportController extends MissionScreen {
         boolean finale = session.finishedFinalMission();
         ending.setVisible(finale);
         ending.setManaged(finale);
-        // The mission after this one on the main ladder, if there is one.
+
         var ladder = session.catalog().missions().stream().filter(com.liftoff.data.MissionEntry::ladder).toList();
         int here = ladder.indexOf(mission());
         following = here >= 0 && here + 1 < ladder.size() ? ladder.get(here + 1) : null;
@@ -81,11 +81,7 @@ public final class ReportController extends MissionScreen {
         return chip;
     }
 
-    /**
-     * What could have been used better: every place the score lost points, each with the numbers
-     * and the kind of change that wins the points back. It adds no rule; it reads the same
-     * resource levels the score was worked out from.
-     */
+
     private void addBetter(double science, double sentGbit, double producedGbit) {
         if (science < ScoreRules.SCIENCE_POINTS - 1e-9) {
             boolean goalMissed = session.designIssues().stream()

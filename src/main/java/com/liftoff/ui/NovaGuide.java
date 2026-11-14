@@ -32,20 +32,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
-/**
- * Nova's tutorial for the first mission. On each screen Nova says what to do next in a speech
- * bubble, and a glowing ring (with the rest of the screen dimmed a little) shows where to look.
- * The tutorial never blocks the screen: everything stays clickable, Next moves on, and
- * "Skip tutorial" turns it off. It only runs while the first mission of the ladder is chosen.
- */
+
 public final class NovaGuide {
 
-    /**
-     * One thing Nova says.
-     *
-     * @param target CSS selector of the control to ring, or null for none
-     * @param ready  when the step may show; steps wait until it is true
-     */
+
     record Step(String id, String target, Predicate<GameSession> ready) {
         Step(String id, String target) {
             this(id, target, session -> true);
@@ -104,7 +94,7 @@ public final class NovaGuide {
         this.text = new UiText(messages);
     }
 
-    /** Wraps a screen with Nova's bubble when the tutorial has something to say there. */
+
     public Parent decorate(Screen screen, Parent root) {
         var steps = SCRIPT.get(screen);
         if (!enabled || steps == null || !firstMission() || progress.getOrDefault(screen, 0) >= steps.size()) {
@@ -125,7 +115,7 @@ public final class NovaGuide {
                 .map(first -> first.id().equals(objective.id())).orElse(false);
     }
 
-    /** The see-through layer over a screen: the dimming, the ring and the bubble. */
+
     private final class Layer extends Pane {
         private static final double BUBBLE_WIDTH = 470;
         private final Screen screen;
@@ -191,7 +181,7 @@ public final class NovaGuide {
             sceneProperty().addListener((property, before, scene) -> {
                 if (scene == null) {
                     follow.stop();
-                    // Leaving the screen counts as having heard what Nova was saying.
+
                     if (shown >= 0 && shown == index()) {
                         progress.put(screen, index() + 1);
                     }
@@ -220,7 +210,7 @@ public final class NovaGuide {
             }
         }
 
-        /** Every frame: show the current step if it is ready, and keep the ring on its target. */
+
         private void place() {
             if (!enabled || index() >= steps.size()) {
                 hideAll();
@@ -255,7 +245,7 @@ public final class NovaGuide {
                 ring.setWidth(target.getWidth() + 16);
                 ring.setHeight(target.getHeight() + 16);
                 drawShade(target, width, height);
-                // Put the bubble in the corner farthest from what Nova is pointing at.
+
                 boolean targetLeft = target.getCenterX() < width / 2;
                 boolean targetLow = target.getCenterY() > height / 2;
                 x = targetLeft ? width - BUBBLE_WIDTH - 24 : 24;

@@ -4,10 +4,7 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
-/**
- * Places a {@link PerspectiveCamera} with a look-at target and keeps the matching
- * world-to-camera rotation so 2D layers (stars, nebula, sun glow) line up with the 3D scene.
- */
+
 final class CameraRig {
     final PerspectiveCamera camera = new PerspectiveCamera(true);
     private final Translate position = new Translate();
@@ -15,9 +12,9 @@ final class CameraRig {
     private final Rotate pitchRotate = new Rotate(0, Rotate.X_AXIS);
     private final Rotate rollRotate = new Rotate(0, Rotate.Z_AXIS);
     double x, y, z;
-    /** Radians. Yaw turns towards +X, pitch looks up (towards -Y), roll tilts the picture. */
+
     double yaw, pitch, roll;
-    // World-to-camera rotation rows.
+
     private double r00, r01, r02, r10, r11, r12, r20, r21, r22;
 
     CameraRig() {
@@ -45,15 +42,15 @@ final class CameraRig {
         yawRotate.setAngle(Math.toDegrees(yawRadians));
         pitchRotate.setAngle(Math.toDegrees(pitchRadians));
         rollRotate.setAngle(Math.toDegrees(rollRadians));
-        // camera-to-world M = Ry(b) * Rx(a) * Rz(c); world-to-camera is its transpose.
+
         double cb = Math.cos(yawRadians), sb = Math.sin(yawRadians);
         double ca = Math.cos(pitchRadians), sa = Math.sin(pitchRadians);
         double cc = Math.cos(rollRadians), sc = Math.sin(rollRadians);
-        // Ry*Rx
+
         double m00 = cb, m01 = sb * sa, m02 = sb * ca;
         double m10 = 0, m11 = ca, m12 = -sa;
         double m20 = -sb, m21 = cb * sa, m22 = cb * ca;
-        // (Ry*Rx)*Rz
+
         double n00 = m00 * cc + m01 * sc, n01 = -m00 * sc + m01 * cc, n02 = m02;
         double n10 = m10 * cc + m11 * sc, n11 = -m10 * sc + m11 * cc, n12 = m12;
         double n20 = m20 * cc + m21 * sc, n21 = -m20 * sc + m21 * cc, n22 = m22;
@@ -62,7 +59,7 @@ final class CameraRig {
         r20 = n02; r21 = n12; r22 = n22;
     }
 
-    /** Rotates a world-space direction (or offset from the eye) into camera space; writes into out. */
+
     void toCamera(double wx, double wy, double wz, double[] out) {
         out[0] = r00 * wx + r01 * wy + r02 * wz;
         out[1] = r10 * wx + r11 * wy + r12 * wz;

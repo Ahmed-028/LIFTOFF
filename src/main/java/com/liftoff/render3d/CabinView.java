@@ -28,11 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.SplittableRandom;
 
-/**
- * Interactive 3D capsule ship cabin with curved Capsule-style architecture, an astronaut rider
- * in a pilot seat, a central live telemetry console with holographic planet display, and a
- * panoramic front viewport looking out to the launch pad or deep space.
- */
+
 public final class CabinView extends StackPane {
     private static final int SCREEN_W = 640;
     private static final int SCREEN_H = 300;
@@ -106,7 +102,7 @@ public final class CabinView extends StackPane {
 
     private Group buildOutsideView(boolean inFlight) {
         var outside = new Group();
-        // Distant backdrop plate behind the window aperture.
+
         var backdrop = box(16, 12, .2, 0, -1.2, 18.5, inFlight ? "#050B1B" : "#4A90D6");
         backdrop.setMaterial(ModelLibrary.lit(inFlight ? "#060D20" : "#56A5EC", inFlight ? "#040918" : "#2D6FB0"));
         outside.getChildren().add(backdrop);
@@ -141,7 +137,7 @@ public final class CabinView extends StackPane {
                 outside.getChildren().add(streak);
             }
         } else {
-            // Friendly launchpad gantry & sky clouds outside the pad window.
+
             var sun = new Sphere(.95, 24);
             sun.setTranslateX(-3.2);
             sun.setTranslateY(-3.3);
@@ -160,7 +156,7 @@ public final class CabinView extends StackPane {
                 outside.getChildren().add(cloud);
             }
 
-            // Red-and-white NASA style launch gantry tower on the left.
+
             for (int tier = 0; tier < 5; tier++) {
                 double y = .8 - tier * 1.05;
                 outside.getChildren().add(lamp(.22, .95, .22, -2.15, y, 11.0, tier % 2 == 0 ? "#E8543E" : "#F3F6FA"));
@@ -186,28 +182,28 @@ public final class CabinView extends StackPane {
 
     private Group buildCapsuleRoom() {
         var room = new Group();
-        // Floor deck + central walkway guide strip.
+
         room.getChildren().add(box(8.2, .24, 11.5, 0, 2.05, 1.0, "#2C3B50"));
         room.getChildren().add(box(1.9, .04, 8.6, 0, 1.91, -.4, "#1C293D"));
         room.getChildren().add(lamp(.08, .05, 8.6, -1.0, 1.91, -.4, "#24E0F0"));
         room.getChildren().add(lamp(.08, .05, 8.6, 1.0, 1.91, -.4, "#24E0F0"));
         room.getChildren().add(lamp(.26, .045, 8.2, 0, 1.91, -.4, "#F39C38"));
 
-        // Ceiling & side capsule walls (rich shaded tones so lights never blow out to flat white).
+
         room.getChildren().addAll(
                 box(8.2, .22, 11.5, 0, -3.05, 1.0, "#4B5D75"),
                 box(.24, 5.2, 11.5, -4.0, -.5, 1.0, "#7C8FA8"),
                 box(.24, 5.2, 11.5, 4.0, -.5, 1.0, "#7C8FA8"),
                 box(8.2, 5.2, .24, 0, -.5, -4.8, "#3B4C63"));
 
-        // Front bulkhead around the open circular viewport window (center 0, -1.20, 6.45).
+
         room.getChildren().addAll(
                 box(2.45, 5.2, .28, -2.8, -.5, 6.45, "#677A94"),
                 box(2.45, 5.2, .28, 2.8, -.5, 6.45, "#677A94"),
                 box(3.3, 1.72, .28, 0, 1.18, 6.45, "#53657E"),
                 box(3.3, .36, .28, 0, -2.89, 6.45, "#53657E"));
 
-        // Curved ceiling shoulders + accent stripes (Capsule Corp color theme).
+
         for (int side : new int[]{-1, 1}) {
             var shoulder = box(2.3, .22, 11.2, side * 3.15, -2.35, 1.0, "#5C6F88");
             shoulder.setRotationAxis(Rotate.Z_AXIS);
@@ -217,7 +213,7 @@ public final class CabinView extends StackPane {
             room.getChildren().addAll(shoulder, stripe, blueTrim);
         }
 
-        // Capsule structural ribs + overhead light strips.
+
         for (int z = -3; z <= 5; z += 2) {
             for (int side : new int[]{-1, 1}) {
                 room.getChildren().add(box(.28, 4.9, .26, 3.86 * side, -.5, z, "#43556D"));
@@ -227,7 +223,7 @@ public final class CabinView extends StackPane {
             }
         }
 
-        // Giant circular capsule viewport frame around the front window opening.
+
         var outerRim = Meshes.view(Meshes.torus(1.94, .34, 64, 14), ModelLibrary.surface("#283C57"));
         outerRim.setRotationAxis(Rotate.X_AXIS);
         outerRim.setRotate(90);
@@ -246,13 +242,13 @@ public final class CabinView extends StackPane {
 
     private MeshView buildCentralConsole(Group room) {
         var console = new Group();
-        // Main curved-look central console pedestal & desk.
+
         console.getChildren().addAll(
                 box(3.7, 1.45, 1.15, 0, 1.22, 3.95, "#233246"),
                 box(4.2, .22, 1.45, 0, .44, 3.85, "#364A63"),
                 lamp(3.9, .05, .06, 0, .54, 3.12, "#24E0F0"));
 
-        // Side angled wings on the console.
+
         for (int side : new int[]{-1, 1}) {
             var wing = box(1.1, .95, .9, side * 2.1, 1.45, 3.55, "#2B3D54");
             wing.setRotationAxis(Rotate.Y_AXIS);
@@ -263,7 +259,7 @@ public final class CabinView extends StackPane {
             console.getChildren().addAll(wing, sideScreen);
         }
 
-        // Live central display screen using dynamic Canvas texture.
+
         screenMaterial.setDiffuseMap(screenImage);
         screenMaterial.setSelfIlluminationMap(screenImage);
         screenMaterial.setSpecularColor(Color.web("#8EEEF8"));
@@ -282,14 +278,14 @@ public final class CabinView extends StackPane {
 
         console.getChildren().addAll(screenFrame, screenMesh);
 
-        // Glowing interactive-looking buttons & dual flight joysticks on the desk surface.
+
         String[] buttonColors = {"#24E0F0", "#FFD273", "#5DF29A", "#FF7B39", "#24E0F0", "#FFD273", "#5DF29A"};
         for (int i = -3; i <= 3; i++) {
             var btn = lamp(.18, .06, .12, i * .34, .31, 3.30, buttonColors[i + 3]);
             consoleButtons.add(btn);
             console.getChildren().add(btn);
         }
-        // Flight joysticks + throttle handle.
+
         for (int side : new int[]{-1, 1}) {
             var base = new Cylinder(.14, .08, 16);
             base.setTranslateX(side * 1.35);
@@ -311,7 +307,7 @@ public final class CabinView extends StackPane {
             console.getChildren().addAll(base, stick, grip);
         }
 
-        // Miniature holographic destination planet projector above the right console deck.
+
         var emitter = new Cylinder(.26, .08, 24);
         emitter.setTranslateX(1.68);
         emitter.setTranslateY(.30);
@@ -336,7 +332,7 @@ public final class CabinView extends StackPane {
     }
 
     private Sphere buildGravityUnit(Group room) {
-        // Capsule Corp Gravity Training Machine column on the left side wall.
+
         var unit = new Group();
         var column = new Cylinder(.55, 3.6, 28);
         column.setTranslateX(-3.25);
@@ -370,7 +366,7 @@ public final class CabinView extends StackPane {
     }
 
     private void buildPilotAndSeat(Group room) {
-        // Ergonomic captain's seat at z = 1.05.
+
         var seat = new Group();
         var pedestal = new Cylinder(.34, .65, 20);
         pedestal.setTranslateY(1.62);
@@ -390,17 +386,17 @@ public final class CabinView extends StackPane {
             seat.getChildren().add(lamp(.12, .05, .28, side * .68, .66, 1.28, "#24E0F0"));
         }
 
-        // Rider (friendly astronaut in Goku-inspired orange/blue space flight suit).
+
         pilotTorso.getChildren().addAll(
                 box(.94, .92, .48, 0, .54, 1.04, "#F2F3EE"),
                 box(.56, .76, .51, 0, .52, 1.04, "#F39C38"),
                 box(.96, .18, .52, 0, .82, 1.04, "#1C62B5"),
-                // Thighs & boots reaching toward the console pedals.
+
                 box(.29, .27, .88, -.26, 1.06, 1.55, "#F39C38"),
                 box(.29, .27, .88, .26, 1.06, 1.55, "#F39C38"),
                 box(.26, .46, .28, -.26, 1.40, 1.92, "#1C62B5"),
                 box(.26, .46, .28, .26, 1.40, 1.92, "#1C62B5"),
-                // Arms resting forward toward armrests/joysticks.
+
                 box(.24, .24, .75, -.58, .58, 1.32, "#F2F3EE"),
                 box(.24, .24, .75, .58, .58, 1.32, "#F2F3EE"),
                 box(.22, .20, .24, -.58, .60, 1.72, "#1C62B5"),
@@ -441,7 +437,7 @@ public final class CabinView extends StackPane {
 
     public void station(int station) {
         switch (station) {
-            case 1 -> { // Pilot seat (clear 3/4 view of rider, seat, and central console)
+            case 1 -> {
                 camera.setTranslateX(1.75);
                 camera.setTranslateY(-.34);
                 camera.setTranslateZ(.25);
@@ -449,7 +445,7 @@ public final class CabinView extends StackPane {
                 cameraPitch.setAngle(-4);
                 pilot.setVisible(true);
             }
-            case 2 -> { // Flight console
+            case 2 -> {
                 camera.setTranslateX(0);
                 camera.setTranslateY(-.22);
                 camera.setTranslateZ(1.92);
@@ -457,7 +453,7 @@ public final class CabinView extends StackPane {
                 cameraPitch.setAngle(-4);
                 pilot.setVisible(false);
             }
-            case 3 -> { // Observation dome
+            case 3 -> {
                 camera.setTranslateX(0);
                 camera.setTranslateY(-1.10);
                 camera.setTranslateZ(4.15);
@@ -465,7 +461,7 @@ public final class CabinView extends StackPane {
                 cameraPitch.setAngle(2);
                 pilot.setVisible(false);
             }
-            default -> { // Cabin aisle (0)
+            default -> {
                 camera.setTranslateX(0);
                 camera.setTranslateY(-.18);
                 camera.setTranslateZ(-4.05);
@@ -479,19 +475,19 @@ public final class CabinView extends StackPane {
     public void setLightMode(int mode) {
         lightMode = ((mode % 3) + 3) % 3;
         switch (lightMode) {
-            case 1 -> { // Night Cruise
+            case 1 -> {
                 mainLight.setColor(Color.web("#5C9BE6"));
                 ambientLight.setColor(Color.web("#394866"));
                 consoleGlow.setColor(Color.web("#2CE8F5"));
                 recolorLamps("#3AA8FF");
             }
-            case 2 -> { // Warp Neon
+            case 2 -> {
                 mainLight.setColor(Color.web("#AF7AE6"));
                 ambientLight.setColor(Color.web("#473C6B"));
                 consoleGlow.setColor(Color.web("#22F5FF"));
                 recolorLamps("#22E3F2");
             }
-            default -> { // Warm Day
+            default -> {
                 mainLight.setColor(Color.web("#BACCE0"));
                 ambientLight.setColor(Color.web("#586785"));
                 consoleGlow.setColor(Color.web("#32D6EB"));
@@ -504,20 +500,20 @@ public final class CabinView extends StackPane {
         double p = Math.clamp(progress, 0, 1);
         radarSweep = (radarSweep + 0.14) % Math.TAU;
 
-        // Gentle breathing & head turn for the rider.
+
         double breath = Math.sin(p * 42) * .022;
         pilotTorso.setTranslateY(breath);
         pilotHead.setTranslateY(breath * 1.2);
         pilotHead.setRotationAxis(Rotate.Y_AXIS);
         pilotHead.setRotate(Math.sin(p * 19) * 5.0);
 
-        // Holographic globe & gravity unit spin.
+
         holoPlanet.setRotationAxis(Rotate.Y_AXIS);
         holoPlanet.setRotate(p * 900);
         holoRing.setRotate(24 + Math.sin(p * 30) * 8);
         gravityRing.setTranslateY(-.45 + Math.sin(p * 28) * .35);
 
-        // Console button blinkers.
+
         for (int i = 0; i < consoleButtons.size(); i++) {
             consoleButtons.get(i).setOpacity(.55 + .45 * Math.pow(Math.sin(p * 55 + i * .9), 2));
         }
@@ -545,7 +541,7 @@ public final class CabinView extends StackPane {
         }
     }
 
-    /** Updates the live graphical display on the 3D central console screen. */
+
     public void updateConsole(String route, String phase, String eta,
                               double fuelUsedKg, double fuelLeftKg, double plannedFuelKg,
                               double powerDrawW, double powerSupplyW,
@@ -561,7 +557,7 @@ public final class CabinView extends StackPane {
         }
         lastSignature = signature;
 
-        // Color-code the hologram and outside planet to match the mission destination.
+
         String lowerRoute = route == null ? "" : route.toLowerCase(Locale.ROOT);
         if (lowerRoute.contains("mars")) {
             holoPlanet.setMaterial(ModelLibrary.lit("#FF8A4C", "#A83B12"));
@@ -590,7 +586,7 @@ public final class CabinView extends StackPane {
         g.setFill(Color.web("#08192C"));
         g.fillRect(0, 0, SCREEN_W, SCREEN_H);
 
-        // Subtle tactical grid.
+
         g.setStroke(Color.web("#123959"));
         g.setLineWidth(1);
         for (int x = 0; x < SCREEN_W; x += 32) {
@@ -600,7 +596,7 @@ public final class CabinView extends StackPane {
             g.strokeLine(0, y, SCREEN_W, y);
         }
 
-        // Top header bar.
+
         g.setFill(Color.web("#0D2C4A"));
         g.fillRect(0, 0, SCREEN_W, 40);
         g.setStroke(Color.web("#24E0F0"));
@@ -616,7 +612,7 @@ public final class CabinView extends StackPane {
         g.setFont(Font.font("System", FontWeight.BOLD, 14));
         g.fillText("SYSTEMS GO", SCREEN_W - 126, 25);
 
-        // Left card: Destination & Time Left.
+
         drawPanel(g, 14, 52, 238, 126, "#24E0F0");
         g.setFill(Color.web("#8EEEF8"));
         g.setFont(Font.font("System", FontWeight.BOLD, 12));
@@ -636,7 +632,7 @@ public final class CabinView extends StackPane {
         g.setFont(Font.font("System", FontWeight.BOLD, 15));
         g.fillText("ETA: " + truncate(eta, 22), 24, 164);
 
-        // Bottom-left card: Fuel Consumption.
+
         drawPanel(g, 14, 188, 238, 98, "#FF9A3C");
         g.setFill(Color.web("#FFCB69"));
         g.setFont(Font.font("System", FontWeight.BOLD, 12));
@@ -659,7 +655,7 @@ public final class CabinView extends StackPane {
         g.setFill(Color.web("#B9C7E6"));
         g.fillText(String.format("Tank Level: %.0f%%", fuelRatio * 100), 24, 278);
 
-        // Center-right card: Ship Stats & Power.
+
         drawPanel(g, 264, 52, 224, 234, "#4BA8FF");
         g.setFill(Color.web("#80EBF5"));
         g.setFont(Font.font("System", FontWeight.BOLD, 13));
@@ -681,7 +677,7 @@ public final class CabinView extends StackPane {
         g.setFont(Font.font("System", FontWeight.NORMAL, 12));
         drawWrapped(g, telemetryNote, 276, 204, 198);
 
-        // Right orbital flight progress ring.
+
         drawPanel(g, 500, 52, 126, 234, "#5DF29A");
         double rcx = 563;
         double rcy = 138;
@@ -693,7 +689,7 @@ public final class CabinView extends StackPane {
         g.strokeLine(rcx - rr, rcy, rcx + rr, rcy);
         g.strokeLine(rcx, rcy - rr, rcx, rcy + rr);
 
-        // Sweeping navigation indicator.
+
         g.setStroke(Color.web("#5DF29A"));
         g.setLineWidth(2.4);
         g.strokeLine(rcx, rcy, rcx + Math.cos(radarSweep) * rr, rcy + Math.sin(radarSweep) * rr);

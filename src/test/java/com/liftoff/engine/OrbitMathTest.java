@@ -37,13 +37,13 @@ class OrbitMathTest {
 
     @Test
     void viewAngleFollowsTheHorizonGeometry() {
-        // arccos(6378.137 x cos 5 deg / 7083.137) - 5 deg = 21.23 deg
+
         assertEquals(21.23, OrbitMath.viewAngleDeg(705, 5), 0.01);
     }
 
     @Test
     void aStationAtThePoleSeesAPolarOrbiterForItsViewAngleShareOfEveryLap() {
-        // Each lap crosses the pole once and stays in view for 2 x viewAngle of 360 degrees.
+
         Orbit polar = TestParts.orbit("polar", 705, 90, LaunchClass.POLAR);
         double expected = MINUTES_PER_DAY * OrbitMath.viewAngleDeg(705, GameRules.MIN_ELEVATION_DEG) / 180;
 

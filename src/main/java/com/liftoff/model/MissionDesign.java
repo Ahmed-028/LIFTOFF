@@ -4,15 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * The player's current design. Immutable: every change returns a new design.
- * Any part may be null (or the lists empty) while the design is unfinished; the ship build is
- * never null, only empty.
- *
- * <p>Two generations live side by side for now. v2 uses {@code mission} and {@code build};
- * {@code objective} and {@code bus} are the v1 fields, kept until the loader reads missions.json
- * and the session stops using them.
- */
+
 public record MissionDesign(
         Objective objective,
         Mission mission,
@@ -49,13 +41,13 @@ public record MissionDesign(
                 launchVehicle, scienceMonths);
     }
 
-    /** Replaces the whole ship. */
+
     public MissionDesign withBuild(ShipBuild newBuild) {
         return new MissionDesign(objective, mission, bus, newBuild, instruments, orbit, stations,
                 launchVehicle, scienceMonths);
     }
 
-    /** Puts one part in its slot of the ship; every other slot keeps its part. */
+
     public MissionDesign withPart(ShipPart part) {
         return withBuild(build.with(part));
     }
@@ -75,7 +67,7 @@ public record MissionDesign(
                 launchVehicle, months);
     }
 
-    /** Adds the instrument; a design carries at most one of each. */
+
     public MissionDesign plusInstrument(Instrument instrument) {
         if (hasInstrument(instrument.id())) {
             return this;

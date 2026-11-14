@@ -17,7 +17,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 
-/** Small drawn icons, each on a 24 x 24 grid. Always shown next to a text label. */
+
 public final class Icons {
 
     private static final double DESIGN_SIZE = 24;
@@ -26,7 +26,7 @@ public final class Icons {
     private Icons() {
     }
 
-    /** Budget: a coin. */
+
     public static Node coin(double size) {
         Circle rim = disc(Palette.BUDGET);
         Text dollar = new Text("$");
@@ -38,7 +38,7 @@ public final class Icons {
         return scaled(new Group(rim, dollar), size);
     }
 
-    /** Time: a clock. */
+
     public static Node clock(double size) {
         Circle face = disc(Palette.TIME);
         Line hourHand = stroke(new Line(12, 12, 12, 6.5));
@@ -46,7 +46,7 @@ public final class Icons {
         return scaled(new Group(face, hourHand, minuteHand), size);
     }
 
-    /** Chosen: a tick. */
+
     public static Node tick(double size) {
         Circle badge = disc(Palette.SKY);
         Polyline mark = stroke(new Polyline(7, 12.5, 10.5, 16, 17, 8.5));
@@ -88,7 +88,7 @@ public final class Icons {
         };
     }
 
-    /** Next step: an arrow. */
+
     public static Node next(double size) {
         return badge("→", Palette.SKY, size);
     }

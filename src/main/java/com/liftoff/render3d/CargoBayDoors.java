@@ -13,7 +13,7 @@ import javafx.scene.shape.Box;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
-/** Opposed hinged doors with their pivots on the top outside edges of the bay. */
+
 final class CargoBayDoors {
     private final Group root = new Group();
     private final Rotate left = new Rotate(0, Rotate.Z_AXIS);

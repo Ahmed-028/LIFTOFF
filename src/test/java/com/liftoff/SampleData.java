@@ -11,14 +11,7 @@ import com.liftoff.model.ValueBasis;
 
 import java.util.List;
 
-/**
- * A small hand-made catalog for Members 3, 4 and 5 to code against until the real
- * ship-parts.json and missions.json arrive. EVERY NUMBER HERE IS MADE UP: round values
- * chosen so arithmetic can be checked by eye. Never show these as NASA data.
- *
- * The starter build (medium plane, medium thruster, solar wings, medium bay, small satellite)
- * is meant to pass every check; the other options are there to trip each warning.
- */
+// Synthetic test fixtures; never present these numbers as NASA data.
 public final class SampleData {
 
     public static final SourceRef SOURCE =
@@ -33,14 +26,16 @@ public final class SampleData {
             "A made-up mission for development.", "Nothing real",
             Difficulty.EASY, Destination.EARTH_ORBIT, false,
             0, false, List.of(), List.of(),
-            500,      // budget cap $M
-            36, 12,   // deadline and minimum science months
-            1000,     // delta-v m/s
-            0,        // no crew
+            // Budget, deadline, science duration, delta-v, crew size.
+            500,
+            36, 12,
+            1000,
+            0,
             SOURCE);
 
     private static final List<ShipPart> PARTS = List.of(
-            //        id                   slot          mass   supply draw  payload bayL bayD  len  dia  thrust isp   tanks  data  cost
+
+            // id, slot, mass, power supply/draw, payload and bay, part size, thrust, Isp, tanks, data, cost
             part("sample-tiny-bus",      ModuleSlot.AIRFRAME,  500,  0,    20,  100,   0,   0,    0,   0,   0,     0,    200,   0,    60),
             part("sample-small-plane",   ModuleSlot.AIRFRAME,  1000, 0,    50,  200,   0,   0,    0,   0,   0,     0,    500,   0,    100),
             part("sample-medium-plane",  ModuleSlot.AIRFRAME,  2000, 0,    80,  500,   0,   0,    0,   0,   0,     0,    1000,  0,    150),
@@ -73,12 +68,12 @@ public final class SampleData {
         return MISSION;
     }
 
-    /** All sample parts, grouped by tab in tab order. */
+
     public static List<ShipPart> parts() {
         return PARTS;
     }
 
-    /** The part with this id; throws if there is none (a typo in a test should fail loudly). */
+
     public static ShipPart part(String id) {
         return PARTS.stream()
                 .filter(p -> p.id().equals(id))
@@ -86,7 +81,7 @@ public final class SampleData {
                 .orElseThrow(() -> new IllegalArgumentException("No sample part " + id));
     }
 
-    /** One sensible part per tab; intended to pass every build check. */
+
     public static ShipBuild starterBuild() {
         return ShipBuild.empty()
                 .with(part("sample-medium-plane"))

@@ -8,11 +8,7 @@ import com.liftoff.model.Requirement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * For the Review step: can this design answer the mission's science question?
- * Checks that every required measurement is made sharply enough, and that the orbit flies over
- * the target latitude. Pure: same design in, same list out. Measurement issues come first.
- */
+
 public final class DesignValidator {
 
     private DesignValidator() {
@@ -36,7 +32,7 @@ public final class DesignValidator {
             checkMeasurement(requirement, design.instruments(), issues);
         }
         if (design.orbit() != null) {
-            // An orbit flies over latitudes up to its inclination (or 180 minus it), north and south alike.
+
             double needed = Math.abs(targetLatitudeDeg);
             double reached = OrbitMath.maxLatitudeDeg(design.orbit().inclinationDeg());
             if (needed > reached) {
@@ -60,9 +56,9 @@ public final class DesignValidator {
             return;
         }
         if (limitM == null) {
-            return; // any resolution will do
+            return; // Any resolution satisfies this requirement.
         }
-        // Finest stated detail. A capability whose source gives no resolution cannot prove the goal is met.
+        // Unstated resolution cannot prove the mission's detail requirement.
         double finestM = matching.stream()
                 .filter(capability -> capability.resolutionM() != null)
                 .mapToDouble(Capability::resolutionM)

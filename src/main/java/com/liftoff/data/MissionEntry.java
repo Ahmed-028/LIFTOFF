@@ -8,7 +8,7 @@ import com.liftoff.session.stub.Mission;
 
 import java.util.Objects;
 
-/** Bundled briefing and flight parameters for a mission. */
+
 public record MissionEntry(Objective briefing, Difficulty difficulty, Mission.Destination destination,
                            boolean ladder, Mission.StepUnit stepUnit, int steps, int crew,
                            double suppliesKgPerCrewDay, SourceRef suppliesSource,

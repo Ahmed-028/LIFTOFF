@@ -18,7 +18,7 @@ import javafx.scene.layout.StackPane;
 import java.util.List;
 import java.util.ResourceBundle;
 
-/** Common navigation and session-listener lifetime for mission screens. */
+
 public abstract class MissionScreen implements ScreenController {
     @FXML private StackPane stepperHost;
 
@@ -72,17 +72,17 @@ public abstract class MissionScreen implements ScreenController {
 
     protected abstract void setUp();
 
-    /** The road-map level this screen belongs to. */
+
     protected Level level() {
         return Level.of(session.step());
     }
 
-    /** Whether the command bar shows the step pills of the level. */
+
     protected boolean showsStepper() {
         return true;
     }
 
-    /** Whether the command bar offers the road map; the road map itself does not. */
+
     protected boolean showsMapButton() {
         return true;
     }
@@ -110,14 +110,14 @@ public abstract class MissionScreen implements ScreenController {
         navigator.showMissionStep();
     }
 
-    /** Moves to the next step; leaving the level's last step sends the ship back to the road map. */
+
     @FXML
     protected void onNext() {
         var before = Level.of(session.step());
         boolean flown = session.step() == com.liftoff.session.MissionStep.FLY;
         session.next();
         if (flown && session.step() == com.liftoff.session.MissionStep.REPORT) {
-            // Between the flight and the report: the end-of-mission cutscene.
+
             navigator.playCutscene(com.liftoff.app.Cutscene.MISSION_END, navigator::showMissionStep);
         } else if (Level.of(session.step()) != before) {
             navigator.finishLevel(before);

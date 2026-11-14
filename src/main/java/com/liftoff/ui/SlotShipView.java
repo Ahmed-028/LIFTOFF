@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.EnumMap;
 
-/** Keeps the builder usable on systems where JavaFX cannot draw 3D. */
+
 final class SlotShipView implements ShipView {
     private final StackPane panel;
     private final EnumMap<ModuleSlot, Label> targets = new EnumMap<>(ModuleSlot.class);

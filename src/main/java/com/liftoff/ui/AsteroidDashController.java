@@ -17,7 +17,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-/** Level 4: Asteroid Dash, a three-lane ride through the asteroid belt. */
+
 public final class AsteroidDashController extends MiniGameScreen {
 
     @FXML private StackPane trackHost;
@@ -77,7 +77,7 @@ public final class AsteroidDashController extends MiniGameScreen {
         canvas.heightProperty().bind(trackHost.heightProperty().subtract(24));
         canvas.widthProperty().addListener((property, previous, width) -> draw());
         canvas.heightProperty().addListener((property, previous, height) -> draw());
-        // Unmanaged, so the canvas follows the frame's size instead of pushing it wider.
+        // Keep the canvas from affecting its parent's layout size.
         canvas.setManaged(false);
         canvas.setLayoutX(12);
         canvas.setLayoutY(12);

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MatchBoardTest {
 
-    /** Columns are listed left to right; each column lists its rows top to bottom. */
+
     private static int[][] columns(int[]... columns) {
         return columns;
     }
@@ -52,7 +52,7 @@ class MatchBoardTest {
 
     @Test
     void matchedTilesClearAndTheTilesAboveFallDown() {
-        // Swapping the 0 in column 1 down into row 2 lines up four 0s along the bottom row.
+
         var board = new MatchBoard(columns(
                 new int[] {3, 4, 0},
                 new int[] {4, 0, 1},
@@ -62,13 +62,13 @@ class MatchBoardTest {
         assertFalse(cascades.isEmpty());
         var first = cascades.get(0);
         assertEquals(Set.of(new Cell(0, 2), new Cell(1, 2), new Cell(2, 2), new Cell(3, 2)), first.cleared());
-        // In column 0 the two tiles above fell one row and one new tile dropped in from above.
+
         assertEquals(1, first.fallFrom()[0][2]);
         assertEquals(0, first.fallFrom()[0][1]);
         assertEquals(-1, first.fallFrom()[0][0]);
         assertEquals(4, first.after()[0][2]);
         assertEquals(3, first.after()[0][1]);
-        // Column 1 keeps the swapped tile: the 1 that moved up now falls back to the bottom.
+
         assertEquals(1, first.after()[1][2]);
         assertEquals(1, first.fallFrom()[1][2]);
     }

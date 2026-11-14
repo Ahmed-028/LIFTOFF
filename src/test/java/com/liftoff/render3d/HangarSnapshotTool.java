@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.FutureTask;
 
-/** Captures the demo's closed and open states with the same scene snapshot method as SnapshotTool. */
+
 public final class HangarSnapshotTool {
     private HangarSnapshotTool() {
     }

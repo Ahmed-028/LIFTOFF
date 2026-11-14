@@ -14,11 +14,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
-/**
- * Base for the 3D cutscenes. A cutscene is placed from the time alone ({@link #update(double)}),
- * so it can be skipped, paused or snapshotted at any second. Subclasses build their stage into
- * {@link #world} and aim the camera with {@link #look}.
- */
+
 public abstract class CutsceneView extends StackPane {
 
     protected final Group world = new Group();
@@ -44,13 +40,13 @@ public abstract class CutsceneView extends StackPane {
         setStyle("-fx-background-color: " + toWeb(Theme.NAVY_950) + ";");
     }
 
-    /** Length of the cutscene in seconds. */
+
     public abstract double length();
 
-    /** Places everything for the given second. */
+
     public abstract void update(double seconds);
 
-    /** Puts the camera at (x, y, z) looking at (tx, ty, tz). */
+
     protected void look(double x, double y, double z, double tx, double ty, double tz) {
         cameraAt.setX(x);
         cameraAt.setY(y);
@@ -67,7 +63,7 @@ public abstract class CutsceneView extends StackPane {
         return Math.max(0, Math.min(1, value));
     }
 
-    /** Smooth start and stop. */
+
     protected static double ease(double t) {
         return t * t * (3 - 2 * t);
     }
@@ -81,7 +77,7 @@ public abstract class CutsceneView extends StackPane {
         return from + delta * t;
     }
 
-    /** 0 before start, 1 after start + duration, eased in between. */
+
     protected static double phase(double t, double start, double duration) {
         return ease(clamp((t - start) / duration));
     }

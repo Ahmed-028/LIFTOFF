@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DesignValidatorTest {
 
-    /** The Farm Watch need: land pictures showing 30 m or finer. */
+
     private static final Requirement LAND_30M = new Requirement(MeasurementType.LAND_IMAGING, 30.0);
 
-    private static final Instrument SHARP = camera("sharp", 30.0);     // like ALI
-    private static final Instrument SHARPER = camera("sharper", 15.0); // like ASTER
-    private static final Instrument COARSE = camera("coarse", 250.0);  // like MODIS
+    private static final Instrument SHARP = camera("sharp", 30.0);
+    private static final Instrument SHARPER = camera("sharper", 15.0);
+    private static final Instrument COARSE = camera("coarse", 250.0);
 
     private static final Orbit POLAR = TestParts.orbit("polar", 705, 98.2, LaunchClass.POLAR);
     private static final Orbit TROPICAL = TestParts.orbit("tropical", 402, 35, LaunchClass.LOW_INCLINATION);
@@ -67,7 +67,7 @@ class DesignValidatorTest {
 
     @Test
     void resolutionTooCoarse() {
-        // The MODIS lesson: fields blur at 250 m when the goal needs 30 m.
+
         assertEquals(List.of(new DesignIssue(DesignIssue.Kind.RESOLUTION_TOO_COARSE, MeasurementType.LAND_IMAGING, 30, 250)),
                 DesignValidator.validate(design(farmMission(50), POLAR, COARSE)));
     }
@@ -102,14 +102,14 @@ class DesignValidatorTest {
 
     @Test
     void orbitMissesTarget() {
-        // A 35 degree orbit never flies over latitude 50.
+
         assertEquals(List.of(new DesignIssue(DesignIssue.Kind.ORBIT_MISSES_TARGET, null, 50, 35)),
                 DesignValidator.validate(design(farmMission(50), TROPICAL, SHARP)));
     }
 
     @Test
     void aRetrogradeOrbitReachesOneEightyMinusItsInclination() {
-        // 98.2 degrees reaches 81.8 degrees: enough for 80, not for the pole.
+
         assertEquals(List.of(), DesignValidator.validate(design(farmMission(80), POLAR, SHARP)));
         List<DesignIssue> issues = DesignValidator.validate(design(farmMission(90), POLAR, SHARP));
         assertEquals(DesignIssue.Kind.ORBIT_MISSES_TARGET, issues.get(0).kind());

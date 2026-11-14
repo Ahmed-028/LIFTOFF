@@ -6,19 +6,16 @@ import static com.liftoff.audio.Synth.Wave.SQUARE;
 import static com.liftoff.audio.Synth.Wave.TRIANGLE;
 import static com.liftoff.audio.Synth.freq;
 
-/**
- * The three pieces of music, written for LIFTOFF and played by the synthesiser. Each one loops
- * seamlessly: the last bar leads back into the first.
- */
+
 public enum Track {
-    /** Calm and curious: menus, the road map, the hangar and the flight. */
+
     HANGAR,
-    /** Bouncy and quick: the two mini-games. */
+
     ARCADE,
-    /** Proud fanfare: the award ending. */
+
     FINALE;
 
-    /** Chords as MIDI notes: root for the bass, then three notes for the harmony. */
+
     private static final int[] C = {48, 60, 64, 67};
     private static final int[] AM = {45, 57, 60, 64};
     private static final int[] F = {41, 57, 60, 65};
@@ -51,7 +48,7 @@ public enum Track {
                 Synth.pluck(out, at + s * beat / 2, beat * 1.2, freq(chord[arp[s]] + 12), .06, SINE, 6);
             }
         }
-        // A gentle tune in the second half, on the notes of the C major pentatonic scale.
+
         double[][] tune = {
                 {4, 0, 76, 1}, {4, 1, 79, 1}, {4, 2, 81, 2},
                 {5, 0, 79, 1}, {5, 1, 76, 1}, {5, 2, 72, 2},
@@ -95,7 +92,7 @@ public enum Track {
                 Synth.pluck(out, at, beat, freq(chord[i]), .05, TRIANGLE, 4);
             }
         }
-        // A catchy riff in A minor pentatonic, then a bright variation.
+
         int[] riff = {81, 84, 86, 84, 81, 79, 76, 79};
         int[] answer = {76, 79, 81, 84, 86, 88, 86, 84};
         for (int b : new int[] {4, 5, 6, 7, 12, 13, 14, 15}) {
@@ -126,7 +123,7 @@ public enum Track {
             }
             Synth.tone(out, at, bar, freq(chord[0]), .12, TRIANGLE, .02, .3);
         }
-        // The fanfare: a rising call and a proud answer, played by a brassy wave.
+
         double[][] call = {
                 {0, 0, 67, .66}, {0, .66, 67, .34}, {0, 1, 72, 1}, {0, 2, 76, 1}, {0, 3, 79, 1},
                 {1, 0, 81, 2}, {1, 2, 77, 2},

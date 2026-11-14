@@ -14,14 +14,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Caches geometry and materials, and returns fresh scene graph nodes on every request. */
+
 public final class ModelLibrary {
     static final String RESOURCE_ROOT = "/com/liftoff/models/";
 
     private final Map<String, Map<String, TriangleMesh>> models = new HashMap<>();
     private final Map<String, PhongMaterial> materials = new HashMap<>();
 
-    /** Creates independent nodes. Their cached meshes and materials are shared and read-only. */
+
     public Group create(String modelId) {
         if (modelId == null || !modelId.matches("[a-zA-Z0-9][a-zA-Z0-9_-]*")) {
             throw new IllegalArgumentException("Invalid model ID: " + modelId);
@@ -49,8 +49,8 @@ public final class ModelLibrary {
     }
 
     private static PhongMaterial paint(String material) {
-        // Friendly NASA-inspired finishes: clean white panels, dark thermal tiles, bright blue cells,
-        // restrained orange safety marks and softly glowing cyan glass and sensors.
+
+
         return switch (material) {
             case "tiles" -> surface("#2A3040");
             case "edge" -> surface("#A9B8CC");

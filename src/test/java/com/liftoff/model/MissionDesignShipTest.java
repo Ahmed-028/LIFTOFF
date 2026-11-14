@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** The v2 additions to MissionDesign: the mission and the ship build. */
+
 class MissionDesignShipTest {
 
     private static final ShipPart PLANE = TestParts.airframe("plane", 1000, 500, 2000, 50, 100);
@@ -60,7 +60,7 @@ class MissionDesignShipTest {
 
     @Test
     void theOldPartsStillWorkBesideTheShip() {
-        // Bus and objective stay until the session and the loader move to missions and ship parts.
+
         Bus bus = TestParts.bus("bus", 400, 100, 100, 60, 24);
         MissionDesign design = MissionDesign.empty().withBus(bus).withPart(PLANE);
         assertSame(bus, design.bus());

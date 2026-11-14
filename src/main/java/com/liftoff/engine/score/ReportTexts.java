@@ -2,10 +2,7 @@ package com.liftoff.engine.score;
 
 import java.util.Map;
 
-/**
- * English fallback texts for the report cards, as MessageFormat patterns. The real texts belong in
- * messages.properties (Member 5); these only keep the report readable if a key is missing there.
- */
+
 public final class ReportTexts {
 
     private static final Map<String, String> PATTERNS = Map.ofEntries(
@@ -70,7 +67,7 @@ public final class ReportTexts {
     private ReportTexts() {
     }
 
-    /** The MessageFormat pattern for the key, or null if there is none. */
+
     public static String pattern(String messageKey) {
         return PATTERNS.get(messageKey);
     }

@@ -42,10 +42,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.SplittableRandom;
 
-/**
- * The mission road map: five levels along a winding route. After a level is finished the ship
- * flies along the route to the next level to play; any open level can be picked straight away.
- */
+
 public final class RoadMapController extends MissionScreen {
 
     private static final double WIDTH = 1180;
@@ -192,7 +189,6 @@ public final class RoadMapController extends MissionScreen {
         super.dispose();
     }
 
-    // ---- drawing ----
 
     private void drawSky() {
         var world = Theme.World.of(mission().destination());
@@ -226,7 +222,7 @@ public final class RoadMapController extends MissionScreen {
         map.getChildren().addAll(road, dashes, doneTrail);
     }
 
-    /** The route through every stop, lifted by the given height above the planets. */
+
     private static Path route(double lift) {
         var path = new Path(new MoveTo(STOPS[0][0], STOPS[0][1] - lift));
         for (int i = 1; i < STOPS.length; i++) {

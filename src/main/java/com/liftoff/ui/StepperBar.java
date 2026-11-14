@@ -22,7 +22,7 @@ public final class StepperBar extends HBox {
     private final UiText text;
     private final EnumMap<MissionStep, Button> buttons = new EnumMap<>(MissionStep.class);
 
-    /** Shows the design steps inside the given level, so the pills never skip past a road-map level. */
+
     StepperBar(GameSession session, UiText text, Consumer<MissionStep> navigate, Level level) {
         super(6);
         this.session = session;
@@ -40,7 +40,7 @@ public final class StepperBar extends HBox {
         }
     }
 
-    /** A level with one step or none needs no step pills. */
+
     boolean hasSteps() {
         return buttons.size() > 1;
     }

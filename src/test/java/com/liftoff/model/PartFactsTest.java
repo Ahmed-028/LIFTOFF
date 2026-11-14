@@ -12,7 +12,7 @@ class PartFactsTest {
 
     @Test
     void anInstrumentsDailyDataIsItsAverageRateOverOneDay() {
-        // 6200 kbit/s x 86 400 s = 535 680 000 kbit = 535.68 Gbit
+
         Instrument imager = TestParts.instrument("imager", 229, 162.5, 6200, 114.5, 30);
 
         assertEquals(535.68, imager.dataGbitPerDay(), 1e-9);

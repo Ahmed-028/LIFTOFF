@@ -8,7 +8,7 @@ class ModuleSlotTest {
 
     @Test
     void slotsAreInTabOrder() {
-        // The builder shows its tabs top to bottom in this order (doc 05 §4).
+
         assertArrayEquals(
                 new ModuleSlot[] {
                         ModuleSlot.AIRFRAME, ModuleSlot.THRUSTERS, ModuleSlot.POWER,

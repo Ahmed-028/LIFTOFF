@@ -7,14 +7,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SplittableRandom;
 
-/**
- * The grid of the Star Match puzzle. Swapping two neighbouring tiles is allowed only when it
- * lines up three or more of a kind; matched tiles clear, the tiles above fall down and new ones
- * drop in from the top, which can set off more matches (a cascade).
- */
+
 public final class MatchBoard {
 
-    /** A grid position; row 0 is the top. */
+
     public record Cell(int col, int row) {
         public boolean nextTo(Cell other) {
             return Math.abs(col - other.col) + Math.abs(row - other.row) == 1;
@@ -24,14 +20,7 @@ public final class MatchBoard {
     public record Move(Cell from, Cell to) {
     }
 
-    /**
-     * One round of clearing and falling.
-     *
-     * @param cleared  the matched cells, before falling
-     * @param after    the kinds after the fall, {@code after[col][row]}
-     * @param fallFrom the row each tile in {@code after} fell from; negative rows are new tiles
-     *                 dropping in from above the board
-     */
+
     public record Cascade(Set<Cell> cleared, int[][] after, int[][] fallFrom) {
     }
 
@@ -54,7 +43,7 @@ public final class MatchBoard {
         fillWithoutMatches();
     }
 
-    /** A board with the given tiles, for tests. New tiles still come from the seeded random. */
+
     MatchBoard(int[][] tiles, int kinds, long seed) {
         this.cols = tiles.length;
         this.rows = tiles[0].length;
@@ -90,7 +79,7 @@ public final class MatchBoard {
         return copy;
     }
 
-    /** True if the last swap left no possible move, so the board was shuffled. */
+
     public boolean reshuffled() {
         return reshuffled;
     }
@@ -99,7 +88,7 @@ public final class MatchBoard {
         return cell.col() >= 0 && cell.col() < cols && cell.row() >= 0 && cell.row() < rows;
     }
 
-    /** Whether swapping the two cells would line up three or more. */
+
     public boolean wouldMatch(Cell a, Cell b) {
         if (!inside(a) || !inside(b) || !a.nextTo(b)) {
             return false;
@@ -110,10 +99,7 @@ public final class MatchBoard {
         return match;
     }
 
-    /**
-     * Swaps two neighbouring tiles and resolves every cascade. Returns no cascades and leaves the
-     * board unchanged if the swap would not make a match.
-     */
+
     public List<Cascade> swap(Cell a, Cell b) {
         reshuffled = false;
         if (!wouldMatch(a, b)) {
@@ -131,7 +117,7 @@ public final class MatchBoard {
         return cascades;
     }
 
-    /** Any swap that makes a match, scanning from the top left. */
+
     public Optional<Move> findMove() {
         for (int c = 0; c < cols; c++) {
             for (int r = 0; r < rows; r++) {
@@ -146,7 +132,7 @@ public final class MatchBoard {
         return Optional.empty();
     }
 
-    /** Every cell that is part of a line of three or more of the same kind. */
+
     static Set<Cell> matches(int[][] grid) {
         int cols = grid.length;
         int rows = grid[0].length;

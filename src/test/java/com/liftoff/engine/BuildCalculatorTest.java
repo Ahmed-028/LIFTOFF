@@ -14,22 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Round numbers, so every expected value can be checked by eye.
- *
- * <pre>
- * part      mass   other
- * airframe  1000   carries 500 kg, tanks 2000 kg, draws 50 W, $100M
- * thruster   100   Isp 300 s, $10M
- * power       50   gives 200 W, $20M
- * bay         50   3 m x 2 m inside, carries 300 kg, $5M
- * satellite  100   2 m x 1 m, draws 100 W, $50M
- * ---------------
- * dry mass  1300   cost $185M, draw 150 W of 200 W, cargo 150 kg of 500 kg
- * </pre>
- *
- * The mission's delta-v is Isp x g0 x ln 2, so the trip needs propellant equal to the dry mass: 1300 kg.
- */
+
 class BuildCalculatorTest {
 
     private static final double TINY = 1e-6;
@@ -52,7 +37,6 @@ class BuildCalculatorTest {
         return BuildCalculator.calculate(build, mission).issues();
     }
 
-    // ---- the numbers ----------------------------------------------------------------------
 
     @Test
     void addsUpMassCostAndPower() {
@@ -66,8 +50,8 @@ class BuildCalculatorTest {
     @Test
     void worksOutFuelFromTheRocketEquation() {
         BuildReport report = BuildCalculator.calculate(goodBuild(), MISSION);
-        assertEquals(1300, report.propellantKg(), TINY);       // equal to dry mass, by choice of delta-v
-        assertEquals(2600, report.totalMassKg(), TINY);        // dry + propellant
+        assertEquals(1300, report.propellantKg(), TINY);
+        assertEquals(2600, report.totalMassKg(), TINY);
         assertEquals(DELTA_V, report.deltaVRequiredMs(), TINY);
         // Full tanks (2000 kg) could give Isp x g0 x ln((1300 + 2000) / 1300).
         assertEquals(ISP * 9.80665 * Math.log(3300.0 / 1300.0), report.deltaVAvailableMs(), TINY);
@@ -85,7 +69,6 @@ class BuildCalculatorTest {
         assertEquals(BuildCalculator.calculate(goodBuild(), MISSION), BuildCalculator.calculate(goodBuild(), MISSION));
     }
 
-    // ---- one test per kind of issue -------------------------------------------------------
 
     @Test
     void slotEmpty_anEmptyBuildAsksForEveryTabInTabOrder() {
@@ -119,7 +102,7 @@ class BuildCalculatorTest {
 
     @Test
     void payloadTooHeavyForTheBay() {
-        // 350 kg in a bay rated for 300 kg; the airframe (500 kg) can still carry bay + satellite = 400 kg.
+
         ShipBuild build = goodBuild().with(TestParts.satellite("heavy", 350, 2, 1, 100, 50));
         assertEquals(List.of(new BuildIssue(BuildIssue.Kind.PAYLOAD_TOO_HEAVY, ModuleSlot.CARGO_BAY, 350, 300)),
                 issues(build, MISSION));
@@ -127,7 +110,7 @@ class BuildCalculatorTest {
 
     @Test
     void payloadTooHeavyForTheAirframe() {
-        // Cargo is bay + satellite = 150 kg; this airframe carries 120 kg.
+
         ShipBuild build = goodBuild().with(TestParts.airframe("weak", 1000, 120, 2000, 50, 100));
         assertEquals(List.of(new BuildIssue(BuildIssue.Kind.PAYLOAD_TOO_HEAVY, ModuleSlot.AIRFRAME, 150, 120)),
                 issues(build, MISSION));
@@ -142,7 +125,7 @@ class BuildCalculatorTest {
 
     @Test
     void fuelShort() {
-        // The trip needs 1300 kg; these tanks hold 1000 kg.
+
         ShipBuild build = goodBuild().with(TestParts.airframe("small-tanks", 1000, 500, 1000, 50, 100));
         List<BuildIssue> issues = issues(build, MISSION);
         assertEquals(1, issues.size());
@@ -160,11 +143,10 @@ class BuildCalculatorTest {
                 issues(goodBuild(), tight));
     }
 
-    // ---- edges ----------------------------------------------------------------------------
 
     @Test
     void exactlyOnEveryLimitStillPasses() {
-        // Needs 1300 kg of propellant, 150 W, 150 kg of cargo and $185M: give exactly that.
+
         ShipBuild snug = ShipBuild.empty()
                 .with(TestParts.airframe("plane", 1000, 150, 1300.000001, 50, 100))
                 .with(THRUSTER)
@@ -177,7 +159,7 @@ class BuildCalculatorTest {
 
     @Test
     void anUnfinishedBuildOnlyAsksForTheMissingParts() {
-        // No thruster yet: fuel cannot be worked out, so there is no fuel warning, only "choose a thruster".
+
         ShipBuild build = ShipBuild.empty().with(AIRFRAME).with(POWER).with(BAY).with(SATELLITE);
         BuildReport report = BuildCalculator.calculate(build, MISSION);
         assertEquals(List.of(new BuildIssue(BuildIssue.Kind.SLOT_EMPTY, ModuleSlot.THRUSTERS, 0, 0)), report.issues());
@@ -202,7 +184,7 @@ class BuildCalculatorTest {
 
     @Test
     void weightlessPlaceholderPartsDoNotBreakTheFuelSum() {
-        // Nothing to push means nothing to burn; the calculator must not divide by a zero dry mass.
+
         ShipBuild ghost = ShipBuild.empty()
                 .with(TestParts.airframe("ghost", 0, 0, 0, 0, 0))
                 .with(TestParts.thruster("ghost-engine", 0, ISP, 0, 0));
@@ -221,7 +203,6 @@ class BuildCalculatorTest {
                 BuildIssue.Kind.POWER_SHORT), kinds);
     }
 
-    // ---- the shared sample catalog ---------------------------------------------------------
 
     @Test
     void theSampleStarterBuildPassesEveryCheck() {

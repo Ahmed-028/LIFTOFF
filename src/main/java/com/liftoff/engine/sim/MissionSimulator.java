@@ -13,10 +13,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.SplittableRandom;
 
-/**
- * Flies a design through time, one month (Earth, Mars) or one day (Moon) per step.
- * Pure and repeatable: the same inputs and seed always give the same result.
- */
+
 public final class MissionSimulator {
 
     private static final double SECONDS_PER_MINUTE = 60;
@@ -25,7 +22,7 @@ public final class MissionSimulator {
     private MissionSimulator() {
     }
 
-    /** Flies with the events bundled in the catalog and no inputs beyond the design. */
+
     public static SimulationResult run(MissionDesign design, Mission mission, Difficulty difficulty, long seed) {
         Bus bus = design.bus();
         double storageGbit = bus == null || bus.storageGbit() == null
@@ -38,7 +35,7 @@ public final class MissionSimulator {
         return run(design, mission, difficulty, seed, deck, extras, null);
     }
 
-    /** Ship power and radio. With no fixed contact window, the chosen orbit sets station visibility. */
+
     public record DeepSpaceLink(double powerW, double downlinkMbps, OptionalDouble contactMinutesPerDay) {
         public DeepSpaceLink(double powerW, double downlinkMbps, double contactMinutesPerDay) {
             this(powerW, downlinkMbps, OptionalDouble.of(contactMinutesPerDay));
@@ -58,7 +55,7 @@ public final class MissionSimulator {
         double drawW = instruments.stream().mapToDouble(Instrument::avgPowerW).sum();
         double downlinkMbps = link == null ? (bus == null ? 0 : bus.downlinkMbps()) : link.downlinkMbps();
 
-        // Share of each instrument's data still coming through (1 until a fault hits it).
+
         double[] output = new double[instruments.size()];
         java.util.Arrays.fill(output, 1);
         double[] contactMinutesPerDay = new double[stations.size()];
@@ -89,7 +86,7 @@ public final class MissionSimulator {
         for (int step = 0; step < steps && !suppliesRanOut; step++) {
             Optional<EventCard> card = offered.draw(difficulty, seed, step);
             if (card.isPresent()) {
-                // A second, independent stream picks what the event hits.
+
                 SplittableRandom random = EventDeck.randomFor(~seed, step);
                 SimEffect effect = SimEffect.none();
                 switch (card.get().type()) {
@@ -127,7 +124,7 @@ public final class MissionSimulator {
                 events.add(new SimEvent(step, card.get().type(), card.get().messageKey(), effect));
             }
 
-            // Share of this step each running effect covers; what is left carries into the next step.
+
             double safeModeShare = Math.min(safeModeDays, stepDays) / stepDays;
             double dustShare = Math.min(dustDays, stepDays) / stepDays;
             double outageShare = Math.min(outageDays, stepDays) / stepDays;
@@ -135,8 +132,7 @@ public final class MissionSimulator {
             dustDays = Math.max(0, dustDays - stepDays);
             outageDays = Math.max(0, outageDays - stepDays);
 
-            // Power: a shortfall switches the instruments off part of the time, so they produce
-            // proportionally less. It is never an outright failure.
+
             double supplyNowW = supplyW * (1 - SimRules.DUST_SOLAR_POWER_LOST_FRACTION * dustShare);
             double shortfallW = Math.max(0, drawW - supplyNowW);
             double onShare = drawW > supplyNowW ? supplyNowW / drawW : 1;
@@ -147,7 +143,7 @@ public final class MissionSimulator {
             }
             double produced = producedPerDay * stepDays * onShare * (1 - safeModeShare);
 
-            // Downlink: Mbps x contact minutes x 60 / 1000 = Gbit per day, summed over the stations.
+
             double contactMinutes = 0;
             for (int i = 0; i < contactMinutesPerDay.length; i++) {
                 contactMinutes += contactMinutesPerDay[i] * (i == outageStation ? 1 - outageShare : 1);
@@ -166,8 +162,8 @@ public final class MissionSimulator {
             double suppliesLeftKg = Math.max(0, extras.suppliesKg() - suppliesUsedKg);
 
             if (firstLimit == SimLimit.NONE) {
-                // Fixed order for limits that break in the same step. Lost data implies a backlog,
-                // so the full recorder is named before the downlink that caused it.
+
+
                 firstLimit = shortfallW > 0 ? SimLimit.POWER
                         : lost > 0 ? SimLimit.STORAGE
                         : backlog > 0 ? SimLimit.DOWNLINK

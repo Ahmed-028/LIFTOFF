@@ -21,7 +21,7 @@ import javafx.stage.Stage;
 
 import java.util.ResourceBundle;
 
-/** The JavaFX application: loads the catalogs, creates the game session and opens the first screen. */
+
 public final class LiftoffApp extends Application {
 
     public static final String MESSAGES_BUNDLE = "com.liftoff.i18n.messages";
@@ -57,7 +57,7 @@ public final class LiftoffApp extends Application {
         navigator.playIntro();
 
         stage.setTitle(messages.getString("app.title"));
-        // Ready-made PNG files (made from icon(256) by the snapshot tool); Windows did not show icons drawn at start-up.
+        // Windows shows raster icons at startup, but not icons drawn then.
         for (int size : new int[] { 16, 24, 32, 48, 64, 128, 256 }) {
             stage.getIcons().add(new Image(LiftoffApp.class.getResourceAsStream("/com/liftoff/art/icon-" + size + ".png")));
         }
@@ -67,9 +67,9 @@ public final class LiftoffApp extends Application {
         stage.setMinHeight(MIN_CONTENT_HEIGHT + stage.getHeight() - scene.getHeight());
     }
 
-    /** Draws the icon art: the title rocket, flame lit, in front of the hangar window. The art/icon-*.png files are made from it. */
+
     public static Image icon(int size) {
-        // The piece of the hangar window behind the title rocket: Earth on the left, stars on the right.
+
         var hangar = new Image(LiftoffApp.class.getResource("/com/liftoff/models/hangar.png").toExternalForm());
         double side = hangar.getHeight() * .444;
         var backdrop = new ImageView(hangar);

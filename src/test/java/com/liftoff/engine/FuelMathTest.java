@@ -12,7 +12,7 @@ class FuelMathTest {
 
     @Test
     void standardGravityIsTheDefinedConstant() {
-        // g0 = 9.80665 m/s^2 exactly (standard acceleration of gravity, a defined value).
+        // g0 = 9.80665 m/s^2 exactly (defined constant).
         assertEquals(9.80665, FuelMath.STANDARD_GRAVITY_MS2);
     }
 
@@ -42,7 +42,7 @@ class FuelMathTest {
 
     @Test
     void fuelGrowsFasterThanTheSpeedChange() {
-        // The lesson of Mission 2: doubling delta-v more than doubles the fuel.
+
         double once = FuelMath.propellantKg(1000, 2000, 300);
         double twice = FuelMath.propellantKg(1000, 4000, 300);
         assertTrue(twice > 2 * once);

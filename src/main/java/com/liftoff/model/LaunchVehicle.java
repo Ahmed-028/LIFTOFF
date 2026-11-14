@@ -3,7 +3,7 @@ package com.liftoff.model;
 import java.util.Map;
 import java.util.OptionalDouble;
 
-/** A rocket, with its published lift capacity per class of orbit. */
+// Lift limits are published per orbit class.
 public record LaunchVehicle(
         String id,
         String name,
@@ -18,7 +18,7 @@ public record LaunchVehicle(
         capacityKg = Map.copyOf(capacityKg);
     }
 
-    /** Lift capacity to the given class of orbit; empty when the catalog has no published figure. */
+
     public OptionalDouble capacityFor(LaunchClass launchClass) {
         Double capacity = capacityKg.get(launchClass);
         return capacity == null ? OptionalDouble.empty() : OptionalDouble.of(capacity);

@@ -8,10 +8,7 @@ import javafx.scene.layout.StackPane;
 
 import java.util.List;
 
-/**
- * Common parts of the two mini-game levels: they leave the step pills out, and finishing or
- * skipping sends the ship on along the road map. Mini-games never touch the mission design.
- */
+
 abstract class MiniGameScreen extends MissionScreen {
 
     @Override
@@ -43,7 +40,7 @@ abstract class MiniGameScreen extends MissionScreen {
         navigator.finishLevel(level());
     }
 
-    /** The mini-game tier for this mission: the harder the mission, the harder the game. */
+
     protected com.liftoff.minigame.Challenge challenge() {
         return com.liftoff.minigame.Challenge.forTier(session.difficulty().ordinal());
     }
@@ -54,7 +51,7 @@ abstract class MiniGameScreen extends MissionScreen {
                 text.get("game.difficulty." + challenge.name()));
     }
 
-    /** Stops timers and animations before the screen is left. */
+
     protected void stop() {
     }
 
@@ -64,7 +61,7 @@ abstract class MiniGameScreen extends MissionScreen {
         super.dispose();
     }
 
-    /** Scales a node to fit its host, keeping its own design size. */
+
     static void fit(StackPane host, Region content, double width, double height, double maxScale) {
         Runnable fit = () -> {
             double scale = Math.min(maxScale, Math.min(host.getWidth() / (width + 24), host.getHeight() / (height + 24)));
@@ -75,7 +72,7 @@ abstract class MiniGameScreen extends MissionScreen {
         host.heightProperty().addListener((property, previous, value) -> fit.run());
     }
 
-    /** A banner shown over the play area when the game ends. */
+
     static Node banner(Node icon, String title, String detail) {
         var heading = new javafx.scene.control.Label(title);
         heading.getStyleClass().add("game-banner-title");

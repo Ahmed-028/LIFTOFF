@@ -19,7 +19,7 @@ class SampleDataTest {
 
     @Test
     void everyTabHasAtLeastFourOptions() {
-        // Doc 05 §4: each tab offers at least four options.
+
         for (ModuleSlot slot : ModuleSlot.values()) {
             long count = SampleData.parts().stream().filter(p -> p.slot() == slot).count();
             assertTrue(count >= 4, slot + " has only " + count + " options");
@@ -36,7 +36,7 @@ class SampleDataTest {
 
     @Test
     void nothingCanBeMistakenForNasaData() {
-        // Data rule: sample numbers are ours, and must say so.
+
         for (ShipPart part : SampleData.parts()) {
             assertEquals(ValueBasis.GAME_ESTIMATE, part.costBasis(), part.id());
             assertEquals(SampleData.SOURCE, part.source(), part.id());

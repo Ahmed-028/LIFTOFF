@@ -42,13 +42,10 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.function.Function;
 
-/**
- * The single door between the user interface and the game logic. Holds the catalog and the
- * current design, recalculates the resources after every change and tells listeners.
- */
+
 public final class GameSession {
 
-    /** Message keys of the reasons a launch or flight is refused. */
+
     public static final String NO_MISSION = "flow.noMissionSelected";
     public static final String ALREADY_FLOWN = "flow.alreadyFlown";
 
@@ -77,15 +74,12 @@ public final class GameSession {
         this(catalog, catalog::shipPart);
     }
 
-    /** @param partLookup alternate source of ship parts, used by test scenarios */
+
     public GameSession(Catalog catalog, Function<String, Optional<ShipPart>> partLookup) {
         this(catalog, partLookup, MissionLog.inMemory());
     }
 
-    /**
-     * @param log where finished missions are recorded; the game passes {@code new MissionLog()} to keep
-     *            them in the user's home folder, the shorter constructors keep them in memory only
-     */
+
     public GameSession(Catalog catalog, Function<String, Optional<ShipPart>> partLookup, MissionLog log) {
         this.catalog = catalog;
         this.partLookup = partLookup;
@@ -104,7 +98,7 @@ public final class GameSession {
         return resources;
     }
 
-    /** Combined limits for the modular builder and review screens. */
+
     public ResourceReport missionResources() {
         var combined = new EnumMap<ResourceType, ResourceUsage>(ResourceType.class);
         combined.putAll(resources.usages());
@@ -136,7 +130,7 @@ public final class GameSession {
         return DesignValidator.validate(design);
     }
 
-    /** Chooses the mission goal and starts the science duration at the goal's minimum. */
+
     public void selectObjective(String objectiveId) {
         Objective objective = found(catalog.objective(objectiveId), "objective", objectiveId);
         update(design.withObjective(objective).withScienceMonths(objective.minScienceMonths()));
@@ -158,7 +152,7 @@ public final class GameSession {
         update(design.withOrbit(found(catalog.orbit(orbitId), "orbit", orbitId)));
     }
 
-    /** Adds the station if the design does not use it yet, removes it if it does. */
+
     public void toggleStation(String stationId) {
         GroundStation station = found(catalog.groundStation(stationId), "ground station", stationId);
         update(design.hasStation(stationId) ? design.minusStation(stationId) : design.plusStation(station));
@@ -176,17 +170,16 @@ public final class GameSession {
         update(design.withScienceMonths(months));
     }
 
-    /** Registers a callback run after every change to the design. */
+
     public void addListener(Runnable onChange) {
         listeners.add(onChange);
     }
 
-    /** Stops a callback registered with {@link #addListener}; used when a screen is closed. */
+
     public void removeListener(Runnable onChange) {
         listeners.remove(onChange);
     }
 
-    // ---- ship build ----
 
     public ShipBuild build() {
         return build;
@@ -196,7 +189,7 @@ public final class GameSession {
         return buildReport;
     }
 
-    /** Puts the part in its own slot and keeps the other slots; un-confirms the build. */
+
     public void choosePart(String partId) {
         ShipPart part = found(partLookup.apply(partId), "ship part", partId);
         String missionId = mission == null
@@ -212,7 +205,7 @@ public final class GameSession {
         notifyListeners();
     }
 
-    /** @throws IllegalStateException unless {@code buildReport().canConfirm()} and the review step is open */
+
     public void confirmBuild() {
         if (!buildReport.canConfirm()) {
             throw new IllegalStateException("The build still has issues: " + buildReport.issues());
@@ -221,9 +214,7 @@ public final class GameSession {
         notifyListeners();
     }
 
-    // ---- mission flow ----
 
-    /** Starts the mission from its briefing with an empty design and an empty ship. */
     public void selectMission(String missionId) {
         MissionEntry entry = catalog.mission(missionId).orElse(null);
         Objective objective;
@@ -249,10 +240,7 @@ public final class GameSession {
         notifyListeners();
     }
 
-    /**
-     * True once the last mission of the main ladder (Mars, after Farm Watch and the Moon) has been
-     * flown successfully: the moment for the game's ending.
-     */
+
     public boolean finishedFinalMission() {
         if (missionEntry == null || simulation == null || !simulation.success()) {
             return false;
@@ -261,12 +249,12 @@ public final class GameSession {
         return !ladder.isEmpty() && ladder.getLast().id().equals(missionEntry.id());
     }
 
-    /** The road map of the current mission: its five levels and where the ship is. */
+
     public LevelPath levels() {
         return levels;
     }
 
-    /** Marks a mini-game level as played (or skipped). Mini-games never change the design. */
+
     public void finishMiniGame(Level game) {
         levels.finishGame(game);
         notifyListeners();
@@ -298,7 +286,7 @@ public final class GameSession {
         update(design);
     }
 
-    /** @throws IllegalStateException with the reason's message key if the step is locked */
+
     public void goTo(MissionStep step) {
         moved(flow.current(), flow.goTo(step));
     }
@@ -315,48 +303,42 @@ public final class GameSession {
         return flow.isUnlocked(step);
     }
 
-    /** Message key for the interface text; empty if the step is open. */
+
     public Optional<String> reasonLocked(MissionStep step) {
         return flow.reasonLocked(step);
     }
 
-    /** Called when the launch check finds no reason to stop. */
+
     public void markLaunchPassed() {
         flow.markLaunchPassed();
         notifyListeners();
     }
 
-    /** Called when the simulation has run to its end. */
+
     public void markSimulationFinished() {
         flow.markSimulationFinished();
         notifyListeners();
     }
 
-    /** From the report back to the ship step, keeping the design. */
+
     public void redesign() {
         flow.redesign();
         clearResults();
         notifyListeners();
     }
 
-    // ---- launch, flight, score and report ----
 
     public Difficulty difficulty() {
         return difficulty;
     }
 
-    /** Sets how many random events the flight meets. Mission 1 is flown at CADET: none. */
+
     public void setDifficulty(Difficulty newDifficulty) {
         difficulty = newDifficulty;
         notifyListeners();
     }
 
-    /**
-     * Runs the launch check on the confirmed build. With no issues the Fly step opens; otherwise
-     * {@link #report()} explains the first one and the design has to change.
-     *
-     * @throws IllegalStateException if no mission is selected or the Launch step is still locked
-     */
+
     public List<LaunchIssue> runLaunchCheck() {
         requireOpen(MissionStep.LAUNCH);
         launchIssues = LaunchChecker.check(design, buildReport, mission, design.launchVehicle(), design.orbit());
@@ -370,12 +352,7 @@ public final class GameSession {
         return launchIssues;
     }
 
-    /**
-     * Flies the mission once: simulates it, scores it, writes the report, opens the Report step and
-     * records the mission in the log. The same seed replays the same flight.
-     *
-     * @throws IllegalStateException if the launch check has not passed, or the mission was already flown
-     */
+
     public SimulationResult fly(long seed) {
         requireOpen(MissionStep.FLY);
         if (simulation != null) {
@@ -402,22 +379,22 @@ public final class GameSession {
         return simulation;
     }
 
-    /** What the last launch check found; empty when it passed or has not run. */
+
     public List<LaunchIssue> launchIssues() {
         return launchIssues;
     }
 
-    /** The flight, once flown. */
+
     public Optional<SimulationResult> simulation() {
         return Optional.ofNullable(simulation);
     }
 
-    /** The score, once flown. */
+
     public Optional<Score> score() {
         return Optional.ofNullable(score);
     }
 
-    /** The report: after a flight, or after a launch check that failed. */
+
     public Optional<Report> report() {
         return Optional.ofNullable(report);
     }
@@ -466,7 +443,7 @@ public final class GameSession {
         buildReport = reportFor(build);
     }
 
-    /** The build report the given ship would have with the rest of the current design. */
+
     private BuildReport reportFor(ShipBuild ship) {
         if (missionEntry == null || design.bus() != null) {
             return BuildCalculator.calculate(ship, mission);
@@ -488,10 +465,7 @@ public final class GameSession {
         return report;
     }
 
-    /**
-     * Part swaps that would bring an over-limit gauge back down, best first. Empty when the
-     * resource is within its limit, has no limit yet, or no mission is chosen.
-     */
+
     public List<SwapAdvisor.Swap> limitTips(SwapAdvisor.Goal goal) {
         if (missionEntry == null) {
             return List.of();

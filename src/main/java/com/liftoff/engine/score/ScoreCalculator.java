@@ -17,22 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
-/** Turns a flown mission into a score out of 100 and one to three stars. Pure. */
+
 public final class ScoreCalculator {
 
     private ScoreCalculator() {
     }
 
-    /**
-     * @param build the ship's report, or null when the design has no modular ship
-     * @param sim   the flight, or null when the mission never left the pad
-     */
+
     public static Score score(MissionDesign design, ResourceReport resources, BuildReport build,
                               SimulationResult sim, Mission mission) {
         return score(design, resources, build, sim, mission, false);
     }
 
-    /** Scores a report whose budget already includes the modular ship. */
+
     public static Score scoreCombined(MissionDesign design, ResourceReport resources, BuildReport build,
                                       SimulationResult sim, Mission mission) {
         return score(design, resources, build, sim, mission, true);
@@ -61,10 +58,7 @@ public final class ScoreCalculator {
         return total >= ScoreRules.TWO_STARS_FROM ? 2 : 1;
     }
 
-    /**
-     * Share (0 to 1) of the required data that came home. Zero when the mission never flew or when
-     * the design cannot make a measurement the goal must have.
-     */
+
     public static double scienceFraction(MissionDesign design, SimulationResult sim, Mission mission) {
         if (sim == null || !unmetRequirements(design).isEmpty()) {
             return 0;
@@ -76,10 +70,7 @@ public final class ScoreCalculator {
         return Math.max(0, Math.min(1, sim.totalSentGbit() / required));
     }
 
-    /**
-     * What the mission asks to be returned: everything the chosen instruments produce at their
-     * average rate over the planned flight, and at least over the goal's minimum science duration.
-     */
+
     public static double requiredDataGbit(MissionDesign design, Mission mission) {
         double perDay = design.instruments().stream().mapToDouble(Instrument::dataGbitPerDay).sum();
         boolean inDays = mission.stepUnit() == Mission.StepUnit.DAY;
@@ -90,7 +81,7 @@ public final class ScoreCalculator {
         return perDay * steps * (inDays ? 1 : SimRules.DAYS_PER_MONTH);
     }
 
-    /** The goal's must-have measurements that no chosen instrument makes finely enough. */
+
     public static List<Requirement> unmetRequirements(MissionDesign design) {
         List<Requirement> unmet = new ArrayList<>();
         if (design.objective() == null) {
@@ -117,7 +108,7 @@ public final class ScoreCalculator {
         return capability.resolutionM() != null && capability.resolutionM() <= requirement.maxResolutionM();
     }
 
-    /** Average margin credit over the six resources, plus fuel beyond Earth orbit. */
+
     private static double marginShare(ResourceReport resources, BuildReport build, Mission mission) {
         double credit = 0;
         int counted = 0;
@@ -140,7 +131,7 @@ public final class ScoreCalculator {
         };
     }
 
-    /** 1 when inside the cap, cap / used when over it, 0 when the cap is not known. */
+
     private static double withinCap(double used, OptionalDouble cap) {
         if (cap.isEmpty()) {
             return 0;

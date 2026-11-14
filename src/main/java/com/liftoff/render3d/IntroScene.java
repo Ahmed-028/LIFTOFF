@@ -24,16 +24,10 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
-/**
- * The opening cutscene: Nova, a round young explorer in an astronaut cap, walks into a bedroom,
- * opens a laptop and loads LIFTOFF, and the camera flies into the screen. Everything is placed
- * from the time alone ({@link #update(double)}), so the scene can be skipped or paused anywhere.
- *
- * <p>Units are roughly metres; y points down, the floor is at y = 0 and the back wall at z = 5.
- */
+
 public final class IntroScene extends CutsceneView {
 
-    /** Length of the cutscene in seconds. */
+
     public static final double LENGTH = 12.2;
 
     private static final int SCREEN_FRAMES = 14;
@@ -42,7 +36,7 @@ public final class IntroScene extends CutsceneView {
 
     private final RoundFigure kid = new RoundFigure(RoundFigure.Look.KID_NOVA);
     private final Group door = new Group();
-    /** Turns the door about its left edge (setRotate would turn it about its middle). */
+
     private final Rotate hinge = new Rotate(0, 0, 0, 0, Rotate.Y_AXIS);
     private final Group lid = new Group();
     private final PhongMaterial screenMaterial = new PhongMaterial(Color.web("#071330"));
@@ -74,14 +68,14 @@ public final class IntroScene extends CutsceneView {
         return LENGTH;
     }
 
-    /** Places everything for the given second of the cutscene. */
+
     @Override
     public void update(double t) {
-        // Door: swings open, stays open.
-        // The door swings fully open, out into the hall and out of Nova's way, before Nova walks in.
+
+
         hinge.setAngle(-95 * ease(clamp((t - .4) / .9)));
 
-        // Walk in along the path, then stop at the desk and turn to it.
+
         double walk = clamp((t - 1.6) / 3.5);
         double[] at = along(walk);
         double[] ahead = along(Math.min(1, walk + .02));
@@ -89,14 +83,14 @@ public final class IntroScene extends CutsceneView {
         kid.setTranslateZ(at[1]);
         double heading = Math.toDegrees(Math.atan2(-(ahead[0] - at[0]), -(ahead[1] - at[1])));
         boolean walking = walk > 0 && walk < 1;
-        // At the desk Nova turns to wave hello, then turns to the laptop.
+
         double hello = ease(clamp((t - 5.1) / .4));
         double toDesk = ease(clamp((t - 6.2) / .5));
         double facing = walk <= 0 ? 0 : t < 5.1 ? heading : lerpAngle(lerpAngle(heading, 0, hello), 180, toDesk);
         kid.setRotationAxis(Rotate.Y_AXIS);
         kid.setRotate(facing);
         kid.bob(t, walking);
-        // Hands reach for the keyboard once the laptop is open.
+
         double reach = ease(clamp((t - 7.6) / .6));
         if (reach > 0) {
             kid.hands(0, reach);
@@ -105,11 +99,11 @@ public final class IntroScene extends CutsceneView {
             }
         }
         if (t > 5.4 && t < 6.2) {
-            // Waving hello to the player.
+
             kid.wave(t - 5.4);
         }
 
-        // Laptop lid opens; the screen lights up and loads.
+
         lid.setRotate(90 - 105 * ease(clamp((t - 6.8) / 1.0)));
         double loading = clamp((t - 7.9) / 2.2);
         boolean on = t > 7.3;
@@ -118,7 +112,7 @@ public final class IntroScene extends CutsceneView {
         double glow = on ? clamp((t - 7.3) / .6) : 0;
         screenGlow.setColor(Color.web("#22E3F2").deriveColor(0, 1, glow * .8, 1));
 
-        // Camera: wide shot, over the shoulder, then into the screen.
+
         double shoulder = ease(clamp((t - 6.2) / 1.3));
         double dive = ease(clamp((t - 10.2) / 1.7));
         double[] wide = {0, -3.1, -7.2, 0, -1.4, 3};
@@ -138,21 +132,20 @@ public final class IntroScene extends CutsceneView {
         return new double[] {lerp(WALK[leg][0], WALK[leg + 1][0], f), lerp(WALK[leg][1], WALK[leg + 1][1], f)};
     }
 
-    // ---- building ----
 
     private void buildRoom(Group room) {
         room.getChildren().addAll(
                 box(13, .2, 13, 0, .1, .5, "#6A4630"),
-                // The back wall has a doorway on the left.
+
                 box(1.4, 6.4, .2, -5.8, -3.2, 5.1, "#27427E"),
                 box(9.6, 6.4, .2, 1.7, -3.2, 5.1, "#27427E"),
                 box(2.0, 3.4, .2, -4.1, -4.7, 5.1, "#27427E"),
                 box(.2, 6.4, 11, -6.5, -3.2, 0, "#284380"),
                 box(.2, 6.4, 11, 6.5, -3.2, 0, "#284380"),
                 box(13, .2, 11, 0, -6.4, 0, "#1E3263"));
-        // Skirting board in the theme orange.
+
         room.getChildren().add(box(13, .25, .22, 0, -.12, 4.98, "#FF7A1A"));
-        // Round rug.
+
         var rug = new Cylinder(2.3, .04, 48);
         rug.setMaterial(ModelLibrary.surface("#22A6B5"));
         Meshes.at(rug, -.5, -.02, 1.6);
@@ -160,7 +153,7 @@ public final class IntroScene extends CutsceneView {
         rugInner.setMaterial(ModelLibrary.surface("#FFCB69"));
         Meshes.at(rugInner, -.5, -.03, 1.6);
         room.getChildren().addAll(rug, rugInner);
-        // Little stars on the wallpaper.
+
         var random = new java.util.SplittableRandom(4);
         for (int i = 0; i < 46; i++) {
             double x = random.nextDouble(-6.2, 6.2);
@@ -173,7 +166,7 @@ public final class IntroScene extends CutsceneView {
             Meshes.at(star, x, y, 4.98);
             room.getChildren().add(star);
         }
-        // Night window with a moon.
+
         room.getChildren().add(box(2.6, 1.9, .1, 2.6, -4.0, 5.0, "#0B1A44"));
         room.getChildren().add(frame(2.6, 1.9, 2.6, -4.0, 4.95));
         var moon = new Sphere(.32, 24);
@@ -186,7 +179,7 @@ public final class IntroScene extends CutsceneView {
             Meshes.at(star, 1.6 + random.nextDouble(1.9), -3.3 - random.nextDouble(1.3), 4.94);
             room.getChildren().add(star);
         }
-        // Rocket poster.
+
         var poster = new MeshView(Meshes.quad(1.3, 1.8));
         var posterMaterial = new PhongMaterial(Color.WHITE);
         posterMaterial.setDiffuseMap(poster());
@@ -195,13 +188,13 @@ public final class IntroScene extends CutsceneView {
         poster.setCullFace(CullFace.NONE);
         Meshes.at(poster, -1.6, -3.7, 4.98);
         room.getChildren().add(poster);
-        // Bed in the right corner.
+
         room.getChildren().addAll(
                 box(2.4, .5, 3.6, 5.1, -.35, 2.6, "#C07A47"),
                 box(2.3, .32, 3.5, 5.1, -.75, 2.6, "#F2F5FA"),
                 box(2.34, .2, 2.4, 5.1, -.95, 2.0, "#FF7A1A"),
                 box(1.4, .28, .7, 5.1, -1.02, 4.0, "#DCE8F7"));
-        // The door, hinged on its left edge, with warm hall light behind it.
+
         room.getChildren().add(box(3.2, 3.4, .05, -4.1, -1.7, 7.4, "#FFD08A"));
         var hallLight = new PointLight(Color.web("#FFC37A"));
         Meshes.at(hallLight, -4.1, -2.4, 6.6);
@@ -224,7 +217,7 @@ public final class IntroScene extends CutsceneView {
                 box(.12, 1.2, .12, DESK_X + 1.25, -.6, 2.95, "#16305E"),
                 box(.12, 1.2, .12, DESK_X - 1.25, -.6, 4.05, "#16305E"),
                 box(.12, 1.2, .12, DESK_X + 1.25, -.6, 4.05, "#16305E"));
-        // Desk lamp and a little globe.
+
         var lampBase = new Cylinder(.18, .06, 24);
         lampBase.setMaterial(ModelLibrary.surface("#FF7A1A"));
         Meshes.at(lampBase, DESK_X + 1.0, -1.33, 3.9);
@@ -239,7 +232,7 @@ public final class IntroScene extends CutsceneView {
         Meshes.at(globe, DESK_X - 1.0, -1.52, 3.8);
         room.getChildren().addAll(lampBase, lampStem, lampBulb, globe);
 
-        // Laptop: a base on the desk and a lid hinged at its back edge.
+
         room.getChildren().add(box(1.0, .05, .66, DESK_X, -1.325, 3.25, "#BAC6D4"));
         room.getChildren().add(box(.86, .01, .4, DESK_X, -1.355, 3.18, "#2A3040"));
         var shell = box(1.0, .68, .03, 0, -.34, 0, "#BAC6D4");
@@ -285,7 +278,7 @@ public final class IntroScene extends CutsceneView {
         return canvas.snapshot(null, null);
     }
 
-    /** The laptop screen: the LIFTOFF logo and a loading bar at the given progress. */
+
     private static Image loadingScreen(double progress) {
         var canvas = new Canvas(460, 300);
         var g = canvas.getGraphicsContext2D();

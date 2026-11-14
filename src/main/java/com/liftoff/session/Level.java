@@ -2,11 +2,7 @@ package com.liftoff.session;
 
 import java.util.List;
 
-/**
- * The five levels on a mission's road map. Mission levels group the workflow steps (the briefing
- * opens the first level instead of being a level of its own); the two mini-game levels sit
- * between them and never change the design or its outcome.
- */
+
 public enum Level {
     BUILD(Kind.MISSION, List.of(MissionStep.BRIEFING, MissionStep.PLAN, MissionStep.SHIP)),
     STAR_MATCH(Kind.MINI_GAME, List.of()),
@@ -28,12 +24,12 @@ public enum Level {
         return kind;
     }
 
-    /** The workflow steps played inside this level; empty for a mini-game. */
+
     public List<MissionStep> steps() {
         return steps;
     }
 
-    /** The number shown on the road map, starting at 1. */
+
     public int number() {
         return ordinal() + 1;
     }

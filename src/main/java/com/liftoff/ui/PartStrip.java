@@ -18,7 +18,7 @@ public final class PartStrip extends HBox {
     private final Runnable endDrag;
     private final List<PartCard> buttons = new ArrayList<>();
 
-    /** One row holding every part of the open module: the cards narrow to fit, so nothing scrolls. */
+
     PartStrip(UiText text, PartPreview preview, Consumer<ShipPart> onChoose,
               Consumer<ShipPart> onFocus, Runnable endDrag) {
         super(8);

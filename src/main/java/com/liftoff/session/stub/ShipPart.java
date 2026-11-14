@@ -5,7 +5,7 @@ import com.liftoff.model.ValueBasis;
 
 import java.util.List;
 
-/** TODO(Member 2): stub of model/ShipPart — one option in a tab. Same fields as the contract. */
+
 public record ShipPart(String id, ModuleSlot slot, String name, String kidName, String description,
                        String basedOn,
                        List<String> missions,

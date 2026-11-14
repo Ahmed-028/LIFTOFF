@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ScoreCalculatorTest {
 
-    /** What the fixture design must return: 100 kbps x 86,400 / 1e6 Gbit a day for 12 months. */
+
     private static final double REQUIRED_GBIT = 100 * 86_400 / 1e6 * SimRules.DAYS_PER_MONTH * 12;
 
     private static final Mission MOON =
@@ -118,7 +118,7 @@ class ScoreCalculatorTest {
 
     @Test
     void aTightResourceEarnsHalfItsMarginCreditAndAnOverOrUnknownOneEarnsNone() {
-        // 50 W drawn of 55 W is over 85 %: TIGHT. 50 W of 40 W: OVER. No rocket: mass limit UNKNOWN.
+
         MissionDesign tight = SimFixtures.design().withBus(TestParts.bus("bus", 100, 55, 10, 10, 12));
         MissionDesign over = SimFixtures.design().withBus(TestParts.bus("bus", 100, 40, 10, 10, 12));
         MissionDesign unknown = SimFixtures.design().withLaunchVehicle(null);
@@ -138,7 +138,7 @@ class ScoreCalculatorTest {
 
     @Test
     void spendingOverTheCapScalesTheBudgetPointsDown() {
-        // The fixture costs 47; a cap of 23.5 is half of that.
+
         MissionDesign overspent = SimFixtures.design().withObjective(SimFixtures.objective(80, 23.5, 200));
 
         assertEquals(5 + 10, score(overspent, null).budgetTime(), 1e-9);
@@ -146,7 +146,7 @@ class ScoreCalculatorTest {
 
     @Test
     void finishingLateScalesTheTimePointsDownAndALaunchSlipCounts() {
-        // The fixture takes 32 months.
+
         MissionDesign late = SimFixtures.design().withObjective(SimFixtures.objective(80, 1000, 16));
         MissionDesign justInTime = SimFixtures.design().withObjective(SimFixtures.objective(80, 1000, 32));
 

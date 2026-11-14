@@ -13,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ShipPartTest {
 
-    /** Builds a part with only the fields these tests care about; every number is 0. */
+
     private static ShipPart part(String id, ModuleSlot slot, List<String> missions, SourceRef source) {
         return new ShipPart(id, slot, id, id, "", "", missions,
-                0, 0, 0,          // massKg, powerSupplyW, powerDrawW
-                0, 0, 0,          // payloadMassKg, bayLengthM, bayDiameterM
-                0, 0,             // lengthM, diameterM
-                0, 0, 0,          // thrustN, specificImpulseS, propellantCapacityKg
-                0, 0, ValueBasis.GAME_ESTIMATE,   // dataGbitPerDay, costMusd, costBasis
+                0, 0, 0,
+                0, 0, 0,
+                0, 0,
+                0, 0, 0,
+                0, 0, ValueBasis.GAME_ESTIMATE,
                 "model-" + id, source);
     }
 
@@ -38,7 +38,7 @@ class ShipPartTest {
 
     @Test
     void rejectsMissingSource() {
-        // A part without a source would break the data rule: every number must say where it comes from.
+        // Reject parts without sources so their values stay traceable.
         assertThrows(NullPointerException.class,
                 () -> part("p", ModuleSlot.POWER, List.of(), null));
     }
@@ -47,8 +47,8 @@ class ShipPartTest {
     void missionListCannotBeChangedFromOutside() {
         List<String> missions = new ArrayList<>(List.of("farm-watch"));
         ShipPart p = part("p", ModuleSlot.POWER, missions, TestParts.SOURCE);
-        missions.add("moon-landing");                       // change the original list...
-        assertEquals(List.of("farm-watch"), p.missions());  // ...the part must not change
+        missions.add("moon-landing");
+        assertEquals(List.of("farm-watch"), p.missions());
     }
 
     @Test
@@ -57,11 +57,11 @@ class ShipPartTest {
         assertThrows(UnsupportedOperationException.class, () -> p.missions().add("mars-drones"));
     }
 
-    /** A part where one number is set and the rest are 0; position counts from massKg = 0. */
+
     private static ShipPart withNumber(ModuleSlot slot, int position, double value) {
         double[] n = new double[13];
         if (slot == ModuleSlot.THRUSTERS) {
-            n[9] = 300;   // a thruster always needs a specific impulse
+            n[9] = 300;
         }
         n[position] = value;
         return new ShipPart("p", slot, "p", "p", "", "", List.of(),
@@ -71,8 +71,8 @@ class ShipPartTest {
 
     @Test
     void rejectsANegativeNumberInAnyField() {
-        // massKg, powerSupplyW, powerDrawW, payloadMassKg, bayLengthM, bayDiameterM, lengthM, diameterM,
-        // thrustN, specificImpulseS, propellantCapacityKg, dataGbitPerDay, costMusd
+
+
         for (int position = 0; position < 13; position++) {
             int field = position;
             assertThrows(IllegalArgumentException.class,
@@ -89,7 +89,7 @@ class ShipPartTest {
 
     @Test
     void aThrusterMustHaveASpecificImpulse() {
-        // The rocket equation divides by Isp: a thruster without one cannot be worked out.
+        // Fuel calculations require every thruster to specify Isp.
         assertThrows(IllegalArgumentException.class, () -> withNumber(ModuleSlot.THRUSTERS, 9, 0));
         assertEquals(300, withNumber(ModuleSlot.THRUSTERS, 0, 20).specificImpulseS());
     }

@@ -3,7 +3,7 @@ package com.liftoff.session.stub;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Checks ship fit, power and propellant for the mission's build review. */
+
 public final class BuildCalculator {
 
     private static final double STANDARD_GRAVITY = 9.80665;
@@ -11,7 +11,7 @@ public final class BuildCalculator {
     private BuildCalculator() {
     }
 
-    /** {@code mission} may be null while no mission is selected. */
+
     public static BuildReport calculate(ShipBuild build, Mission mission) {
         return calculate(build, mission, 0, 0, 0, 0);
     }

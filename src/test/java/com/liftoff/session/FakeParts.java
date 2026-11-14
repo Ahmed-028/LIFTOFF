@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/** Hand-made parts for flow tests. Every figure is zero: these are test fakes, not real hardware. */
+
 final class FakeParts {
 
     private FakeParts() {
@@ -22,7 +22,7 @@ final class FakeParts {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null, id, null);
     }
 
-    /** Two parts per slot: "airframe-a", "airframe-b", "thrusters-a", ... */
+
     static List<ShipPart> all() {
         return Stream.of(ModuleSlot.values())
                 .flatMap(slot -> Stream.of("a", "b").map(suffix -> part(idOf(slot, suffix), slot)))
@@ -38,7 +38,7 @@ final class FakeParts {
         return id -> Optional.ofNullable(byId.get(id));
     }
 
-    /** A build with the "a" part in every slot. */
+
     static ShipBuild completeBuild() {
         ShipBuild build = ShipBuild.empty();
         for (ModuleSlot slot : ModuleSlot.values()) {

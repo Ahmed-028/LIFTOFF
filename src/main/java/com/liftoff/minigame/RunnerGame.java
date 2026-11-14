@@ -5,19 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SplittableRandom;
 
-/**
- * Asteroid Dash, the second mini-game: ride a hover-board down a three-lane space track to the
- * finish. Low rocks are jumped, high beams are ducked under, big boulders block a whole lane and
- * stars are collected. Every row of obstacles leaves at least one lane clear. Three shields;
- * a hit costs one and gives a moment of safety. Just for fun: nothing here touches the mission.
- *
- * <p>Distances are in game metres along the track, ahead of the rider (rider at 0).
- */
+
 public final class RunnerGame {
 
     public enum Kind { ROCK, BEAM, BOULDER, STAR }
 
-    /** Something on the track, {@code z} metres ahead of the rider. */
+
     public static final class Thing {
         private final Kind kind;
         private final int lane;
@@ -42,7 +35,7 @@ public final class RunnerGame {
             return z;
         }
 
-        /** Collected (a star) or already hit. */
+
         public boolean done() {
             return done;
         }
@@ -75,12 +68,12 @@ public final class RunnerGame {
     private int hits;
     private double nextRow;
 
-    /** A medium ride, for tests. */
+
     RunnerGame(long seed, boolean calm) {
         this(seed, Challenge.MEDIUM, calm);
     }
 
-    /** @param calm slower and gentler, for calm mode */
+
     public RunnerGame(long seed, Challenge challenge, boolean calm) {
         this.random = new SplittableRandom(seed);
         this.challenge = challenge;
@@ -115,7 +108,7 @@ public final class RunnerGame {
         }
     }
 
-    /** Moves the game on by the given seconds. Does nothing once the run is over. */
+
     public void update(double seconds) {
         if (over() || seconds <= 0) {
             return;
@@ -191,7 +184,7 @@ public final class RunnerGame {
         return free == 1 ? 0 : free + 1;
     }
 
-    /** The lane the rider counts as being in for collisions. */
+
     public int currentLane() {
         return (int) Math.round(laneX);
     }
@@ -204,7 +197,7 @@ public final class RunnerGame {
         return lane;
     }
 
-    /** Height of the jump right now, in metres. */
+
     public double height() {
         if (jumpClock <= 0) {
             return 0;
@@ -221,7 +214,7 @@ public final class RunnerGame {
         return duckClock > 0;
     }
 
-    /** True for a moment after a hit, while the rider cannot be hit again. */
+
     public boolean safe() {
         return safeClock > 0;
     }
@@ -238,7 +231,7 @@ public final class RunnerGame {
         return speed;
     }
 
-    /** Length of the ride in game metres. */
+
     public double finish() {
         return finish;
     }
@@ -275,12 +268,12 @@ public final class RunnerGame {
         return Collections.unmodifiableList(things);
     }
 
-    /** Puts a thing on the track, for tests. */
+
     void place(Kind kind, int lane, double z) {
         things.add(new Thing(kind, lane, z));
     }
 
-    /** Removes everything from the track, for tests. */
+
     void clearTrack() {
         things.clear();
         nextRow = Double.MAX_VALUE / 4;

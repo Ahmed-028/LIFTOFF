@@ -1,17 +1,6 @@
-/*
- * LIFTOFF hangar theme for young explorers (ages 7-13).
- *
- * One navy hangar shell around every screen: cyan shows focus and picks, orange means "go"
- * (one primary action per screen). Mission screens add a world class (.world-earth,
- * .world-moon or .world-mars) that recolours the background and panels through the
- * -world-* looked-up colours below. State is never shown by colour alone: every picked,
- * locked or warning state also carries a word or a symbol.
- *
- * The same tokens live in com.liftoff.render.Theme for drawn and 3D art (ThemeTest keeps them
- * equal); the written style guide is docs/style-guide.md.
- */
 
-/* ---------- Tokens ---------- */
+
+
 .root {
     -navy-950: #050E26;
     -navy-900: #071330;
@@ -31,7 +20,7 @@
     -alert: #FFACA4;
     -good: #8BE07A;
 
-    /* Bright choice cards that sit on the darker panels. */
+
     -card: #F2F8FF;
     -card-hover: #FFFFFF;
     -card-ink: #0B1A38;
@@ -43,7 +32,7 @@
     -chip-ink: #16305E;
     -report-accent: #3B6FD1;
 
-    /* World colours. The shell values here are replaced per mission destination. */
+    /* Mission worlds override these tokens. */
     -world-top: #12285A;
     -world-bottom: #071330;
     -world-panel: #0D1E42;
@@ -91,7 +80,7 @@
     -world-soft: #FFE1D2;
 }
 
-/* ---------- Screens ---------- */
+
 .screen {
     -fx-padding: 18 28 16 28;
     -fx-background-color: linear-gradient(to bottom, -world-top 0%, -world-bottom 100%);
@@ -109,7 +98,7 @@
             linear-gradient(to bottom, -world-top 0%, -world-bottom 100%);
 }
 
-/* ---------- Type ---------- */
+
 .label, .check-box, .radio-button { -fx-text-fill: -text; }
 
 .game-title, .screen-heading {
@@ -161,7 +150,7 @@
 .muted { -fx-text-fill: -world-soft; -fx-font-size: 15px; -fx-line-spacing: 3; }
 .reading-value { -fx-text-fill: -cyan-soft; -fx-font-size: 16px; -fx-font-weight: bold; }
 
-/* ---------- Shell bars ---------- */
+
 .selection-header, .command-bar {
     -fx-background-color: rgba(7, 19, 48, 0.88);
     -fx-background-radius: 20;
@@ -192,7 +181,7 @@
 
 .action-hint { -fx-text-fill: -text-soft; -fx-font-size: 15px; }
 
-/* ---------- Panels and cards ---------- */
+
 .panel, .part-strip {
     -fx-background-color: -world-panel;
     -fx-background-radius: 22;
@@ -257,7 +246,7 @@
 .extra-missions, .source-rows { -fx-padding: 14; -fx-spacing: 14; }
 .mission-art { -fx-background-color: -navy-950; -fx-background-radius: 18; }
 
-/* ---------- Scroll areas ---------- */
+
 .scroll-pane, .scroll-pane > .viewport, .scroll-pane > .corner,
 .clear-scroll, .clear-scroll > .viewport, .inspection-scroll, .inspection-scroll > .viewport {
     -fx-background-color: transparent;
@@ -269,7 +258,7 @@
 .scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-background-color: transparent; }
 .scroll-bar .increment-arrow, .scroll-bar .decrement-arrow { -fx-background-color: rgba(195, 211, 238, 0.55); }
 
-/* ---------- Buttons ---------- */
+
 .button, .toggle-button, .choice-box, .text-field {
     -fx-background-color: -navy-700;
     -fx-background-radius: 14;
@@ -320,7 +309,7 @@
 
 .button.big { -fx-font-size: 24px; -fx-padding: 14 40; -fx-min-height: 64; -fx-background-radius: 20; -fx-border-radius: 20; }
 
-/* Mission steps: current = cyan with a dot, open = outline, locked = dashed edge and a word. */
+
 .stepper { -fx-spacing: 8; -fx-alignment: center-right; }
 .button.step {
     -fx-font-size: 15px;
@@ -349,7 +338,7 @@
 .hyperlink { -fx-text-fill: -cyan-soft; -fx-padding: 0; -fx-font-size: 16px; -fx-underline: true; }
 .hyperlink:focused { -fx-border-color: -cyan; -fx-border-width: 2; -fx-border-radius: 6; }
 
-/* ---------- Form controls ---------- */
+
 .check-box { -fx-cursor: hand; -fx-font-size: 17px; -fx-label-padding: 0 0 0 10; }
 .check-box > .box {
     -fx-background-color: -navy-800;
@@ -415,7 +404,7 @@
 }
 .titled-pane:focused > .title { -fx-border-color: -cyan; -fx-border-width: 3; }
 
-/* ---------- Tooltips ---------- */
+
 .tooltip {
     -fx-background-color: -card;
     -fx-text-fill: -card-ink;
@@ -425,7 +414,7 @@
     -fx-effect: dropshadow(gaussian, rgba(5, 14, 38, 0.5), 12, 0.2, 0, 3);
 }
 
-/* ---------- Choice cards (instruments, ground stations) ---------- */
+
 .choice-card {
     -fx-background-color: -card;
     -fx-background-radius: 20;
@@ -491,7 +480,7 @@
 
 .choice-heading { -fx-font-size: 28px; -fx-font-weight: bold; }
 
-/* ---------- Briefing ---------- */
+
 .briefing-difficulty {
     -fx-padding: 8 14;
     -fx-background-radius: 999;
@@ -525,7 +514,7 @@
 .goal-row.bonus .goal-badge { -fx-text-fill: -card-ink; -fx-background-color: transparent; -fx-border-color: -world-line; -fx-border-width: 2; }
 .briefing-target { -fx-font-weight: bold; }
 
-/* ---------- Ship builder ---------- */
+
 .builder { -fx-padding: 12 0 0 0; }
 .ship-screen { -fx-padding: 14 24 12 24; }
 .ship-screen .screen-heading { -fx-font-size: 32px; }
@@ -651,7 +640,7 @@
     -fx-border-color: transparent transparent rgba(195, 211, 238, 0.25) transparent;
 }
 
-/* ---------- Gauges ---------- */
+
 .gauge-label { -fx-font-size: 14px; -fx-font-weight: bold; -fx-graphic-text-gap: 7; }
 .gauge-reading { -fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: -cyan-soft; }
 .compact-gauge .gauge-reading { -fx-font-size: 15px; }
@@ -673,7 +662,7 @@
 .live-readings { -fx-border-color: -world-line; }
 .live-readings .gauge-label { -fx-text-fill: -text; }
 
-/* ---------- Warnings ---------- */
+
 .warnings { -fx-padding: 4 0 0 0; -fx-spacing: 8; }
 .warning {
     -fx-font-size: 15px;
@@ -684,7 +673,7 @@
     -fx-padding: 8 12;
 }
 
-/* ---------- Supplies ---------- */
+
 .supplies-tabs { -fx-tab-min-height: 44; }
 .supplies-tabs > .tab-header-area { -fx-padding: 0 0 8 0; }
 .supplies-tabs > .tab-header-area > .tab-header-background { -fx-background-color: transparent; }
@@ -719,7 +708,7 @@
 .preview-card .reading-value { -fx-text-fill: #0B6F7A; }
 .preview-card .discover-label { -fx-text-fill: #0B6F7A; -fx-font-size: 13px; -fx-font-weight: bold; }
 
-/* ---------- Launch, flight and report ---------- */
+
 .countdown, .score { -fx-text-fill: -cyan-soft; -fx-font-size: 54px; -fx-font-weight: bold; }
 .launch-pad {
     -fx-background-color: -navy-950;
@@ -773,7 +762,7 @@
 .report-card.broke { -report-accent: #D9822B; }
 .report-card.try { -report-accent: #3B6FD1; }
 
-/* ---------- Sources ---------- */
+
 .source-card {
     -fx-background-color: -card;
     -fx-background-radius: 18;
@@ -786,7 +775,7 @@
 .source-card .hyperlink { -fx-text-fill: #1D4F8C; }
 .link-status { -fx-padding: 10 4 0 4; }
 
-/* ---------- Mission goal, fix-it hints and builder status ---------- */
+
 .mission-goal {
     -fx-background-color: -card-picked;
     -fx-background-radius: 14;
@@ -822,7 +811,7 @@
     -fx-font-size: 15px;
 }
 
-/* ---------- Flight and landing scenes ---------- */
+
 .flight-viewport {
     -fx-background-color: -navy-950;
     -fx-border-color: -world-line;
@@ -841,7 +830,7 @@
 .flight-console .telemetry { -fx-font-size: 15px; -fx-line-spacing: 4; }
 .flight-console .eyebrow { -fx-text-fill: -world-soft; }
 
-/* ---------- Cockpit ---------- */
+
 .cockpit-panel {
     -fx-padding: 12 16;
     -fx-spacing: 10;
@@ -853,7 +842,7 @@
 .cockpit-panel .eyebrow { -fx-max-width: Infinity; -fx-alignment: center; -fx-font-size: 15px; }
 .cockpit-panel .button { -fx-min-height: 44; }
 
-/* The flight screen keeps its bottom bar visible at the smallest window size. */
+/* Keep the flight action bar visible at 660px. */
 .fly-screen .page-content { -fx-padding: 10 2 4 2; }
 .fly-screen .screen-heading { -fx-font-size: 34px; }
 .fly-screen .flight-console { -fx-spacing: 6; -fx-padding: 14 16; }
@@ -862,7 +851,7 @@
 .fly-screen .list-cell { -fx-padding: 5 10; -fx-font-size: 15px; }
 .fly-screen .supplies-tabs > .tab-header-area { -fx-padding: 0 0 6 0; }
 
-/* ---------- Road map ---------- */
+
 .map-frame {
     -fx-background-color: radial-gradient(center 50% 40%, radius 75%, rgba(255, 255, 255, 0.08) 0%, transparent 100%),
             rgba(5, 14, 38, 0.55);
@@ -909,7 +898,7 @@
 .level-state { -fx-font-size: 14px; -fx-text-fill: -text-soft; }
 .level-done .level-state, .level-state.level-done { -fx-text-fill: -good; }
 
-/* ---------- Mini-games ---------- */
+
 .game-frame {
     -fx-background-color: radial-gradient(center 50% 30%, radius 80%, rgba(255, 255, 255, 0.06) 0%, transparent 100%),
             rgba(5, 14, 38, 0.6);
@@ -972,7 +961,7 @@
 .dash-controls { -fx-spacing: 10; -fx-alignment: center; }
 .dash-controls .button { -fx-min-width: 110; }
 
-/* ---------- Intro cutscene ---------- */
+
 .intro-screen { -fx-background-color: -navy-950; }
 .cutscene-caption {
     -fx-background-color: rgba(5, 14, 38, 0.86);
@@ -990,7 +979,7 @@
 .intro-skip { -fx-translate-x: -22; -fx-translate-y: 22; }
 .intro-fade { -fx-background-color: -navy-950; }
 
-/* ---------- Expandable cards ---------- */
+
 .choice-card .hyperlink.details-toggle {
     -fx-text-fill: #0B6F7A;
     -fx-font-size: 14px;
@@ -1016,7 +1005,7 @@
     -fx-padding: 10;
 }
 
-/* ---------- Over-limit tips ---------- */
+
 .button.gauge-fix {
     -fx-background-color: rgba(255, 172, 164, 0.18);
     -fx-text-fill: -alert;
@@ -1056,7 +1045,7 @@
 .button.ending-button { -fx-border-color: -amber; -fx-text-fill: -amber; }
 .button.ending-button:hover { -fx-background-color: rgba(255, 203, 105, 0.16); }
 
-/* ---------- Settings menu ---------- */
+
 .button.settings-button {
     -fx-padding: 6 10;
     -fx-min-height: 42;
@@ -1088,11 +1077,11 @@
     -fx-text-fill: -text;
 }
 
-/* ---------- Science tool families ---------- */
+
 .tool-group-title { -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: -world-accent; }
 .plan-panel { -fx-padding: 20; }
 
-/* ---------- Report: points and what could have been used better ---------- */
+
 .points-chip {
     -fx-background-radius: 999;
     -fx-padding: 6 14;
@@ -1108,7 +1097,7 @@
 .report-card .better-finding { -fx-font-weight: bold; -fx-font-size: 17px; }
 .report-card .better-swap { -fx-text-fill: #0B6F7A; -fx-font-weight: bold; -fx-font-size: 15px; }
 
-/* ---------- Nova's tutorial ---------- */
+
 .guide-ring {
     -fx-fill: transparent;
     -fx-stroke: -cyan;

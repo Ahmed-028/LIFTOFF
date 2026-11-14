@@ -30,10 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Plays Mission 1 from briefing to report through GameSession only, with the real catalog.
- * Zero-mass test modules isolate the launch, flight and score checks in these scenarios.
- */
+
 class FullMissionTest {
 
     private static final long SEED = 2026;
@@ -57,7 +54,7 @@ class FullMissionTest {
         session = new GameSession(catalog, FakeParts.lookup(), log);
     }
 
-    /** Briefing, ship and supplies for Farm Watch, up to a confirmed build standing on the launch step. */
+
     private void designFarmWatch(String busId, String instrumentId, String rocketId) {
         session.selectMission("farm-watch");
         session.next();
@@ -100,7 +97,7 @@ class FullMissionTest {
         Report report = session.report().orElseThrow();
         assertEquals("report.broke.nothing", report.brokeFirst().messageKey());
         assertEquals("report.try.thinnestMargin", report.tryNext().messageKey());
-        // ALI's 100 W of the EO-1 class bus's 115 W is the tightest gauge of this design.
+
         assertEquals("POWER", report.tryNext().params().get(0));
         assertEquals(ResourceLevel.TIGHT, session.resources().get(ResourceType.POWER).level());
         assertFalse(report.worked().isEmpty());
@@ -155,7 +152,7 @@ class FullMissionTest {
         session.fly(SEED);
         session.next();
 
-        // MODIS also draws more than the bus supplies, but the wrong instrument comes first.
+
         assertEquals(SimLimit.POWER, session.simulation().orElseThrow().firstLimit());
         Report report = session.report().orElseThrow();
         assertEquals("report.broke.requirementTooCoarse", report.brokeFirst().messageKey());
@@ -187,7 +184,7 @@ class FullMissionTest {
         assertTrue(session.simulation().isEmpty());
         assertFalse(session.isUnlocked(MissionStep.LAUNCH));
 
-        // Swap the instrument and fly again: this time it works, and a second entry is logged.
+
         session.removeInstrument("modis");
         session.addInstrument("ali");
         session.goTo(MissionStep.SUPPLIES);
@@ -264,7 +261,7 @@ class FullMissionTest {
                 .anyMatch(issue -> issue.kind() == BuildIssue.Kind.POWER_SHORT));
         session.choosePart("mmrtg");
 
-        // This seed draws the bundled InSight dust-storm card during the six-month flight.
+
         finishFlight(23);
 
         var result = session.simulation().orElseThrow();

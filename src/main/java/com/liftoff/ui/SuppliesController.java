@@ -58,7 +58,7 @@ public final class SuppliesController extends MissionScreen {
         catalog.instruments().stream()
                 .sorted(Comparator.comparingInt(item -> measurementPriority(item, goal)))
                 .forEach(item -> groups.computeIfAbsent(ToolGroup.of(item), key -> new ArrayList<>()).add(item));
-        // Groups holding a tool for the must-do goal come first; inside a group the best match leads.
+
         groups.entrySet().stream()
                 .sorted(Comparator.comparingInt(group -> measurementPriority(group.getValue().getFirst(), goal)))
                 .forEach(group -> {
@@ -88,10 +88,7 @@ public final class SuppliesController extends MissionScreen {
         readout.getChildren().add(warnings);
     }
 
-    /**
-     * A science tool card. What the tool does and what it measures are always on the card; the
-     * figures of the real instrument open under "More details".
-     */
+
     private ChoiceCard instrumentCard(Instrument instrument, Objective goal) {
         var option = new CheckBox(instrument.kidName());
         option.setId("instrument-" + instrument.id());
@@ -124,7 +121,7 @@ public final class SuppliesController extends MissionScreen {
         return card;
     }
 
-    /** The published figures of the real instrument, shown once "More details" is opened. */
+    // Show cited instrument values in the expanded details.
     private List<Node> instrumentDetails(Instrument instrument) {
         var content = new ArrayList<Node>();
         content.add(text.label(text.get("supplies.resolutionTitle"), "discover-label"));
@@ -161,7 +158,7 @@ public final class SuppliesController extends MissionScreen {
         return content;
     }
 
-    /** A figure with an "about" sign in front when the catalog marks it as a game estimate. */
+    // Prefix estimates with "about" so they are not mistaken for published values.
     private String basis(String key, double value, ValueBasis basis) {
         return (basis == ValueBasis.GAME_ESTIMATE ? "\u2248" : "") + text.get(key, value);
     }
@@ -220,11 +217,11 @@ public final class SuppliesController extends MissionScreen {
         node.setManaged(visible);
     }
 
-    /** Science tools that do a similar job, so the list reads as a few families instead of one long row. */
+
     private enum ToolGroup {
         CAMERA, HEAT, MICROWAVE, LASER, GROUND, WEATHER;
 
-        /** The family of the tool's main (first listed) measurement. */
+
         static ToolGroup of(Instrument instrument) {
             return switch (instrument.capabilities().getFirst().type()) {
                 case LAND_IMAGING, CLOUD_IMAGING, LIGHTNING, MARS_SURFACE_IMAGING -> CAMERA;

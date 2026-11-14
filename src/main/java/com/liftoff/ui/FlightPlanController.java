@@ -17,11 +17,7 @@ import javafx.util.StringConverter;
 import java.util.Arrays;
 import java.util.function.Function;
 
-/**
- * The flight plan, chosen before the ship is built: the rocket, the science orbit (Earth
- * missions) and how long the science lasts. Knowing the rocket first tells the player how
- * heavy the ship may be.
- */
+
 public final class FlightPlanController extends MissionScreen {
     @FXML private ChoiceBox<LaunchVehicle> rocket;
     @FXML private Label rocketAbout;
@@ -107,7 +103,7 @@ public final class FlightPlanController extends MissionScreen {
                 .filter(issue -> issue.kind() == DesignIssue.Kind.ORBIT_MISSES_TARGET).toList());
     }
 
-    /** The class of orbit the rocket must reach: the chosen orbit's on Earth, else the destination's. */
+
     private LaunchClass launchClass(Orbit chosen) {
         return switch (mission().destination()) {
             case EARTH -> chosen == null ? LaunchClass.LOW_INCLINATION : chosen.launchClass();

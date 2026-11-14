@@ -5,15 +5,10 @@ import javafx.scene.shape.Box;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
-/**
- * A simple blocky character for the cutscenes, built only from boxes like the cockpit pilot:
- * a box head with a drawn-on face, a box body, and arms and legs that swing at the shoulders and
- * hips. Nova wears space goggles pushed up on the forehead. The figure faces -Z (towards a
- * default camera) and stands on y = 0.
- */
+
 final class RoundFigure extends Group {
 
-    /** What the figure looks like. */
+
     record Look(boolean grownUp, String suit, String trim, String legs, String skin, String hair, boolean goggles) {
         static final Look KID_NOVA = new Look(false, "#F2F5FA", "#FF7A1A", "#DCE8F7", "#F6C9A0", "#5A3A2A", true);
         static final Look GROWN_UP_NOVA = new Look(true, "#16305E", "#FF7A1A", "#0D1E42", "#F6C9A0", "#5A3A2A", true);
@@ -36,8 +31,8 @@ final class RoundFigure extends Group {
     private final double headY;
 
     RoundFigure(Look look) {
-        // Everyone has Nova's shape; grown-ups are the same figure drawn a little bigger,
-        // in a jacket instead of a space suit.
+
+
         boolean big = look.grownUp();
         double legLength = .74;
         double torsoHeight = .95;
@@ -50,7 +45,7 @@ final class RoundFigure extends Group {
         shoulderY = torsoTop + .12;
         headY = torsoTop - .06 - headSize / 2;
 
-        // Legs, hinged at the hips, with chunky boots.
+
         for (int side : new int[] {-1, 1}) {
             var leg = side < 0 ? leftLeg : rightLeg;
             var swing = side < 0 ? leftLegSwing : rightLegSwing;
@@ -61,7 +56,7 @@ final class RoundFigure extends Group {
             getChildren().add(leg);
         }
 
-        // Body: torso, belt stripe, chest badge and either a backpack or a jacket stripe and collar.
+
         body.getChildren().addAll(
                 box(torsoWidth, torsoHeight, torsoDepth, 0, hipY - torsoHeight / 2, 0, look.suit()),
                 box(torsoWidth + .03, .13, torsoDepth + .03, 0, hipY - .16, 0, look.trim()),
@@ -74,7 +69,7 @@ final class RoundFigure extends Group {
             body.getChildren().add(box(.62, .66, .26, 0, torsoTop + .46, torsoDepth / 2 + .13, look.trim()));
         }
 
-        // Arms, hinged at the shoulders: sleeve, cuff and a hand (white gloves for young Nova).
+
         for (int side : new int[] {-1, 1}) {
             var arm = side < 0 ? leftArm : rightArm;
             var swing = side < 0 ? leftArmSwing : rightArmSwing;
@@ -88,7 +83,7 @@ final class RoundFigure extends Group {
             body.getChildren().add(arm);
         }
 
-        // Head with a simple face.
+
         double front = -headSize * .45 - .01;
         body.getChildren().addAll(
                 box(.24, .1, .24, 0, torsoTop - .03, 0, look.skin()),
@@ -100,12 +95,12 @@ final class RoundFigure extends Group {
                     box(.12, .07, .02, side * .27, headY + .1, front, "#FF9DA8"),
                     box(.06, .2, .2, side * (headSize / 2 + .03), headY + .02, 0, look.skin()));
         }
-        // Smile: a short bar with two raised corners.
+
         body.getChildren().addAll(
                 box(.16, .04, .03, 0, headY + .17, front, "#7A2E2E"),
                 box(.05, .04, .03, -.1, headY + .14, front, "#7A2E2E"),
                 box(.05, .04, .03, .1, headY + .14, front, "#7A2E2E"));
-        // Hair: a block on top, the back and a fringe.
+
         double top = headY - headSize * .475;
         body.getChildren().addAll(
                 box(headSize + .04, .16, headSize * .9 + .04, 0, top - .02, 0, look.hair()),
@@ -116,7 +111,7 @@ final class RoundFigure extends Group {
         }
 
         getChildren().add(body);
-        // Grown-ups are scaled about the feet, so they still stand on y = 0 whatever their arms do.
+
         scale = big ? GROWN_UP : 1;
         if (big) {
             getTransforms().add(new javafx.scene.transform.Scale(scale, scale, scale, 0, 0, 0));
@@ -127,7 +122,7 @@ final class RoundFigure extends Group {
     private static final double GROWN_UP = 1.18;
     private double scale;
 
-    /** Space goggles pushed up on the forehead: an orange strap and two glowing cyan lenses. */
+
     private void addGoggles(double headSize, double top, double front) {
         double y = top + .17;
         body.getChildren().add(box(headSize + .07, .1, headSize * .9 + .07, 0, y, 0, "#FF7A1A"));
@@ -139,10 +134,7 @@ final class RoundFigure extends Group {
         body.getChildren().add(box(.08, .06, .06, 0, y - .02, front - .04, "#16305E"));
     }
 
-    /**
-     * Arms by the sides; {@code swing} moves them back and forth (walking), {@code reach} lifts
-     * them forward to work at a desk or hold something.
-     */
+
     void hands(double swing, double reach) {
         leftArmRaise.setAngle(6);
         rightArmRaise.setAngle(-6);
@@ -150,25 +142,25 @@ final class RoundFigure extends Group {
         rightArmSwing.setAngle(-swing * 110 - 72 * reach);
     }
 
-    /** Small tapping movements while reaching forward to a keyboard. */
+
     void type(double t) {
         leftArmSwing.setAngle(-72 + Math.sin(t * 22) * 4);
         rightArmSwing.setAngle(-72 - Math.sin(t * 22) * 4);
     }
 
-    /** The right arm up beside the head, waving. */
+
     void wave(double t) {
         rightArmSwing.setAngle(0);
         rightArmRaise.setAngle(-150 + Math.sin(t * 9) * 16);
     }
 
-    /** The right arm held straight out to the side, pointing. */
+
     void point() {
         rightArmSwing.setAngle(-20);
         rightArmRaise.setAngle(-92);
     }
 
-    /** Both arms straight up, holding something high. */
+
     void cheer(double t) {
         double bounce = Math.sin(t * 6) * 3;
         leftArmSwing.setAngle(-14);
@@ -177,12 +169,12 @@ final class RoundFigure extends Group {
         rightArmRaise.setAngle(-166 - bounce);
     }
 
-    /** How high the hands are when cheering, measured from the feet, after any scaling. */
+
     double handsHighY() {
         return (shoulderY - armLength * .95) * scale;
     }
 
-    /** A walking step; standing still when {@code walking} is false. */
+
     void bob(double t, boolean walking) {
         double stride = walking ? Math.sin(t * 9) : 0;
         body.setTranslateY(walking ? -Math.abs(stride) * .06 : 0);

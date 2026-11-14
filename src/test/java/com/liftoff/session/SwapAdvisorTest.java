@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Round, obviously made-up numbers: these test the ranking, not any real hardware. */
+
 class SwapAdvisorTest {
 
     private static ShipPart part(String id, ModuleSlot slot, double mass, double cost, double supply, double draw) {
@@ -24,7 +24,7 @@ class SwapAdvisorTest {
                 mass, supply, draw, 0, 0, 0, 0, 0, 0, 0, 0, 0, cost, null, id, null);
     }
 
-    /** A pretend calculator: sums the parts, warns over 100 $M and when power runs short. */
+
     private static BuildReport calculate(ShipBuild build) {
         double mass = 0;
         double cost = 0;
@@ -75,8 +75,8 @@ class SwapAdvisorTest {
 
     @Test
     void aSwapThatCausesANewWarningRanksBelowOneThatDoesNot() {
-        // Budget 105: both the small body (saves 50) and dropping the power part (saves 25) fix it,
-        // but no power part leaves the body's 10 W draw unpowered.
+
+
         var tips = SwapAdvisor.suggest(Goal.BUDGET, build, options, SwapAdvisorTest::calculate, 0, 105, 3);
         assertEquals("small-body", tips.get(0).to().id());
         assertTrue(tips.get(1).newProblems().contains(BuildIssue.Kind.POWER_SHORT));
@@ -93,7 +93,7 @@ class SwapAdvisorTest {
 
     @Test
     void massCountsWhatIsOutsideTheShipToo() {
-        // 550 kg of parts plus 100 kg of science tools against a 600 kg rocket.
+
         assertEquals(50, SwapAdvisor.overBy(Goal.MASS, calculate(build), 100, 600), 1e-9);
         var tips = SwapAdvisor.suggest(Goal.MASS, build, options, SwapAdvisorTest::calculate, 100, 600, 1);
         assertEquals(1, tips.size());

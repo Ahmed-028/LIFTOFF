@@ -35,7 +35,7 @@ class MissionFlowTest {
         flow.partsChanged();
     }
 
-    /** Briefing read, ship complete, supplies visited, standing on REVIEW. */
+
     private void reachReview() {
         flow.next();
         flow.next();

@@ -29,7 +29,7 @@ import javafx.util.Duration;
 
 import java.util.List;
 
-/** Level 2: Star Match, a swap-three-in-a-row puzzle with space tiles. */
+
 public final class StarMatchController extends MiniGameScreen {
 
     private static final double TILE = 66;
@@ -66,7 +66,7 @@ public final class StarMatchController extends MiniGameScreen {
 
     @Override
     protected void setUp() {
-        // Each mission plays with its own tiles: farms on Earth, landers on the Moon, rovers on Mars.
+
         var destination = mission().destination();
         tileSet = SpaceTiles.set(destination);
         subtitle.setText(text.get("match.subtitle." + destination.name()));
@@ -82,7 +82,7 @@ public final class StarMatchController extends MiniGameScreen {
         board.addEventHandler(KeyEvent.KEY_PRESSED, this::onKey);
         board.focusedProperty().addListener((property, was, focused) -> cursor.setVisible(focused));
         boardHost.getChildren().add(new Group(board));
-        
+
         hint.setOnFinished(event -> showHint());
         newGame();
         board.requestFocus();
@@ -112,7 +112,6 @@ public final class StarMatchController extends MiniGameScreen {
         hint.playFromStart();
     }
 
-    // ---- input ----
 
     private void onPress(MouseEvent event) {
         board.requestFocus();
@@ -213,7 +212,6 @@ public final class StarMatchController extends MiniGameScreen {
         describeFocus();
     }
 
-    // ---- playing ----
 
     private void trySwap(Cell a, Cell b) {
         if (busy || game.over()) {
@@ -320,12 +318,7 @@ public final class StarMatchController extends MiniGameScreen {
         }
     }
 
-    // ---- drawing ----
 
-    /**
-     * Replaces every tile node with the given kinds. With fall rows, tiles start where they fell
-     * from and the returned animation drops them into place.
-     */
     private ParallelTransition drawAll(int[][] kinds, int[][] fallFrom) {
         var fall = new ParallelTransition();
         int cols = kinds.length;
@@ -413,7 +406,7 @@ public final class StarMatchController extends MiniGameScreen {
         refreshHud(List.of(), -1);
     }
 
-    /** Shows the score; during a cascade, counts the tiles cleared so far. */
+
     private void refreshHud(List<MatchBoard.Cascade> cascades, int upTo) {
         int shown = game.collected();
         for (int i = upTo + 1; i < cascades.size(); i++) {

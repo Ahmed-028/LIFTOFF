@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static com.liftoff.model.ModuleSlot.*;
 
-/** Standalone visual check and integration example. */
+
 public final class HangarDemo {
     private static final List<KeyCode> SLOT_KEYS =
             List.of(KeyCode.DIGIT1, KeyCode.DIGIT2, KeyCode.DIGIT3, KeyCode.DIGIT4, KeyCode.DIGIT5);

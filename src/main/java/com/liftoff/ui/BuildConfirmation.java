@@ -9,7 +9,7 @@ import javafx.scene.layout.StackPane;
 
 import java.util.ArrayList;
 
-/** Shares the same build gate on the builder and Review screens. */
+
 final class BuildConfirmation {
     private final StackPane gate;
     private final Button button;

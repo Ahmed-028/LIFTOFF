@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ShipBuildTest {
 
-    /** A part with only an id and a slot; every number is 0 (a thruster also gets its required Isp). */
+
     private static ShipPart part(String id, ModuleSlot slot) {
         double specificImpulseS = slot == ModuleSlot.THRUSTERS ? 300 : 0;
         return new ShipPart(id, slot, id, id, "", "", List.of(),
@@ -23,7 +23,7 @@ class ShipBuildTest {
                 0, ValueBasis.GAME_ESTIMATE, "model-" + id, TestParts.SOURCE);
     }
 
-    /** A build with one part in every slot. */
+
     private static ShipBuild fullBuild() {
         ShipBuild build = ShipBuild.empty();
         for (ModuleSlot slot : ModuleSlot.values()) {
@@ -50,7 +50,7 @@ class ShipBuildTest {
 
     @Test
     void swappingOnePartKeepsEveryOtherPart() {
-        // The builder rule: changing one tab never touches the others.
+
         ShipPart airframe = part("plane", ModuleSlot.AIRFRAME);
         ShipPart oldPower = part("solar", ModuleSlot.POWER);
         ShipPart newPower = part("fuel-cell", ModuleSlot.POWER);
@@ -85,7 +85,7 @@ class ShipBuildTest {
 
     @Test
     void partsComeOutInTabOrder() {
-        // Built in reverse order, read back in tab order (screens rely on this).
+
         ShipBuild build = ShipBuild.empty()
                 .with(part("sat", ModuleSlot.SATELLITE))
                 .with(part("plane", ModuleSlot.AIRFRAME));

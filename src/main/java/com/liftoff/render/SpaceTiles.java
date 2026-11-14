@@ -15,18 +15,13 @@ import javafx.scene.shape.StrokeLineJoin;
 
 import java.util.List;
 
-/**
- * The Star Match tiles. Each mission plays with its own set (farms and satellites for Earth,
- * landers and helmets for the Moon, rovers and drones for Mars), and every tile has its own
- * shape as well as its own colour, so they can be told apart without colour. Drawn on a
- * 100-unit grid centred on 0 and scaled to the size asked for.
- */
+
 public final class SpaceTiles {
 
     private SpaceTiles() {
     }
 
-    /** The six tile names for a destination, easiest first (easy games use the first five). */
+
     public static List<String> set(Mission.Destination destination) {
         return switch (destination) {
             case EARTH -> List.of("earth", "satellite", "leaf", "rocket", "star", "moon");
@@ -145,7 +140,7 @@ public final class SpaceTiles {
         return new Group(left, right, dish, body);
     }
 
-    /** A crop leaf, for the farms Farm Watch looks after. */
+
     private static Group leaf() {
         var leaf = new Ellipse(4, -4, 22, 36);
         leaf.setRotate(35);
@@ -162,7 +157,7 @@ public final class SpaceTiles {
         return new Group(stem, leaf, vein);
     }
 
-    /** A Moon lander: gold body on four legs. */
+
     private static Group lander() {
         var group = new Group();
         for (int side : new int[] {-1, 1}) {
@@ -186,7 +181,7 @@ public final class SpaceTiles {
         return group;
     }
 
-    /** An astronaut helmet with a gold visor. */
+
     private static Group helmet() {
         var shell = new Circle(0, 0, 36, Theme.HULL_WHITE);
         outline(shell, Theme.NAVY_950, 5);
@@ -199,7 +194,7 @@ public final class SpaceTiles {
         return new Group(shell, visor, shine, light);
     }
 
-    /** A Mars rover: a body on six wheels with a camera mast. */
+
     private static Group rover() {
         var group = new Group();
         for (int i = -1; i <= 1; i++) {
@@ -226,7 +221,7 @@ public final class SpaceTiles {
         return group;
     }
 
-    /** A Mars helicopter drone: two long rotor blades over a small body on legs. */
+
     private static Group drone() {
         var group = new Group();
         for (int side : new int[] {-1, 1}) {
@@ -256,7 +251,7 @@ public final class SpaceTiles {
         return group;
     }
 
-    /** A red Mars rock. */
+
     private static Group rock() {
         var rock = new Polygon(-34, 18, -28, -10, -8, -26, 18, -22, 34, -2, 30, 22, 4, 30);
         rock.setFill(Color.web("#A0522D"));

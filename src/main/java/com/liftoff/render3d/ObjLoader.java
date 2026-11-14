@@ -11,12 +11,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Loads Wavefront geometry. Assets use metres or a consistent set of art units, Y up. */
+
 public final class ObjLoader {
     private ObjLoader() {
     }
 
-    /** Builds a single mesh, with material assignments omitted. The caller owns the reader. */
+
     public static TriangleMesh load(Reader reader) throws IOException {
         Geometry geometry = parse(reader);
         return geometry.mesh(geometry.faces().values().stream().flatMap(List::stream).toList());
@@ -72,7 +72,7 @@ public final class ObjLoader {
                         triangulate(corners, points, faces.computeIfAbsent(material, key -> new ArrayList<>()));
                     }
                     default -> {
-                        // Object/group names and external material libraries are optional.
+
                     }
                 }
             } catch (IllegalArgumentException | IndexOutOfBoundsException ex) {
@@ -126,7 +126,7 @@ public final class ObjLoader {
                 normal = normal.add(polygon.get(i).crossProduct(polygon.get((i + 1) % polygon.size())));
             }
             Point3D direction = normal.normalize();
-            // Clip convex ears to preserve the interior of concave Wavefront faces.
+
             var remaining = new ArrayList<>(polygon);
             while (remaining.size() > 3) {
                 int ear = findEar(remaining, direction);
@@ -180,7 +180,7 @@ public final class ObjLoader {
     }
 
     private static void triangle(List<Integer> faces, Corner a, Corner b, Corner c) {
-        // Negating Y reflects the geometry, so reverse the winding.
+
         for (Corner corner : List.of(a, c, b)) {
             faces.add(corner.point());
             faces.add(corner.texture());

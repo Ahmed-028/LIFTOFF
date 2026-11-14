@@ -141,11 +141,11 @@ class GameSessionTest {
 
         ResourceReport report = session.resources();
 
-        assertEquals(1857.0, report.get(ResourceType.MASS).used(), 1e-9);          // 1557 + 300
+        assertEquals(1857.0, report.get(ResourceType.MASS).used(), 1e-9);
         assertEquals(8080.0, report.get(ResourceType.MASS).capacity().orElseThrow(), 1e-9);
         assertEquals(330.0, report.get(ResourceType.POWER).used(), 1e-9);
-        assertEquals(553.55, report.get(ResourceType.BUDGET).used(), 1e-6);        // 233.55+150+153.8+16.2
-        assertEquals(86.0, report.get(ResourceType.TIME).used(), 1e-9);            // 42 + 6 + 2 + 36
+        assertEquals(553.55, report.get(ResourceType.BUDGET).used(), 1e-6);
+        assertEquals(86.0, report.get(ResourceType.TIME).used(), 1e-9);
         assertFalse(report.anyOver(), report.toString());
     }
 
@@ -157,12 +157,11 @@ class GameSessionTest {
         session.chooseOrbit("tropical-402");
         session.chooseLaunchVehicle("electron");
 
-        // 248.4 + 48.6 = 297.0 kg against Electron's 300 kg
+
         assertEquals(297.0, session.resources().get(ResourceType.MASS).used(), 1e-9);
         assertEquals(ResourceLevel.TIGHT, session.resources().get(ResourceType.MASS).level());
     }
 
-    // ---- ship build and mission flow (parts are test fakes until the real catalog has them) ----
 
     private GameSession sessionWithParts() {
         return new GameSession(catalog, FakeParts.lookup());
@@ -252,10 +251,10 @@ class GameSessionTest {
         AtomicInteger calls = new AtomicInteger();
         game.addListener(calls::incrementAndGet);
 
-        game.selectMission("farm-watch");                  // 1
-        game.next();                                       // 2
-        game.next();                                       // 3
-        chooseAllParts(game, "a");                         // 3 + one per slot
+        game.selectMission("farm-watch");
+        game.next();
+        game.next();
+        chooseAllParts(game, "a");
         game.goTo(MissionStep.SUPPLIES);
         game.next();
         game.confirmBuild();

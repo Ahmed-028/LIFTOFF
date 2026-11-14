@@ -13,10 +13,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Rotate;
 
-/**
- * A small 3D window with Nova from the waist up, for the guide's speech bubble. Nova bobs
- * gently and waves each time {@link #talk()} is called. Shows nothing where 3D is unavailable.
- */
+
 public final class NovaPortrait extends StackPane {
 
     private final RoundFigure nova = new RoundFigure(RoundFigure.Look.KID_NOVA);
@@ -75,7 +72,7 @@ public final class NovaPortrait extends StackPane {
         });
     }
 
-    /** Nova waves for a moment, as if starting to speak. */
+
     public void talk() {
         talkUntil = now + 1.3;
     }

@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-/** The two switches of the settings menu: music and sound effects. Each says "on" or "off" in words. */
+
 final class SoundToggles {
 
     private SoundToggles() {

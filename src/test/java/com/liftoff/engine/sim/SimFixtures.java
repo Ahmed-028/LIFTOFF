@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-/** Round-number designs and the event fixture for the simulation tests. Nothing here is real data. */
+
 public final class SimFixtures {
 
     public static final Mission EARTH = new Mission("test-earth", 0);
@@ -26,11 +26,7 @@ public final class SimFixtures {
                 budgetCapMusd, deadlineMonths, 12, TestParts.SOURCE);
     }
 
-    /**
-     * 150 kg (bus 100 + instrument 50), 50 W drawn of 100 W, 100 kbps, polar orbit reaching 82 degrees,
-     * one polar station, a rocket lifting 1000 kg to polar orbit, 12 science months.
-     * Budget 10 + 5 + 20 + 1 x 12 = 47; time 12 + 6 + 2 + 12 = 32 months.
-     */
+
     public static MissionDesign design() {
         return MissionDesign.empty()
                 .withObjective(objective(80, 1000, 200))

@@ -10,13 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 
-/**
- * Works out mass, cost, power, fuel and every warning for a ship. Pure: same input, same report.
- *
- * <p>Works on an unfinished ship too: each empty tab gives one SLOT_EMPTY, and a check that needs
- * a missing part is skipped rather than reported twice. Issues come out in a fixed order:
- * empty tabs (tab order), cargo fit, power, fuel, budget.
- */
+
 public final class BuildCalculator {
 
     private BuildCalculator() {
@@ -36,14 +30,14 @@ public final class BuildCalculator {
 
         List<BuildIssue> issues = new ArrayList<>();
 
-        // 1. A tab with nothing chosen.
+
         for (ModuleSlot slot : ModuleSlot.values()) {
             if (build.part(slot).isEmpty()) {
                 issues.add(new BuildIssue(BuildIssue.Kind.SLOT_EMPTY, slot, 0, 0));
             }
         }
 
-        // 2. Does the payload fit the bay, and can the airframe carry bay plus payload?
+
         if (bay.isPresent() && payload.isPresent()) {
             issues.addAll(FitRules.payloadFits(bay.get(), payload.get()));
         }
@@ -52,12 +46,12 @@ public final class BuildCalculator {
             FitRules.airframeCarries(airframe.get(), cargoKg).ifPresent(issues::add);
         }
 
-        // 3. Power: everything that draws, against what the power system gives.
+
         if (power.isPresent() && powerDrawW > powerSupplyW) {
             issues.add(new BuildIssue(BuildIssue.Kind.POWER_SHORT, ModuleSlot.POWER, powerDrawW, powerSupplyW));
         }
 
-        // 4. Fuel: the rocket equation with the thruster's Isp, against the airframe's tanks.
+        // Compare rocket-equation fuel needs against the airframe tanks.
         double propellantKg = 0;
         double deltaVAvailableMs = 0;
         if (airframe.isPresent() && thrusters.isPresent() && dryMassKg > 0) {
@@ -70,7 +64,7 @@ public final class BuildCalculator {
             }
         }
 
-        // 5. Budget: about the whole ship, so it belongs to no tab.
+
         if (costMusd > mission.budgetCapMusd()) {
             issues.add(new BuildIssue(BuildIssue.Kind.OVER_BUDGET, null, costMusd, mission.budgetCapMusd()));
         }

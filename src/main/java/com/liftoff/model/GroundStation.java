@@ -1,6 +1,6 @@
 package com.liftoff.model;
 
-/** A ground station that can receive data from the spacecraft. */
+
 public record GroundStation(
         String id,
         String name,

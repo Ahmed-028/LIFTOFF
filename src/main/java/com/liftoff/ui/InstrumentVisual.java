@@ -12,7 +12,7 @@ import javafx.scene.shape.Line;
 
 import java.util.Map;
 
-/** Instrument diagrams paired with credited images of the spacecraft that carry them. */
+
 final class InstrumentVisual {
     private record Host(String file, String name) {}
 

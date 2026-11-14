@@ -109,11 +109,7 @@ public final class BuildGauges extends StackPane {
         gauges.getChildren().add(gauge);
     }
 
-    /**
-     * The "Over limit" words become a small button. Pressing it shows which part swaps would
-     * bring this gauge back within its limit; the tips close by themselves after five seconds,
-     * or sooner on a click anywhere (the popup uses up that click). Nothing opens on hover.
-     */
+
     private Button fixButton(String resource, SwapAdvisor.Goal goal) {
         var button = new Button(text.get("tips.button"));
         button.setId("fix-" + goal.name().toLowerCase(Locale.ROOT));
@@ -164,7 +160,7 @@ public final class BuildGauges extends StackPane {
     private VBox tipsContent(String resource, SwapAdvisor.Goal goal) {
         var box = new VBox(8);
         box.getStyleClass().add("limit-tips");
-        // A fixed width lets the wrapped lines work out their height; without it the window grows very tall.
+
         box.setMinWidth(360);
         box.setPrefWidth(360);
         box.setMaxWidth(360);

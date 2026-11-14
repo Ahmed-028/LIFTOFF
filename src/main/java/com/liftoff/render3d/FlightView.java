@@ -30,17 +30,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.SplittableRandom;
 
-/**
- * Renders an illustrative flight from playback progress. Simulation rules live in the engine.
- *
- * <p>Long trips are filmed like a classic anime space journey: the camera cuts between chase,
- * fly-by, side-tracking, spin and orbiting shots while warp streaks pour past and friendly
- * escort ships keep the player company.
- */
+
 public final class FlightView extends StackPane {
     public enum Phase { DEPARTURE, CRUISE, ORBIT, ENTRY, LANDING, SURFACE, RETURN }
 
-    /** Camera set-ups used while the engines push the ship through space. */
+
     enum Shot { CHASE, FLYBY, SIDE, SPIN, ORBIT_CAM }
 
     static final double SHOT_SECONDS = 6.2;
@@ -227,7 +221,7 @@ public final class FlightView extends StackPane {
         return Phase.SURFACE;
     }
 
-    /** Calm mode holds one steady camera, slows the stars and turns off flashes and spins. */
+
     public void setCalm(boolean calm) {
         this.calm = calm;
         render();
@@ -243,7 +237,7 @@ public final class FlightView extends StackPane {
         render();
     }
 
-    /** Stops the clock and draws one frame at a fixed time. Used for screenshots. */
+
     void freezeAt(double seconds) {
         timer.stop();
         lastDt = 1 / 60.0;
@@ -311,7 +305,7 @@ public final class FlightView extends StackPane {
         drawOverlay(speedLines, flash, surface);
     }
 
-    /** Returns {flow, streak seconds, speed-line strength}. */
+
     private double[] flyThroughSpace(double burn) {
         List<Shot> shots = switch (phase) {
             case DEPARTURE -> DEPARTURE_SHOTS;
@@ -599,7 +593,7 @@ public final class FlightView extends StackPane {
         return resource == null ? null : new Image(resource.toExternalForm());
     }
 
-    /** An escort spacecraft flying along +Z, spinning slowly around its own travel axis. */
+
     private static final class Escort {
         final SpaceShips.Craft craft;
         final Group root;

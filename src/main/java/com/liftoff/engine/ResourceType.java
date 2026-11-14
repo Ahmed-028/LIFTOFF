@@ -1,6 +1,6 @@
 package com.liftoff.engine;
 
-/** The six resources every mission design is measured against. */
+
 public enum ResourceType {
     MASS("kg"),
     POWER("W"),

@@ -2,16 +2,12 @@ package com.liftoff.audio;
 
 import java.util.SplittableRandom;
 
-/**
- * A tiny synthesiser: adds tones, sweeps and noise into mono sample buffers (floats from -1 to
- * 1 at {@link #RATE} samples per second). Everything LIFTOFF plays is made here, so the game
- * ships no recorded audio and needs no audio library beyond Java's own.
- */
+
 public final class Synth {
 
     public static final int RATE = 44_100;
 
-    /** Wave shapes, from soft to bright. */
+
     public enum Wave { SINE, TRIANGLE, SQUARE, SAW }
 
     private Synth() {
@@ -21,18 +17,18 @@ public final class Synth {
         return new float[(int) Math.ceil(seconds * RATE)];
     }
 
-    /** The frequency of a MIDI note number (69 is A4, 440 Hz). */
+
     public static double freq(double midi) {
         return 440 * Math.pow(2, (midi - 69) / 12.0);
     }
 
-    /** A held note with a linear attack and release. */
+
     public static void tone(float[] out, double start, double duration, double freq, double amp, Wave wave,
             double attack, double release) {
         sweep(out, start, duration, freq, freq, amp, wave, attack, release, 0);
     }
 
-    /** A plucked note: quick attack, then it dies away at the given speed. */
+
     public static void pluck(float[] out, double start, double duration, double freq, double amp, Wave wave,
             double decay) {
         int from = (int) (start * RATE);
@@ -49,11 +45,7 @@ public final class Synth {
         }
     }
 
-    /**
-     * A note gliding from one frequency to another.
-     *
-     * @param vibrato depth of a gentle wobble in semitones (0 for none)
-     */
+
     public static void sweep(float[] out, double start, double duration, double from, double to, double amp,
             Wave wave, double attack, double release, double vibrato) {
         int first = (int) (start * RATE);
@@ -74,10 +66,7 @@ public final class Synth {
         }
     }
 
-    /**
-     * Noise through a simple low-pass filter whose brightness moves from {@code brightFrom} to
-     * {@code brightTo} (0 to 1; small numbers are a dull rumble, 1 is a hiss).
-     */
+
     public static void noise(float[] out, double start, double duration, double amp, double attack, double release,
             double brightFrom, double brightTo, long seed) {
         var random = new SplittableRandom(seed);
@@ -95,7 +84,7 @@ public final class Synth {
         }
     }
 
-    /** Adds a fading echo, for a sense of space. */
+
     public static void echo(float[] out, double delaySeconds, double feedback) {
         int delay = (int) (delaySeconds * RATE);
         for (int i = delay; i < out.length; i++) {
@@ -103,7 +92,7 @@ public final class Synth {
         }
     }
 
-    /** Scales the buffer so its loudest sample is at the given peak. */
+
     public static float[] normalise(float[] samples, double peak) {
         float max = 0;
         for (float sample : samples) {
@@ -118,7 +107,7 @@ public final class Synth {
         return samples;
     }
 
-    /** Turns the buffer down only if its loudest sample is above the given peak. */
+
     public static float[] limit(float[] samples, double peak) {
         float max = 0;
         for (float sample : samples) {
@@ -134,7 +123,7 @@ public final class Synth {
         return in * out;
     }
 
-    /** One cycle of the wave at the given phase (in cycles). Bright waves are softened a little. */
+
     private static double shape(Wave wave, double phase) {
         double x = phase - Math.floor(phase);
         return switch (wave) {

@@ -31,10 +31,7 @@ import javafx.util.Duration;
 
 import java.util.ResourceBundle;
 
-/**
- * The title screen: the game's name and the way into a mission. Straight after the intro
- * cutscene the rocket lifts off, then the title appears and a new rocket rolls onto the pad.
- */
+
 public final class TitleController implements ScreenController {
 
     private static final double ROCKET_HEIGHT = 300;
@@ -77,7 +74,7 @@ public final class TitleController implements ScreenController {
         flame.setTranslateY(ROCKET_HEIGHT / 2 + 30);
         flame.setScaleY(.2);
         artHolder.getChildren().remove(rocket);
-        // A stack keeps the flame centred under the rocket however the art is drawn.
+
         var ship = new StackPane(flame, rocket);
         ship.setMouseTransparent(true);
         artHolder.getChildren().add(ship);

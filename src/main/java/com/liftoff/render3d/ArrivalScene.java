@@ -16,12 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.SplittableRandom;
 
-/**
- * The cutscene at the end of each mission. Nova watches from the observation deck as the
- * spacecraft reaches the destination. When the mission worked, glowing data pulses stream back
- * and Nova cheers; when it did not, the ship's lights blink red and Nova scratches their head
- * before turning to the player to try again.
- */
+
 public final class ArrivalScene extends CutsceneView {
 
     public static final double LENGTH = 8.6;
@@ -60,7 +55,7 @@ public final class ArrivalScene extends CutsceneView {
         planet.setRotationAxis(Rotate.Y_AXIS);
         world.getChildren().add(planet);
 
-        // The spacecraft: white body, gold foil, blue solar wings, an orange stripe and two lights.
+
         ship.getChildren().addAll(
                 box(.7, .55, .9, 0, 0, 0, "#F2F5FA"),
                 box(.72, .12, .92, 0, .1, 0, "#FF7A1A"),
@@ -79,14 +74,14 @@ public final class ArrivalScene extends CutsceneView {
         ship.getChildren().add(dish);
         world.getChildren().add(ship);
 
-        // Data pulses that travel from the ship back to Nova.
+
         for (int i = 0; i < 6; i++) {
             var pulse = glow(.16, "#22E3F2");
             pulse.setVisible(false);
             pulses.add(pulse);
             world.getChildren().add(pulse);
         }
-        // Star sparkles around Nova when it works.
+
         String[] colours = {"#FFCB69", "#22E3F2", "#FF7A1A", "#F2F5FA", "#8BE07A"};
         for (int i = 0; i < 60; i++) {
             var sparkle = new Box(.1, .1, .02);
@@ -123,7 +118,7 @@ public final class ArrivalScene extends CutsceneView {
     public void update(double t) {
         planet.setRotate(-20 + t * 5);
 
-        // The ship flies out from beside the deck and settles into orbit around the destination.
+
         double travel = phase(t, .2, 2.6);
         double orbit = (t - 2.8) * .45;
         double[] start = {1.6, -3.2, 1.5};
@@ -142,7 +137,7 @@ public final class ArrivalScene extends CutsceneView {
             light.setMaterial(blink ? redLight : cyanLight);
         }
 
-        // Data comes home: pulses run from the ship to the deck, one after another.
+
         for (int i = 0; i < pulses.size(); i++) {
             var pulse = pulses.get(i);
             double p = success ? (t - 3.0 - i * .35) / 1.4 : -1;
@@ -155,7 +150,7 @@ public final class ArrivalScene extends CutsceneView {
             }
         }
 
-        // Nova watches the ship, then turns to the player: cheering, or scratching their head.
+
         double toPlayer = phase(t, 4.3, .5);
         double watching = Math.toDegrees(Math.atan2(-(ship.getTranslateX()), -(ship.getTranslateZ())));
         nova.setRotate(lerpAngle(t < .2 ? 160 : watching, 18, toPlayer));

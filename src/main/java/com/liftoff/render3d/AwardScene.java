@@ -21,11 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
 
-/**
- * The ending: years later, a grown-up Nova walks onto a stage and is handed an award for
- * outstanding work designing space missions. Nova lifts the trophy, the audience cheers and
- * confetti falls.
- */
+
 public final class AwardScene extends CutsceneView {
 
     public static final double LENGTH = 13.5;
@@ -67,7 +63,7 @@ public final class AwardScene extends CutsceneView {
 
     @Override
     public void update(double t) {
-        // Nova walks on from the left, stops by the podium and turns to the audience.
+
         double walk = clamp((t - 2.4) / 3.0);
         nova.setTranslateX(lerp(-7.5, NOVA_X, ease(walk)));
         nova.setTranslateY(STAGE_TOP);
@@ -77,7 +73,7 @@ public final class AwardScene extends CutsceneView {
         nova.setRotate(lerpAngle(walk <= 0 ? -90 : -90, 0, faceFront));
         nova.bob(t, walking);
 
-        // The presenter waits at the podium, then turns and hands over the trophy.
+
         presenter.setTranslateX(1.9);
         presenter.setTranslateY(STAGE_TOP);
         presenter.setTranslateZ(STAGE_Z + .2);
@@ -91,7 +87,7 @@ public final class AwardScene extends CutsceneView {
             presenter.wave(t);
         }
 
-        // Trophy: on the podium, in the presenter's hands, passed to Nova, then lifted high.
+
         double[] onPodium = {2.9, STAGE_TOP - 1.42, STAGE_Z - .1};
         double[] held = {1.2, STAGE_TOP - 1.55, STAGE_Z - .3};
         double[] given = {NOVA_X + .2, STAGE_TOP - 1.55, STAGE_Z - .75};
@@ -113,7 +109,7 @@ public final class AwardScene extends CutsceneView {
             nova.cheer(t);
         }
 
-        // The audience bounces when Nova lifts the trophy.
+
         for (int i = 0; i < audience.size(); i++) {
             var person = audience.get(i);
             boolean cheering = t > 8.7 + (i % 5) * .12;
@@ -126,7 +122,7 @@ public final class AwardScene extends CutsceneView {
             }
         }
 
-        // Confetti falls once the trophy goes up.
+
         double fall = t - 8.7;
         for (int i = 0; i < confetti.size(); i++) {
             var piece = confetti.get(i);
@@ -139,9 +135,7 @@ public final class AwardScene extends CutsceneView {
             piece.setRotate(since * 300 + i * 40);
         }
 
-        // Camera: from behind the audience, along with Nova, then close on the celebration.
-        // High over the crowd, down in front of the audience for the award, then back up high
-        // to see everyone cheering.
+
         double follow = phase(t, 2.4, 3.6);
         double close = phase(t, 8.4, 1.8);
         double outro = phase(t, 11.0, 2.2);
@@ -162,7 +156,7 @@ public final class AwardScene extends CutsceneView {
                 box(12, .6, 5.2, 0, STAGE_TOP / 2, STAGE_Z + .3, "#21427A"),
                 box(12.05, .12, .1, 0, STAGE_TOP + .06, STAGE_Z - 2.3, "#FF7A1A"),
                 box(30, 14, .2, 0, -7, 5.4, "#101A3A"));
-        // Curtains on both sides.
+
         for (int side : new int[] {-1, 1}) {
             for (int fold = 0; fold < 4; fold++) {
                 var drape = new Cylinder(.45, 12, 20);
@@ -171,7 +165,7 @@ public final class AwardScene extends CutsceneView {
                 world.getChildren().add(drape);
             }
         }
-        // The award banner.
+
         var banner = new MeshView(Meshes.quad(7.2, 2.3));
         var material = new PhongMaterial(Color.WHITE);
         var art = banner();
@@ -181,11 +175,11 @@ public final class AwardScene extends CutsceneView {
         banner.setCullFace(CullFace.NONE);
         at(banner, 0, -6.4, 5.25);
         world.getChildren().add(banner);
-        // Lights along the top of the stage.
+
         for (int i = -5; i <= 5; i++) {
             world.getChildren().add(at(glow(.12, i % 2 == 0 ? "#FFCB69" : "#22E3F2"), i * 1.1, -8.4, 5.2));
         }
-        // Podium with a glowing star.
+
         world.getChildren().addAll(
                 box(1.3, 1.4, .9, 2.9, STAGE_TOP - .7, STAGE_Z, "#F2F5FA"),
                 box(1.32, .16, .92, 2.9, STAGE_TOP - .95, STAGE_Z, "#FF7A1A"),
@@ -214,7 +208,7 @@ public final class AwardScene extends CutsceneView {
         return material;
     }
 
-    /** Rows of people with Nova's shape, seen from behind, facing the stage. */
+
     private void buildAudience() {
         String[] shirts = {"#FF7A1A", "#22A6B5", "#8BE07A", "#B388FF", "#FFCB69", "#3E7FD0", "#FF6F91"};
         String[] legs = {"#16305E", "#2A3040", "#3D4E70", "#0D1E42"};

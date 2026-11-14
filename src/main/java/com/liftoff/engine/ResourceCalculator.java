@@ -14,14 +14,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.function.ToDoubleFunction;
 
-/**
- * Works out the six resources of a design. Pure: same design in, same report out.
- *
- * <p>Handles both generations of design. A v2 design has a ship built from parts and a mission:
- * the ship's parts count toward mass, power, budget and data, propellant is added to mass, the
- * POWER part sets the power limit and the mission sets the caps. A v1 design (bus and objective)
- * works as before. Downlink rate still comes from the bus: ship parts do not carry one yet.
- */
+
 public final class ResourceCalculator {
 
     private static final double SECONDS_PER_MINUTE = 60;
@@ -41,7 +34,7 @@ public final class ResourceCalculator {
         return new ResourceReport(usages);
     }
 
-    /** Communication resources using the radio carried by the modular ship. */
+
     public static Map<ResourceType, ResourceUsage> communication(MissionDesign design, double downlinkMbps,
                                                                   OptionalDouble fixedContactMinutes,
                                                                   double additionalDataGbitPerDay) {
@@ -58,10 +51,7 @@ public final class ResourceCalculator {
                         gbitPerMinute > 0 ? contact : OptionalDouble.empty()));
     }
 
-    /**
-     * Everything that flies (ship parts, bus, instruments) plus the propellant for the trip,
-     * against what the rocket lifts to the chosen class of orbit.
-     */
+
     private static ResourceUsage mass(MissionDesign design) {
         double dryMassKg = dryMassKg(design);
         double used = dryMassKg + propellantKg(design, dryMassKg);
@@ -81,10 +71,7 @@ public final class ResourceCalculator {
         return dryMassKg;
     }
 
-    /**
-     * Propellant for the mission's trip, from the rocket equation with the thruster's Isp.
-     * Zero until there is a mission, an airframe (the tanks) and a thruster.
-     */
+    // Fuel needs a mission, airframe, and thruster to apply the rocket equation.
     private static double propellantKg(MissionDesign design, double dryMassKg) {
         Optional<ShipPart> thrusters = design.build().part(ModuleSlot.THRUSTERS);
         boolean hasTanks = design.build().part(ModuleSlot.AIRFRAME).isPresent();
@@ -95,10 +82,7 @@ public final class ResourceCalculator {
                 thrusters.get().specificImpulseS());
     }
 
-    /**
-     * Average draw of the instruments and the ship's parts, against what the POWER part supplies.
-     * A design with no POWER part falls back to what the bus can supply to its payload.
-     */
+
     private static ResourceUsage power(MissionDesign design) {
         double used = design.instruments().stream().mapToDouble(Instrument::avgPowerW).sum()
                 + sum(design.build(), ShipPart::powerDrawW);
@@ -111,7 +95,7 @@ public final class ResourceCalculator {
         return ResourceUsage.of(ResourceType.POWER, used, capacity);
     }
 
-    /** Everything bought, plus ground stations for every science month, against the mission's cap. */
+
     private static ResourceUsage budget(MissionDesign design) {
         double used = design.instruments().stream().mapToDouble(Instrument::costMusd).sum()
                 + sum(design.build(), ShipPart::costMusd);
@@ -133,7 +117,7 @@ public final class ResourceCalculator {
         return ResourceUsage.of(ResourceType.BUDGET, used, capacity);
     }
 
-    /** Data produced per day, against what the radio can send down in the daily contact time. */
+
     private static ResourceUsage data(MissionDesign design) {
         OptionalDouble capacity = OptionalDouble.empty();
         if (design.bus() != null && design.orbit() != null) {
@@ -143,7 +127,7 @@ public final class ResourceCalculator {
         return ResourceUsage.of(ResourceType.DATA, dataGbitPerDay(design), capacity);
     }
 
-    /** Contact minutes needed to send the daily data, against the minutes the stations can see the spacecraft. */
+
     private static ResourceUsage comms(MissionDesign design) {
         double used = 0;
         Bus bus = design.bus();
@@ -157,7 +141,7 @@ public final class ResourceCalculator {
         return ResourceUsage.of(ResourceType.COMMS, used, capacity);
     }
 
-    /** Build and test time plus the science duration, against the mission's deadline. */
+
     private static ResourceUsage time(MissionDesign design) {
         double used = buildMonths(design) + design.scienceMonths();
         OptionalDouble capacity = OptionalDouble.empty();
@@ -169,7 +153,7 @@ public final class ResourceCalculator {
         return ResourceUsage.of(ResourceType.TIME, used, capacity);
     }
 
-    /** The slowest part sets the pace; integration and test are added on top. Ship parts carry no build time yet. */
+
     private static int buildMonths(MissionDesign design) {
         if (design.bus() == null && design.instruments().isEmpty()) {
             return 0;
@@ -183,13 +167,13 @@ public final class ResourceCalculator {
                 + GameRules.INTEGRATION_MONTHS_PER_INSTRUMENT * design.instruments().size();
     }
 
-    /** Instruments plus whatever the ship's parts (a satellite with its own camera) produce. */
+
     private static double dataGbitPerDay(MissionDesign design) {
         return design.instruments().stream().mapToDouble(Instrument::dataGbitPerDay).sum()
                 + sum(design.build(), ShipPart::dataGbitPerDay);
     }
 
-    /** Contact from several stations is summed: a small overcount when two see the spacecraft at once. */
+    // Summing stations can double-count simultaneous visibility.
     private static double contactMinutesPerDay(MissionDesign design) {
         return design.stations().stream()
                 .mapToDouble(station -> OrbitMath.contactMinutesPerDay(design.orbit(), station.latitudeDeg()))

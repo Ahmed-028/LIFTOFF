@@ -17,7 +17,7 @@ import java.util.Objects;
 
 import static com.liftoff.model.ModuleSlot.*;
 
-/** Keeps stable attachment groups and moves them when the airframe or bay changes. */
+
 final class ShipAssembly {
     private static final Bounds DEFAULT_HULL = new BoundingBox(-1.6, -.7, -4, 3.2, 1.5, 8);
     private final Group root = new Group();

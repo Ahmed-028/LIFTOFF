@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-/** Clicks through the shipped UI and captures each screen at both supported QA sizes. */
+
 public final class SnapshotTool {
     private final Path folder;
     private final CompletableFuture<Void> done = new CompletableFuture<>();
@@ -249,7 +249,7 @@ public final class SnapshotTool {
         });
     }
 
-    /** After the last mission the report offers the ending cutscene. */
+
     private void watchEnding(Scene scene, GameSession session, CheckedAction next) {
         require(session.finishedFinalMission(), "Flying Mars did not finish the final mission");
         var ending = button(scene, "#watch-ending");
@@ -263,7 +263,7 @@ public final class SnapshotTool {
         });
     }
 
-    /** From the road map after a level, flies past any mini-game straight into the next mission level. */
+
     private static void toMissionLevel(Scene scene) {
         for (int i = 0; i < 4; i++) {
             if (lookup(scene, "#skip-game") != null) {

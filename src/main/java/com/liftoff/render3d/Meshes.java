@@ -9,16 +9,12 @@ import javafx.scene.transform.Rotate;
 
 import java.util.SplittableRandom;
 
-/** Small procedural meshes (rings, turned shapes, rocks and flat screens) for the flight scenes. */
+
 final class Meshes {
     private Meshes() {
     }
 
-    /**
-     * A surface of revolution around the Y axis.
-     *
-     * @param profile pairs of (radius, y), listed from the top of the shape to the bottom
-     */
+
     static TriangleMesh lathe(double[] profile, int segments) {
         int rings = profile.length / 2;
         var mesh = new TriangleMesh();
@@ -50,7 +46,7 @@ final class Meshes {
         return mesh;
     }
 
-    /** A ring lying in the XZ plane (its axis is Y). */
+
     static TriangleMesh torus(double major, double minor, int majorSegments, int minorSegments) {
         var mesh = new TriangleMesh();
         for (int i = 0; i < majorSegments; i++) {
@@ -84,7 +80,7 @@ final class Meshes {
         return mesh;
     }
 
-    /** A sphere whose radius wobbles, for friendly cartoon asteroids. */
+
     static TriangleMesh rock(long seed, int detail) {
         var random = new SplittableRandom(seed);
         double[] bumps = new double[6];
@@ -129,7 +125,7 @@ final class Meshes {
         return mesh;
     }
 
-    /** A flat rectangle facing -Z (towards a default camera), with the whole texture mapped upright. */
+
     static TriangleMesh quad(double width, double height) {
         var mesh = new TriangleMesh();
         float w = (float) (width / 2);
@@ -146,7 +142,7 @@ final class Meshes {
         return view;
     }
 
-    /** Turns a node whose axis is +Y so that its axis points along the given direction. */
+
     static <N extends Node> N orient(N node, double nx, double ny, double nz) {
         double length = Math.sqrt(nx * nx + ny * ny + nz * nz);
         nx /= length;

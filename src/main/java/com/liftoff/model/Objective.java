@@ -2,7 +2,7 @@ package com.liftoff.model;
 
 import java.util.List;
 
-/** A mission goal the player can choose. Caps and durations are scenario settings, not NASA data. */
+// Caps and durations are scenario settings, not NASA data.
 public record Objective(
         String id,
         String title,

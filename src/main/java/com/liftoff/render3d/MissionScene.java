@@ -14,11 +14,7 @@ import javafx.scene.transform.Rotate;
 import java.util.Locale;
 import java.util.SplittableRandom;
 
-/**
- * The cutscene before a mission: Nova stands on a little observation deck in space looking at
- * the destination (the real NASA map of Earth, the Moon or Mars on a globe), turns to wave at
- * the player and points the way, and the camera flies towards the planet.
- */
+// The globes use NASA maps of Earth, the Moon, and Mars.
 public final class MissionScene extends CutsceneView {
 
     public static final double LENGTH = 8.2;
@@ -63,7 +59,7 @@ public final class MissionScene extends CutsceneView {
             }
         }
 
-        // A little spacecraft circling the destination.
+
         var core = box(.5, .5, .7, 0, 0, 0, "#D9AE5E");
         var leftPanel = box(1.1, .04, .5, -.85, 0, 0, "#2F64CF");
         var rightPanel = box(1.1, .04, .5, .85, 0, 0, "#2F64CF");
@@ -72,7 +68,7 @@ public final class MissionScene extends CutsceneView {
         satellite.getChildren().addAll(core, leftPanel, rightPanel, dish);
         world.getChildren().add(satellite);
 
-        // Nova's observation deck.
+
         var deck = new Cylinder(2.3, .3, 48);
         deck.setMaterial(ModelLibrary.surface("#16305E"));
         at(deck, 0, .15, 0);
@@ -106,7 +102,7 @@ public final class MissionScene extends CutsceneView {
         satellite.setRotationAxis(Rotate.Y_AXIS);
         satellite.setRotate(Math.toDegrees(orbit));
 
-        // Look at the planet, turn to wave hello, then point the way.
+
         double turn = phase(t, 2.4, .6);
         nova.setRotate(lerpAngle(facingPlanet, 22, turn));
         nova.bob(t, false);
