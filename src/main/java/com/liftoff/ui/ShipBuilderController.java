@@ -91,7 +91,7 @@ public final class ShipBuilderController extends MissionScreen {
         strip.select(selectedId());
         gauges.refresh(session);
         var report = session.buildReport();
-        warnings.showBuild(report.issues());
+        warnings.showBuildWithoutGauges(report.issues());
         int openSlots = ModuleSlot.values().length - session.build().parts().size();
         buildStatus.setText(openSlots > 0 ? text.get("ship.slotsLeft", openSlots)
                 : report.canConfirm() ? text.get("ship.readyHint")

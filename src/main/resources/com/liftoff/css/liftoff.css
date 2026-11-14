@@ -6,6 +6,9 @@
  * .world-moon or .world-mars) that recolours the background and panels through the
  * -world-* looked-up colours below. State is never shown by colour alone: every picked,
  * locked or warning state also carries a word or a symbol.
+ *
+ * The same tokens live in com.liftoff.render.Theme for drawn and 3D art (ThemeTest keeps them
+ * equal); the written style guide is docs/style-guide.md.
  */
 
 /* ---------- Tokens ---------- */
@@ -865,3 +868,245 @@
 .fly-screen .flight-alert { -fx-font-size: 14px; -fx-padding: 6 10; }
 .fly-screen .list-cell { -fx-padding: 5 10; -fx-font-size: 15px; }
 .fly-screen .supplies-tabs > .tab-header-area { -fx-padding: 0 0 6 0; }
+
+/* ---------- Road map ---------- */
+.map-frame {
+    -fx-background-color: radial-gradient(center 50% 40%, radius 75%, rgba(255, 255, 255, 0.08) 0%, transparent 100%),
+            rgba(5, 14, 38, 0.55);
+    -fx-background-radius: 24;
+    -fx-border-color: -world-line;
+    -fx-border-radius: 24;
+    -fx-border-width: 2;
+}
+
+.button.level-node {
+    -fx-background-color: transparent;
+    -fx-background-radius: 999;
+    -fx-border-color: transparent;
+    -fx-border-width: 4;
+    -fx-border-radius: 999;
+    -fx-padding: 6;
+    -fx-cursor: hand;
+}
+.button.level-node:hover { -fx-background-color: rgba(255, 255, 255, 0.12); }
+.button.level-node:focused {
+    -fx-border-color: -cyan;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.7), 18, 0.35, 0, 0);
+}
+.button.level-node.level-here { -fx-border-color: -orange; }
+.button.level-node.level-here:focused { -fx-border-color: -cyan; }
+.button.level-node.level-locked { -fx-opacity: 0.55; -fx-border-style: segments(7, 6); -fx-border-color: #8FB0E0; }
+
+.level-number {
+    -fx-font-family: "Barlow Condensed";
+    -fx-font-weight: bold;
+    -fx-font-style: italic;
+    -fx-font-size: 40px;
+    -fx-text-fill: -navy-950;
+}
+
+.level-caption {
+    -fx-background-color: rgba(5, 14, 38, 0.78);
+    -fx-background-radius: 14;
+    -fx-padding: 6 12 8 12;
+    -fx-max-width: 200;
+}
+.level-eyebrow { -fx-text-fill: -world-accent; -fx-font-weight: bold; -fx-font-size: 12px; }
+.level-name { -fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: -text; }
+.level-state { -fx-font-size: 14px; -fx-text-fill: -text-soft; }
+.level-done .level-state, .level-state.level-done { -fx-text-fill: -good; }
+
+/* ---------- Mini-games ---------- */
+.game-frame {
+    -fx-background-color: radial-gradient(center 50% 30%, radius 80%, rgba(255, 255, 255, 0.06) 0%, transparent 100%),
+            rgba(5, 14, 38, 0.6);
+    -fx-background-radius: 24;
+    -fx-border-color: -world-line;
+    -fx-border-radius: 24;
+    -fx-border-width: 2;
+    -fx-padding: 12;
+}
+.game-side { -fx-spacing: 12; }
+.game-status {
+    -fx-background-color: -chip;
+    -fx-text-fill: -chip-ink;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+.match-board { -fx-background-color: transparent; }
+.match-board:focused { -fx-background-color: transparent; }
+.match-tile {
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(195, 211, 238, 0.35);
+    -fx-border-radius: 16;
+    -fx-border-width: 1.5;
+}
+.match-tile.picked {
+    -fx-background-color: rgba(255, 122, 26, 0.35);
+    -fx-border-color: -orange;
+    -fx-border-width: 3;
+}
+.match-cursor {
+    -fx-fill: transparent;
+    -fx-stroke: -cyan;
+    -fx-stroke-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.7), 10, 0.3, 0, 0);
+}
+
+.game-banner {
+    -fx-background-color: rgba(7, 19, 48, 0.94);
+    -fx-background-radius: 24;
+    -fx-border-color: -cyan;
+    -fx-border-radius: 24;
+    -fx-border-width: 3;
+    -fx-padding: 24 28;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 24, 0.3, 0, 6);
+}
+.game-banner .label { -fx-text-alignment: center; -fx-alignment: center; }
+.game-banner-title {
+    -fx-font-family: "Barlow Condensed";
+    -fx-font-weight: bold;
+    -fx-font-style: italic;
+    -fx-font-size: 40px;
+    -fx-text-fill: -amber;
+}
+.game-banner-text { -fx-font-size: 18px; -fx-text-fill: -text; }
+
+.dash-controls { -fx-spacing: 10; -fx-alignment: center; }
+.dash-controls .button { -fx-min-width: 110; }
+
+/* ---------- Intro cutscene ---------- */
+.intro-screen { -fx-background-color: -navy-950; }
+.cutscene-caption {
+    -fx-background-color: rgba(5, 14, 38, 0.86);
+    -fx-background-radius: 16;
+    -fx-border-color: -shell-line;
+    -fx-border-radius: 16;
+    -fx-padding: 12 22;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+    -fx-max-width: 760;
+    -fx-text-alignment: center;
+    -fx-translate-y: -28;
+}
+.intro-skip { -fx-translate-x: -22; -fx-translate-y: 22; }
+.intro-fade { -fx-background-color: -navy-950; }
+
+/* ---------- Expandable cards ---------- */
+.choice-card .hyperlink.details-toggle {
+    -fx-text-fill: #0B6F7A;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 0 0 0;
+    -fx-border-color: transparent;
+    -fx-underline: true;
+}
+.choice-card .hyperlink.details-toggle:hover { -fx-text-fill: #08505A; }
+.choice-card .hyperlink.details-toggle:focused {
+    -fx-border-color: -card-ring;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+}
+.choice-card .card-details {
+    -fx-border-color: -card-line transparent transparent transparent;
+    -fx-border-width: 1.5 0 0 0;
+    -fx-padding: 10 0 0 0;
+}
+.choice-card .details-picture {
+    -fx-background-color: -chip;
+    -fx-background-radius: 14;
+    -fx-padding: 10;
+}
+
+/* ---------- Over-limit tips ---------- */
+.button.gauge-fix {
+    -fx-background-color: rgba(255, 172, 164, 0.18);
+    -fx-text-fill: -alert;
+    -fx-border-color: -alert;
+    -fx-border-radius: 999;
+    -fx-background-radius: 999;
+    -fx-border-width: 1.5;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 10;
+    -fx-min-height: 26;
+    -fx-cursor: hand;
+}
+.button.gauge-fix:hover, .button.gauge-fix:focused { -fx-background-color: rgba(255, 172, 164, 0.32); -fx-border-color: -cyan; }
+.tooltip.tips-tooltip {
+    -fx-background-color: -card;
+    -fx-background-radius: 16;
+    -fx-border-color: -card-ring;
+    -fx-border-radius: 16;
+    -fx-border-width: 2;
+    -fx-padding: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 18, 0.2, 0, 4);
+}
+.limit-tips .label { -fx-text-fill: -card-ink; }
+.tips-title { -fx-font-weight: bold; -fx-font-size: 17px; }
+.tips-card {
+    -fx-background-color: -chip;
+    -fx-background-radius: 12;
+    -fx-padding: 8 10;
+}
+.tips-swap { -fx-font-weight: bold; -fx-font-size: 15px; }
+.tips-fixes { -fx-text-fill: #1E7A33; -fx-font-weight: bold; -fx-font-size: 14px; }
+.limit-tips .tips-fixes { -fx-text-fill: #1E7A33; }
+.tips-line { -fx-font-size: 14px; }
+.limit-tips .tips-caution { -fx-text-fill: #9A3412; -fx-font-size: 14px; }
+
+.button.ending-button { -fx-border-color: -amber; -fx-text-fill: -amber; }
+.button.ending-button:hover { -fx-background-color: rgba(255, 203, 105, 0.16); }
+
+/* ---------- Sound switches ---------- */
+.toggle-button.sound-toggle {
+    -fx-font-size: 13px;
+    -fx-padding: 4 10;
+    -fx-min-height: 34;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+}
+.toggle-button.sound-toggle:selected {
+    -fx-background-color: rgba(34, 227, 242, 0.18);
+    -fx-border-color: -cyan;
+    -fx-text-fill: -text;
+}
+
+/* ---------- Nova's tutorial ---------- */
+.guide-ring {
+    -fx-fill: transparent;
+    -fx-stroke: -cyan;
+    -fx-stroke-width: 4;
+    -fx-effect: dropshadow(gaussian, rgba(34, 227, 242, 0.9), 22, 0.45, 0, 0);
+}
+.guide-bubble {
+    -fx-background-color: -card;
+    -fx-background-radius: 22;
+    -fx-border-color: -cyan;
+    -fx-border-width: 3;
+    -fx-border-radius: 22;
+    -fx-padding: 12 16 12 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 24, 0.25, 0, 6);
+}
+.nova-portrait {
+    -fx-background-color: radial-gradient(center 50% 40%, radius 70%, #2A5BA8 0%, #0D1E42 100%);
+    -fx-background-radius: 18;
+}
+.guide-name { -fx-text-fill: #0B6F7A; -fx-font-weight: bold; -fx-font-size: 15px; }
+.guide-words { -fx-text-fill: -card-ink; -fx-font-size: 18px; -fx-line-spacing: 2; }
+.button.guide-next {
+    -fx-background-color: #0B6F7A;
+    -fx-border-color: #0B6F7A;
+    -fx-text-fill: #FFFFFF;
+    -fx-min-height: 40;
+    -fx-padding: 4 16;
+    -fx-font-size: 15px;
+}
+.button.guide-next:hover { -fx-background-color: #08505A; }
+.button.guide-next:focused { -fx-border-color: -cyan; }
+.hyperlink.guide-skip { -fx-text-fill: -card-soft; -fx-font-size: 13px; -fx-border-color: transparent; }

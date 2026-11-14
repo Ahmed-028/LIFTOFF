@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ArchitectureTest {
 
     private static final Path SOURCES = Path.of("src", "main", "java", "com", "liftoff");
-    private static final List<String> LOGIC_PACKAGES = List.of("model", "engine", "data", "session", "util");
+    private static final List<String> LOGIC_PACKAGES = List.of("model", "engine", "data", "session", "util", "minigame", "audio");
 
     @Test
     void logicPackagesNeverImportJavaFx() throws IOException {

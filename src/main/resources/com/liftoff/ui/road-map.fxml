@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.liftoff.ui.RoadMapController" styleClass="screen, mission-screen, map-screen">
+    <top>
+        <VBox spacing="8" styleClass="mission-header">
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="command-bar">
+                <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
+            </HBox>
+            <HBox alignment="BASELINE_LEFT" spacing="18">
+                <Label text="%map.heading" styleClass="screen-heading" minWidth="-Infinity"/>
+                <Label text="%map.subtitle" styleClass="sub-heading" wrapText="true"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <StackPane fx:id="mapHost" styleClass="map-frame" minHeight="240">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
+        </StackPane>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="16" styleClass="action-bar">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
+            <StackPane fx:id="statusIcon" minWidth="52"/>
+            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                <Label fx:id="statusTitle" styleClass="section-title" wrapText="true"/>
+                <Label fx:id="statusText" styleClass="muted" wrapText="true"/>
+            </VBox>
+            <CheckBox fx:id="calm" text="%map.calm"/>
+            <Button fx:id="play" id="play-level" onAction="#onPlay" styleClass="primary" minWidth="-Infinity"/>
+        </HBox>
+    </bottom>
+</BorderPane>

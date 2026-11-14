@@ -48,7 +48,6 @@ public final class SuppliesController extends MissionScreen {
     @FXML private Label suppliesError;
     @FXML private Button review;
     @FXML private TabPane supplyTabs;
-    @FXML private VBox instrumentPreview;
     @FXML private VBox spacecraftPreview;
     @FXML private ChoiceBox<ShipPart> airframe;
     @FXML private Button previousTab;
@@ -112,45 +111,27 @@ public final class SuppliesController extends MissionScreen {
             option.setId("instrument-" + instrument.id());
             option.setSelected(session.design().instruments().contains(instrument));
             option.setOnAction(event -> {
-                showInstrument(instrument);
                 if (option.isSelected()) {
                     session.addInstrument(instrument.id());
                 } else {
                     session.removeInstrument(instrument.id());
                 }
             });
-            option.focusedProperty().addListener((property, before, focused) -> {
-                if (focused) {
-                    showInstrument(instrument);
-                }
-            });
             var card = new ChoiceCard(option, text.get("supplies.picked"), text.get("supplies.pick"));
-            card.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showInstrument(instrument));
             Tooltip.install(card, new Tooltip(instrument.name()));
-            var tags = new ArrayList<Node>();
-            int priority = measurementPriority(instrument, goal);
-            if (priority < 2) {
-                tags.add(ChoiceCard.chip(text.get(priority == 0 ? "supplies.goal.required" : "supplies.goal.bonus"),
-                        null, "goal-tag"));
-                tags.getLast().getStyleClass().add(priority == 0 ? "required" : "bonus");
-            }
-            instrument.capabilities().stream().map(capability -> text.get("measurement." + capability.type()))
-                    .distinct().forEach(name -> tags.add(ChoiceCard.chip(name, null, "goal-tag")));
             String origin = instrument.flewOn() == null ? instrument.name()
                     : text.get("supplies.flewOn", instrument.name(), instrument.flewOn());
-            card.add(text.label(origin, "muted"),
-                    text.label(text.get("supplies.discover"), "discover-label"),
-                    text.label(instrument.description(), "body-text"),
-                    ChoiceCard.chips(tags.toArray(Node[]::new)),
-                    ChoiceCard.chips(
-                            ChoiceCard.chip(text.get("supplies.stat.mass", instrument.massKg()), Icons.mass(16), "stat-chip"),
-                            ChoiceCard.chip(text.get("supplies.stat.power", instrument.avgPowerW()), Icons.power(16), "stat-chip"),
-                            ChoiceCard.chip(text.get("supplies.stat.data", instrument.dataGbitPerDay()), Icons.data(16), "stat-chip"),
-                            ChoiceCard.chip(text.cost(instrument.costMusd(), instrument.costBasis()), Icons.coin(16), "stat-chip")));
+            card.add(text.label(origin, "muted"));
+            int priority = measurementPriority(instrument, goal);
+            if (priority < 2) {
+                var tag = ChoiceCard.chip(text.get(priority == 0 ? "supplies.goal.required" : "supplies.goal.bonus"),
+                        null, "goal-tag");
+                tag.getStyleClass().add(priority == 0 ? "required" : "bonus");
+                card.add(ChoiceCard.chips(tag));
+            }
+            card.addDetails("details-" + instrument.id(), text.get("supplies.moreDetails"),
+                    text.get("supplies.fewerDetails"), () -> instrumentDetails(instrument));
             instruments.getChildren().add(card);
-        }
-        if (!options.isEmpty()) {
-            showInstrument(session.design().instruments().stream().findFirst().orElse(options.getFirst()));
         }
         airframe.setConverter(names(ShipPart::kidName));
         airframe.getItems().setAll(catalog.partsFor(entry.id(), ModuleSlot.AIRFRAME));
@@ -185,21 +166,32 @@ public final class SuppliesController extends MissionScreen {
         readout.getChildren().add(warnings);
     }
 
-    private void showInstrument(Instrument instrument) {
+    /** What a science tool card shows once its "More details" link is opened. */
+    private java.util.List<Node> instrumentDetails(Instrument instrument) {
+        var content = new ArrayList<Node>();
+        content.add(text.label(text.get("supplies.discover"), "discover-label"));
+        content.add(text.label(instrument.description(), "body-text"));
+        var tags = instrument.capabilities().stream().map(capability -> text.get("measurement." + capability.type()))
+                .distinct().map(name -> (Node) ChoiceCard.chip(name, null, "goal-tag")).toArray(Node[]::new);
+        content.add(ChoiceCard.chips(tags));
+        content.add(ChoiceCard.chips(
+                ChoiceCard.chip(text.get("supplies.stat.mass", instrument.massKg()), Icons.mass(16), "stat-chip"),
+                ChoiceCard.chip(text.get("supplies.stat.power", instrument.avgPowerW()), Icons.power(16), "stat-chip"),
+                ChoiceCard.chip(text.get("supplies.stat.data", instrument.dataGbitPerDay()), Icons.data(16), "stat-chip"),
+                ChoiceCard.chip(text.cost(instrument.costMusd(), instrument.costBasis()), Icons.coin(16), "stat-chip")));
         String model = InstrumentVisual.model(instrument);
-        boolean renderModel = model != null && javafx.application.Platform.isSupported(javafx.application.ConditionalFeature.SCENE3D);
-        instrumentPreview.getChildren().setAll(text.label(text.get("supplies.closerLook"), "discover-label"),
-                text.label(instrument.kidName(), "section-title"), text.label(instrument.name(), "muted"),
-                renderModel ? previews.thumbnail(model, 240, 126) : InstrumentVisual.diagram(instrument),
-                text.label(text.get(renderModel ? "supplies.nasaInstrument" : "supplies.schematic"), "muted"),
-                text.label(text.get("supplies.instrumentStats", instrument.massKg(), instrument.avgPowerW(),
-                        instrument.dataGbitPerDay(), text.cost(instrument.costMusd(), instrument.costBasis())), "reading-value"));
+        boolean renderModel = model != null
+                && javafx.application.Platform.isSupported(javafx.application.ConditionalFeature.SCENE3D);
+        var picture = new VBox(6, renderModel ? previews.thumbnail(model, 260, 136) : InstrumentVisual.diagram(instrument),
+                text.label(text.get(renderModel ? "supplies.nasaInstrument" : "supplies.schematic"), "muted"));
         var host = InstrumentVisual.hostImage(instrument);
         if (host != null) {
-            instrumentPreview.getChildren().addAll(host,
+            picture.getChildren().addAll(host,
                     text.label(text.get("supplies.hostCredit", InstrumentVisual.hostName(instrument)), "muted"));
         }
-        instrumentPreview.getChildren().add(text.label(instrument.description(), "body-text"));
+        picture.getStyleClass().add("details-picture");
+        content.add(picture);
+        return content;
     }
 
     @FXML private void onAirframe() {
@@ -224,7 +216,7 @@ public final class SuppliesController extends MissionScreen {
         }
         crewMinimum.setText(text.get("supplies.crewMinimum", session.requiredCrewSuppliesKg()));
         gauges.refresh(session);
-        warnings.showBuild(session.buildReport().issues());
+        warnings.showBuildWithoutGauges(session.buildReport().issues());
     }
 
     private void updateSupplies(String input) {

@@ -50,20 +50,13 @@
                     </ScrollPane>
                 </Tab>
                 <Tab text="%supplies.instruments">
-                    <HBox spacing="14" styleClass="panel">
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="420" minWidth="240"
-                                    HBox.hgrow="ALWAYS" styleClass="clear-scroll">
-                            <VBox spacing="12">
-                                <Label text="%supplies.instrumentsHeading" styleClass="choice-heading"/>
-                                <Label text="%supplies.instrumentsHint" styleClass="muted" wrapText="true"/>
-                                <VBox fx:id="instruments" spacing="12"/>
-                            </VBox>
-                        </ScrollPane>
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="290" minWidth="240"
-                                    styleClass="clear-scroll">
-                            <VBox fx:id="instrumentPreview" spacing="8" styleClass="preview-card"/>
-                        </ScrollPane>
-                    </HBox>
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
+                        <VBox spacing="12" styleClass="panel">
+                            <Label text="%supplies.instrumentsHeading" styleClass="choice-heading"/>
+                            <Label text="%supplies.instrumentsHint" styleClass="muted" wrapText="true"/>
+                            <VBox fx:id="instruments" spacing="12"/>
+                        </VBox>
+                    </ScrollPane>
                 </Tab>
                 <Tab text="%supplies.stations">
                     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.liftoff.ui.CutsceneController" styleClass="intro-screen">
+    <StackPane fx:id="stage"/>
+    <Label fx:id="caption" styleClass="cutscene-caption" wrapText="true" StackPane.alignment="BOTTOM_CENTER"/>
+    <Button fx:id="skip" id="skip-cutscene" text="%cutscene.skip" onAction="#onSkip" styleClass="secondary, intro-skip"
+            StackPane.alignment="TOP_RIGHT"/>
+    <Region fx:id="fade" mouseTransparent="true" styleClass="intro-fade" opacity="0"/>
+</StackPane>

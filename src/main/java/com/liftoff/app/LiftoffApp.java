@@ -28,6 +28,7 @@ public final class LiftoffApp extends Application {
     @Override
     public void start(Stage stage) {
         loadFonts();
+        com.liftoff.audio.Audio.get().preload();
         ResourceBundle messages = ResourceBundle.getBundle(MESSAGES_BUNDLE);
 
         GameSession session;
@@ -44,7 +45,9 @@ public final class LiftoffApp extends Application {
 
         Scene scene = new Scene(new StackPane(), START_WIDTH, START_HEIGHT);
         scene.getStylesheets().add(LiftoffApp.class.getResource(STYLESHEET).toExternalForm());
-        new SceneNavigator(scene, session, messages, getHostServices()::showDocument).show(Screen.TITLE);
+        var navigator = new SceneNavigator(scene, session, messages, getHostServices()::showDocument);
+        navigator.setScreenDecorator(new com.liftoff.ui.NovaGuide(navigator, session, messages)::decorate);
+        navigator.playIntro();
 
         stage.setTitle(messages.getString("app.title"));
         stage.setMinWidth(MIN_WIDTH);
