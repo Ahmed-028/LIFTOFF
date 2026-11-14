@@ -10,6 +10,7 @@
             <Label text="%select.heading" styleClass="screen-heading"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button id="open-sources" text="%select.sources" onAction="#onSources" styleClass="secondary"/>
+            <StackPane fx:id="soundHost"/>
         </HBox>
     </top>
     <center>

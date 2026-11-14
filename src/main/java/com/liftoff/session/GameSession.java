@@ -64,6 +64,7 @@ public final class GameSession {
     private ShipBuild build = ShipBuild.empty();
     private BuildReport buildReport = BuildCalculator.calculate(build, null);
     private MissionFlow flow = newFlow();
+    private final LevelPath levels = new LevelPath(step -> flow.isUnlocked(step), () -> flow.current());
 
     private final MissionLog log;
     private Difficulty difficulty = Difficulty.CADET;
@@ -243,7 +244,31 @@ public final class GameSession {
         build = ShipBuild.empty();
         refreshBuildReport();
         flow = newFlow();
+        levels.reset();
         clearResults();
+        notifyListeners();
+    }
+
+    /**
+     * True once the last mission of the main ladder (Mars, after Farm Watch and the Moon) has been
+     * flown successfully: the moment for the game's ending.
+     */
+    public boolean finishedFinalMission() {
+        if (missionEntry == null || simulation == null || !simulation.success()) {
+            return false;
+        }
+        var ladder = catalog.missions().stream().filter(MissionEntry::ladder).toList();
+        return !ladder.isEmpty() && ladder.getLast().id().equals(missionEntry.id());
+    }
+
+    /** The road map of the current mission: its five levels and where the ship is. */
+    public LevelPath levels() {
+        return levels;
+    }
+
+    /** Marks a mini-game level as played (or skipped). Mini-games never change the design. */
+    public void finishMiniGame(Level game) {
+        levels.finishGame(game);
         notifyListeners();
     }
 
@@ -438,25 +463,64 @@ public final class GameSession {
     }
 
     private void refreshBuildReport() {
+        buildReport = reportFor(build);
+    }
+
+    /** The build report the given ship would have with the rest of the current design. */
+    private BuildReport reportFor(ShipBuild ship) {
         if (missionEntry == null || design.bus() != null) {
-            buildReport = BuildCalculator.calculate(build, mission);
-            return;
+            return BuildCalculator.calculate(ship, mission);
         }
-        buildReport = BuildCalculator.calculate(build, mission,
+        var report = BuildCalculator.calculate(ship, mission,
                 design.instruments().stream().mapToDouble(Instrument::massKg).sum(),
                 design.instruments().stream().mapToDouble(Instrument::avgPowerW).sum(),
                 crewSuppliesKg, requiredCrewSuppliesKg());
         var budget = resources.get(ResourceType.BUDGET);
         double cap = missionEntry.briefing().budgetCapMusd();
-        double totalCost = buildReport.costMusd() + budget.used();
+        double totalCost = report.costMusd() + budget.used();
         if (totalCost > cap) {
-            var report = buildReport;
             var issues = new ArrayList<>(report.issues());
             issues.add(new BuildIssue(BuildIssue.Kind.OVER_BUDGET, null, totalCost, cap));
-            buildReport = new BuildReport(report.dryMassKg(), report.propellantKg(), report.totalMassKg(),
+            report = new BuildReport(report.dryMassKg(), report.propellantKg(), report.totalMassKg(),
                     report.costMusd(), report.powerSupplyW(), report.powerDrawW(), report.deltaVAvailableMs(),
                     report.deltaVRequiredMs(), issues);
         }
+        return report;
+    }
+
+    /**
+     * Part swaps that would bring an over-limit gauge back down, best first. Empty when the
+     * resource is within its limit, has no limit yet, or no mission is chosen.
+     */
+    public List<SwapAdvisor.Swap> limitTips(SwapAdvisor.Goal goal) {
+        if (missionEntry == null) {
+            return List.of();
+        }
+        double offset = 0;
+        double limit = 0;
+        var combined = missionResources();
+        switch (goal) {
+            case MASS -> {
+                var mass = combined.get(ResourceType.MASS);
+                if (mass.capacity().isEmpty()) {
+                    return List.of();
+                }
+                offset = mass.used() - buildReport.totalMassKg();
+                limit = mass.capacity().getAsDouble();
+            }
+            case BUDGET -> {
+                var budget = combined.get(ResourceType.BUDGET);
+                offset = budget.used() - buildReport.costMusd();
+                limit = budget.capacity().orElse(missionEntry.briefing().budgetCapMusd());
+            }
+            default -> {
+            }
+        }
+        var options = new EnumMap<ModuleSlot, List<ShipPart>>(ModuleSlot.class);
+        for (var slot : ModuleSlot.values()) {
+            options.put(slot, catalog.partsFor(missionEntry.id(), slot));
+        }
+        return SwapAdvisor.suggest(goal, build, options, this::reportFor, offset, limit, 3);
     }
 
     private boolean usesModularRadio() {

@@ -2,7 +2,9 @@ package com.liftoff.ui;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -11,6 +13,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * A rounded, bright card around a check box. The whole card toggles the choice, the check box keeps
@@ -45,7 +50,8 @@ final class ChoiceCard extends VBox {
             }
         });
         addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (event.getButton() == MouseButton.PRIMARY && !inside(option, event.getTarget())) {
+            if (event.getButton() == MouseButton.PRIMARY && !inside(option, event.getTarget())
+                    && !onOtherButton(event.getTarget())) {
                 option.requestFocus();
                 option.fire();
             }
@@ -55,6 +61,37 @@ final class ChoiceCard extends VBox {
 
     void add(Node... nodes) {
         getChildren().addAll(nodes);
+    }
+
+    /**
+     * Adds a small "More details" link that opens the rest of the card in place. The content is
+     * built the first time the card opens, so heavy pictures only load when asked for.
+     */
+    void addDetails(String id, String moreText, String lessText, Supplier<List<Node>> content) {
+        var details = new VBox(10);
+        details.getStyleClass().add("card-details");
+        details.setVisible(false);
+        details.setManaged(false);
+        var toggle = new Hyperlink(moreText);
+        toggle.setId(id);
+        toggle.getStyleClass().add("details-toggle");
+        toggle.setAccessibleText(moreText);
+        toggle.setOnAction(event -> {
+            boolean open = !details.isVisible();
+            if (open && details.getChildren().isEmpty()) {
+                details.getChildren().setAll(content.get());
+            }
+            details.setVisible(open);
+            details.setManaged(open);
+            toggle.setText(open ? lessText : moreText);
+            toggle.setAccessibleText(open ? lessText : moreText);
+            toggle.setVisited(false);
+            getStyleClass().remove("expanded");
+            if (open) {
+                getStyleClass().add("expanded");
+            }
+        });
+        getChildren().addAll(toggle, details);
     }
 
     static FlowPane chips(Node... chips) {
@@ -77,6 +114,16 @@ final class ChoiceCard extends VBox {
         if (picked) {
             getStyleClass().add("chosen");
         }
+    }
+
+    /** Clicks on a link or button inside the card do their own job instead of picking the card. */
+    private boolean onOtherButton(Object target) {
+        for (var node = target instanceof Node start ? start : null; node != null && node != this; node = node.getParent()) {
+            if (node instanceof ButtonBase && node != option) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean inside(Node owner, Object target) {

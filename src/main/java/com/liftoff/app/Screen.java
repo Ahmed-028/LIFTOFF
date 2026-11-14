@@ -2,8 +2,12 @@ package com.liftoff.app;
 
 /** The screens of the game and the FXML file that lays each one out. */
 public enum Screen {
+    CUTSCENE("cutscene.fxml"),
     TITLE("title.fxml"),
     MISSION_SELECT("mission-select.fxml"),
+    ROAD_MAP("road-map.fxml"),
+    STAR_MATCH("star-match.fxml"),
+    ASTEROID_DASH("asteroid-dash.fxml"),
     BRIEFING("briefing.fxml"),
     SHIP("ship-builder.fxml"),
     SUPPLIES("supplies.fxml"),

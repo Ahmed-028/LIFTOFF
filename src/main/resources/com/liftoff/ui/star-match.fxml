@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.liftoff.ui.StarMatchController" styleClass="screen, mission-screen, game-screen">
+    <top>
+        <VBox spacing="8" styleClass="mission-header">
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="command-bar">
+                <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
+            </HBox>
+            <HBox alignment="BASELINE_LEFT" spacing="18">
+                <Label text="%match.heading" styleClass="screen-heading" minWidth="-Infinity"/>
+                <Label fx:id="subtitle" text="%match.subtitle" styleClass="sub-heading" wrapText="true" minHeight="-Infinity"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <HBox spacing="18" styleClass="page-content">
+            <StackPane fx:id="boardHost" HBox.hgrow="ALWAYS" styleClass="game-frame" minWidth="380" minHeight="300"/>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="330" minWidth="290" styleClass="clear-scroll">
+            <VBox spacing="12" styleClass="light-card, game-side">
+                <Label fx:id="difficulty" styleClass="goal-tag, difficulty-tag"/>
+                <Label text="%match.goalTitle" styleClass="section-title"/>
+                <Label fx:id="goal" styleClass="body-text" wrapText="true" minHeight="-Infinity"/>
+                <ProgressBar fx:id="goalProgress" maxWidth="Infinity" progress="0" accessibleText="%match.goalTitle"/>
+                <HBox spacing="8">
+                    <Label fx:id="collected" styleClass="stat-chip"/>
+                    <Label fx:id="moves" styleClass="stat-chip"/>
+                </HBox>
+                <Label fx:id="status" styleClass="game-status" wrapText="true" minHeight="-Infinity"/>
+                <Label text="%match.howTitle" styleClass="section-title"/>
+                <Label text="%match.how" styleClass="muted" wrapText="true" minHeight="-Infinity"/>
+                <Label text="%game.justForFun" styleClass="muted" wrapText="true" minHeight="-Infinity"/>
+            </VBox>
+            </ScrollPane>
+        </HBox>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="action-bar">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
+            <Button text="%game.restart" onAction="#onRestart" styleClass="secondary"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button id="skip-game" text="%game.skip" onAction="#onSkip" styleClass="secondary"/>
+            <Button fx:id="finish" id="finish-game" text="%game.continue" onAction="#onFinish" styleClass="primary" disable="true"/>
+        </HBox>
+    </bottom>
+</BorderPane>

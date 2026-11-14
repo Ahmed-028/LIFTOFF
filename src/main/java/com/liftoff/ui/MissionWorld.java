@@ -1,5 +1,6 @@
 package com.liftoff.ui;
 
+import com.liftoff.render.Theme;
 import com.liftoff.session.stub.Mission;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -9,11 +10,7 @@ final class MissionWorld {
     private MissionWorld() {}
 
     static String styleClass(Mission.Destination destination) {
-        return switch (destination) {
-            case EARTH -> "world-earth";
-            case MOON -> "world-moon";
-            case MARS -> "world-mars";
-        };
+        return Theme.World.of(destination).styleClass();
     }
 
     /** Adds the world class to the top of the node's tree so every panel below picks up its colours. */

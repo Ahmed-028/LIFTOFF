@@ -16,9 +16,13 @@ public final class ReportController extends MissionScreen {
     @FXML private Label workedTitle;
     @FXML private Label brokeTitle;
     @FXML private Label tryTitle;
+    @FXML private javafx.scene.control.Button ending;
 
     @Override
     protected void setUp() {
+        boolean finale = session.finishedFinalMission();
+        ending.setVisible(finale);
+        ending.setManaged(finale);
         workedTitle.setGraphic(Icons.tick(28));
         brokeTitle.setGraphic(Icons.warning(28));
         tryTitle.setGraphic(Icons.next(28));
@@ -27,6 +31,7 @@ public final class ReportController extends MissionScreen {
         var report = session.report().orElseThrow();
         score.setText(text.get("report.score", "★".repeat(rating.stars()), rating.total()));
         result.setText(text.get(flight.success() ? "report.completed" : "report.incomplete"));
+        com.liftoff.audio.Audio.get().play(flight.success() ? com.liftoff.audio.Sfx.WIN : com.liftoff.audio.Sfx.LOSE);
         totals.setText(text.get("report.totals", flight.totalSentGbit(), flight.totalProducedGbit(),
                 flight.totalLostGbit(), rating.science(), rating.margins(), rating.budgetTime()));
         report.worked().forEach(card -> worked.getChildren().add(text.label("✓ " + describe(card), "body-text")));
@@ -51,6 +56,11 @@ public final class ReportController extends MissionScreen {
             }
         }
         return value;
+    }
+
+    @FXML
+    private void onEnding() {
+        navigator.playCutscene(com.liftoff.app.Cutscene.ENDING, () -> navigator.show(com.liftoff.app.Screen.TITLE));
     }
 
     @FXML

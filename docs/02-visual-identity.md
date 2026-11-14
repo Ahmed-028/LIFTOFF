@@ -1,5 +1,7 @@
 # LIFTOFF — Visual Identity and Screen Layouts
 
+> **Style guide:** colours, type and component rules now live in `style-guide.md` (and `Theme.java`).
+
 > **Updated direction (2026-11-13):** the missions, screen layouts, colours and milestone split in this document are superseded by `05-missions-and-ship-builder.md` and `06-team-work-split.md`. The rest still applies.
 
 Direction produced with the UI/UX Pro Max design-system query for a children's

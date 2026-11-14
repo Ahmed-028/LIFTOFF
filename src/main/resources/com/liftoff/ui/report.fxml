@@ -44,6 +44,8 @@
                 <Insets top="12"/>
             </BorderPane.margin>
             <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="ending" id="watch-ending" text="%report.ending" onAction="#onEnding"
+                    styleClass="secondary, ending-button" visible="false" managed="false"/>
             <Label text="%report.nextHint" styleClass="action-hint"/>
             <Button text="%report.redesign" onAction="#onRedesign" styleClass="primary" />
         </HBox>

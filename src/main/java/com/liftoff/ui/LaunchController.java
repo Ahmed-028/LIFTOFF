@@ -57,14 +57,26 @@ public final class LaunchController extends MissionScreen {
     @FXML
     private void onCheck() {
         if (!session.isUnlocked(MissionStep.FLY) && !session.runLaunchCheck().isEmpty()) {
+            com.liftoff.audio.Audio.get().play(com.liftoff.audio.Sfx.ERROR);
             return;
         }
         check.setDisable(true);
         countdown.setText(text.get("launch.countdown", 3));
+        com.liftoff.audio.Audio.get().play(com.liftoff.audio.Sfx.BEEP);
         timer = new Timeline(
-                new KeyFrame(Duration.seconds(1), event -> countdown.setText(text.get("launch.countdown", 2))),
-                new KeyFrame(Duration.seconds(2), event -> countdown.setText(text.get("launch.countdown", 1))),
-                new KeyFrame(Duration.seconds(3), event -> onNext()));
+                new KeyFrame(Duration.seconds(1), event -> {
+                    countdown.setText(text.get("launch.countdown", 2));
+                    com.liftoff.audio.Audio.get().play(com.liftoff.audio.Sfx.BEEP);
+                }),
+                new KeyFrame(Duration.seconds(2), event -> {
+                    countdown.setText(text.get("launch.countdown", 1));
+                    com.liftoff.audio.Audio.get().play(com.liftoff.audio.Sfx.BEEP);
+                }),
+                new KeyFrame(Duration.seconds(3), event -> {
+                    com.liftoff.audio.Audio.get().play(com.liftoff.audio.Sfx.BEEP_HIGH);
+                    com.liftoff.audio.Audio.get().play(com.liftoff.audio.Sfx.LIFTOFF);
+                    onNext();
+                }));
         timer.play();
     }
 

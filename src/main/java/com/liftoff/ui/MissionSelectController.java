@@ -14,16 +14,19 @@ import java.util.ResourceBundle;
 public final class MissionSelectController implements ScreenController {
     @FXML private HBox mainMissions;
     @FXML private HBox extraMissions;
+    @FXML private javafx.scene.layout.StackPane soundHost;
     private SceneNavigator navigator;
 
     @Override
     public void attach(SceneNavigator navigator, GameSession session, ResourceBundle messages) {
         this.navigator = navigator;
         var text = new UiText(messages);
+        // The music and sound switches first appear here, once a mission is being chosen.
+        soundHost.getChildren().add(SoundToggles.create(text));
         for (MissionEntry mission : session.catalog().missions()) {
             var card = new ObjectiveCard(mission, text, () -> {
                 session.selectMission(mission.id());
-                navigator.showMissionStep();
+                navigator.playCutscene(com.liftoff.app.Cutscene.MISSION, () -> navigator.showRoadMap(java.util.List.of()));
             });
             HBox.setHgrow(card, Priority.ALWAYS);
             (mission.ladder() ? mainMissions : extraMissions).getChildren().add(card);

@@ -44,6 +44,7 @@ public final class SnapshotTool {
 
     public static void main(String[] args) throws Exception {
         Path folder = Path.of(args.length > 0 ? args[0] : "target/snapshots");
+        System.setProperty("liftoff.sound", "off");
         var tool = new SnapshotTool(folder);
         Platform.startup(() -> {
             Platform.setImplicitExit(false);
@@ -51,7 +52,7 @@ public final class SnapshotTool {
             tool.start(800);
         });
         try {
-            tool.done.get(60, TimeUnit.SECONDS);
+            tool.done.get(150, TimeUnit.SECONDS);
         } finally {
             Platform.exit();
         }
@@ -65,6 +66,9 @@ public final class SnapshotTool {
             scene.getStylesheets().add(LiftoffApp.class.getResource(LiftoffApp.STYLESHEET).toExternalForm());
             var messages = ResourceBundle.getBundle(LiftoffApp.MESSAGES_BUNDLE);
             var navigator = new SceneNavigator(scene, session, messages);
+            if (height == 800) {
+                navigator.setScreenDecorator(new com.liftoff.ui.NovaGuide(navigator, session, messages)::decorate);
+            }
             var stage = new Stage();
             stage.setScene(scene);
             stage.show();
@@ -72,8 +76,26 @@ public final class SnapshotTool {
             var output = folder.resolve("1280x" + height);
             Files.createDirectories(output);
             current = output;
-            navigator.show(Screen.TITLE);
-            save(scene, output.resolve("01-title.png"));
+            if (height == 800) {
+                navigator.playIntro();
+                after(1500, () -> {
+                    save(scene, output.resolve("00-intro.png"));
+                    button(scene, "#skip-cutscene").fire();
+                    after(4800, () -> {
+                        save(scene, output.resolve("01-title.png"));
+                        playThrough(scene, session, stage, output, height);
+                    });
+                });
+            } else {
+                navigator.show(Screen.TITLE);
+                save(scene, output.resolve("01-title.png"));
+                playThrough(scene, session, stage, output, height);
+            }
+        });
+    }
+
+    private void playThrough(Scene scene, GameSession session, Stage stage, Path output, int height) {
+        verify(() -> {
             button(scene, ".primary").fire();
             save(scene, output.resolve("02-mission-select.png"));
             button(scene, "#open-sources").fire();
@@ -85,9 +107,17 @@ public final class SnapshotTool {
             button(scene, ".secondary").fire();
 
             button(scene, "#mission-farm-watch").fire();
-            require(session.step() == MissionStep.BRIEFING, "Mission card did not open the briefing");
+            require(lookup(scene, "#skip-cutscene") != null, "Choosing a mission did not play its cutscene");
+            button(scene, "#skip-cutscene").fire();
+            require(session.step() == MissionStep.BRIEFING, "Mission card did not start at the briefing");
+            require(lookup(scene, "#play-level") != null, "Mission card did not open the road map");
+            save(scene, output.resolve("02b-road-map.png"));
+            button(scene, "#level-pack").fire();
+            require(lookup(scene, "#play-level") != null, "A locked level opened");
+            button(scene, "#play-level").fire();
             save(scene, output.resolve("03-briefing.png"));
             button(scene, ".primary").fire();
+            require(session.step() == MissionStep.SHIP, "The briefing did not lead to the ship builder");
             require(button(scene, "#supplies").isDisabled(), "An empty build can reach Supplies");
             var confirm = (javafx.scene.control.Button) button(scene, "#confirm");
             require(confirm.isDisabled() && confirm.getTooltip().getText().contains("Cargo bay"),
@@ -109,6 +139,14 @@ public final class SnapshotTool {
             after(300, () -> {
                 save(scene, output.resolve("04-ship-builder.png"));
                 button(scene, "#supplies").fire();
+                require(lookup(scene, "#play-level") != null, "Finishing the ship did not fly to the road map");
+                save(scene, output.resolve("04b-road-map-travel.png"));
+                button(scene, "#play-level").fire();
+                require(lookup(scene, "#skip-game") != null, "Level 2 did not open Star Match");
+                save(scene, output.resolve("04c-star-match.png"));
+                button(scene, "#skip-game").fire();
+                require(session.levels().isDone(com.liftoff.session.Level.STAR_MATCH), "Skipping did not finish Star Match");
+                button(scene, "#play-level").fire();
                 require(session.step() == MissionStep.SUPPLIES, "Supplies step did not open");
                 var airframeChoice = (ChoiceBox<?>) lookup(scene, "#airframe");
                 int fittedAirframe = airframeChoice.getSelectionModel().getSelectedIndex();
@@ -123,6 +161,7 @@ public final class SnapshotTool {
                 orbit.getSelectionModel().select(orbitIndex(orbit, "sso-705"));
                 supplyTab(scene, 1);
                 button(scene, "#instrument-ali").fire();
+                button(scene, "#details-ali").fire();
                 save(scene, output.resolve("11-instrument-preview.png"));
                 supplyTab(scene, 2);
                 button(scene, "#station-svalbard").fire();
@@ -130,8 +169,25 @@ public final class SnapshotTool {
                 supplyTab(scene, 0);
                 var rocket = (ChoiceBox<?>) lookup(scene, "#rocket");
                 rocket.getSelectionModel().select(rocketIndex(rocket, "electron"));
+                var fixMass = (javafx.scene.control.Button) lookup(scene, "#fix-mass");
+                require(fixMass != null, "The over-limit mass gauge offers no tips");
+                fixMass.fire();
+                require(fixMass.getTooltip().isShowing(), "The tips did not open");
+                save(fixMass.getTooltip().getScene(), output.resolve("05b-limit-tips.png"));
+                fixMass.getTooltip().hide();
                 button(scene, "#review").fire();
                 button(scene, "#confirm").fire();
+                require(lookup(scene, "#play-level") != null, "Confirming the build did not fly to the road map");
+                button(scene, "#play-level").fire();
+                require(lookup(scene, "#skip-game") != null, "Level 4 did not open Asteroid Dash");
+                if (height == 800) {
+                    button(scene, "#start-ride").fire();
+                }
+                after(height == 800 ? 1600 : 0, () -> {
+                save(scene, output.resolve("07b-asteroid-dash.png"));
+                button(scene, "#skip-game").fire();
+                button(scene, "#play-level").fire();
+                require(session.step() == MissionStep.LAUNCH, "Level 5 did not open the launch");
                 button(scene, "#check").fire();
                 require(session.launchIssues().stream().anyMatch(issue ->
                                 issue.kind() == com.liftoff.engine.sim.LaunchIssue.Kind.MASS_OVER_CAPACITY),
@@ -139,13 +195,14 @@ public final class SnapshotTool {
                 require(lookup(scene, ".warning-action") != null, "Launch warning has no next action");
                 button(scene, ".action-bar .secondary").fire();
                 button(scene, ".action-bar .secondary").fire();
-                rocket = (ChoiceBox<?>) lookup(scene, "#rocket");
-                rocket.getSelectionModel().select(rocketIndex(rocket, "atlas-v-401"));
+                var biggerRocket = (ChoiceBox<?>) lookup(scene, "#rocket");
+                biggerRocket.getSelectionModel().select(rocketIndex(biggerRocket, "atlas-v-401"));
                 save(scene, output.resolve("05-supplies.png"));
                 button(scene, ".primary").fire();
                 save(scene, output.resolve("06-review.png"));
                 require(!button(scene, "#confirm").isDisabled(), "Valid build has issues: " + session.buildReport());
                 button(scene, "#confirm").fire();
+                toMissionLevel(scene);
                 save(scene, output.resolve("07-launch.png"));
                 verifyCabin(scene, "#launch-views");
                 save(scene, output.resolve("14-launch-cabin.png"));
@@ -160,8 +217,14 @@ public final class SnapshotTool {
                     button(scene, "#skip-playback").fire();
                     save(scene, output.resolve("08-fly.png"));
                     button(scene, "#report").fire();
+                    button(scene, "#skip-cutscene").fire();
                     require(session.simulation().orElseThrow().success(), "Modular ship did not return data");
                     save(scene, output.resolve("09-report.png"));
+                    button(scene, "#open-map").fire();
+                    require(session.levels().allDone(), "The road map does not show the mission complete");
+                    save(scene, output.resolve("09b-road-map-complete.png"));
+                    button(scene, "#level-liftoff").fire();
+                    require(session.step() == MissionStep.REPORT, "The finished flight did not reopen on its report");
                     button(scene, ".primary").fire();
                     require(session.step() == MissionStep.SHIP && session.build().isComplete()
                             && session.simulation().isEmpty(), "Redesign did not retain the ship and clear the flight");
@@ -169,14 +232,42 @@ public final class SnapshotTool {
                         stage.close();
                         start(660);
                     } else {
-                        verifyMoon(scene, session, () -> verifyMars(scene, session, () -> {
+                        verifyMoon(scene, session, () -> verifyMars(scene, session, () -> watchEnding(scene, session, () -> {
                             stage.close();
                             done.complete(null);
-                        }));
+                        })));
                     }
+                });
                 });
             });
         });
+    }
+
+    /** After the last mission the report offers the ending cutscene. */
+    private void watchEnding(Scene scene, GameSession session, CheckedAction next) {
+        require(session.finishedFinalMission(), "Flying Mars did not finish the final mission");
+        var ending = button(scene, "#watch-ending");
+        require(ending.isVisible(), "The final report does not offer the ending");
+        ending.fire();
+        after(2800, () -> {
+            save(scene, folder.resolve("1280x660/16-ending.png"));
+            button(scene, "#skip-cutscene").fire();
+            require(lookup(scene, ".game-title") != null, "The ending did not return to the title screen");
+            next.run();
+        });
+    }
+
+    /** From the road map after a level, flies past any mini-game straight into the next mission level. */
+    private static void toMissionLevel(Scene scene) {
+        for (int i = 0; i < 4; i++) {
+            if (lookup(scene, "#skip-game") != null) {
+                button(scene, "#skip-game").fire();
+            } else if (lookup(scene, "#play-level") != null) {
+                button(scene, "#play-level").fire();
+            } else {
+                return;
+            }
+        }
     }
 
     private void verifyMoon(Scene scene, GameSession session, CheckedAction next) throws IOException {
@@ -219,14 +310,19 @@ public final class SnapshotTool {
     private void startMission(Scene scene, String id, String... partIds) throws IOException {
         button(scene, ".command-bar .button").fire();
         button(scene, "#mission-" + id).fire();
+        button(scene, "#skip-cutscene").fire();
+        save(scene, current.resolve(id + "-02-road-map.png"));
+        button(scene, "#play-level").fire();
         save(scene, current.resolve(id + "-03-briefing.png"));
         button(scene, ".primary").fire();
+        toMissionLevel(scene);
         var slots = com.liftoff.model.ModuleSlot.values();
         for (int index = 0; index < slots.length; index++) {
             part(scene, slots[index].name(), partIds[index]);
         }
         save(scene, current.resolve(id + "-04-ship-builder.png"));
         button(scene, "#supplies").fire();
+        toMissionLevel(scene);
     }
 
     private static void chooseRocket(Scene scene, String id) {
@@ -245,6 +341,7 @@ public final class SnapshotTool {
         save(scene, current.resolve(id + "-06-review.png"));
         require(!button(scene, "#confirm").isDisabled(), "Build issues: " + session.buildReport());
         button(scene, "#confirm").fire();
+        toMissionLevel(scene);
         button(scene, "#check").fire();
         require(session.launchIssues().isEmpty(), "Launch failed: " + session.launchIssues());
         after(3200, () -> {
@@ -253,6 +350,7 @@ public final class SnapshotTool {
                 save(scene, folder.resolve("1280x660/" + (moon ? "12-moon-surface.png" : "13-mars-surface.png")));
                 button(scene, "#skip-playback").fire();
                 button(scene, "#report").fire();
+                    button(scene, "#skip-cutscene").fire();
                 require(session.step() == MissionStep.REPORT && session.simulation().orElseThrow().success(),
                         "Mission did not fly through to its report");
                 save(scene, current.resolve(id + "-09-report.png"));

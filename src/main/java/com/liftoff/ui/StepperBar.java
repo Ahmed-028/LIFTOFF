@@ -1,6 +1,7 @@
 package com.liftoff.ui;
 
 import com.liftoff.session.GameSession;
+import com.liftoff.session.Level;
 import com.liftoff.session.MissionStep;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
@@ -21,18 +22,27 @@ public final class StepperBar extends HBox {
     private final UiText text;
     private final EnumMap<MissionStep, Button> buttons = new EnumMap<>(MissionStep.class);
 
-    StepperBar(GameSession session, UiText text, Consumer<MissionStep> navigate) {
+    /** Shows the design steps inside the given level, so the pills never skip past a road-map level. */
+    StepperBar(GameSession session, UiText text, Consumer<MissionStep> navigate, Level level) {
         super(6);
         this.session = session;
         this.text = text;
         getStyleClass().add("stepper");
         for (var step : DESIGN_STEPS) {
+            if (!level.steps().contains(step)) {
+                continue;
+            }
             var button = new Button();
             button.getStyleClass().add("step");
             button.setOnAction(event -> navigate.accept(step));
             buttons.put(step, button);
             getChildren().add(button);
         }
+    }
+
+    /** A level with one step or none needs no step pills. */
+    boolean hasSteps() {
+        return buttons.size() > 1;
     }
 
     static State state(MissionStep step, MissionStep current, Optional<String> reasonLocked) {
