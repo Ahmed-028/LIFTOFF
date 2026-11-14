@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 public final class StepperBar extends HBox {
     private static final List<MissionStep> DESIGN_STEPS = List.of(
-            MissionStep.BRIEFING, MissionStep.SHIP, MissionStep.SUPPLIES, MissionStep.REVIEW);
+            MissionStep.BRIEFING, MissionStep.PLAN, MissionStep.SHIP, MissionStep.SUPPLIES, MissionStep.REVIEW);
 
     enum State { CURRENT, OPEN, LOCKED }
 

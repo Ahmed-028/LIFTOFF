@@ -8,7 +8,7 @@ import java.util.List;
  * between them and never change the design or its outcome.
  */
 public enum Level {
-    BUILD(Kind.MISSION, List.of(MissionStep.BRIEFING, MissionStep.SHIP)),
+    BUILD(Kind.MISSION, List.of(MissionStep.BRIEFING, MissionStep.PLAN, MissionStep.SHIP)),
     STAR_MATCH(Kind.MINI_GAME, List.of()),
     PACK(Kind.MISSION, List.of(MissionStep.SUPPLIES, MissionStep.REVIEW)),
     ASTEROID_DASH(Kind.MINI_GAME, List.of()),

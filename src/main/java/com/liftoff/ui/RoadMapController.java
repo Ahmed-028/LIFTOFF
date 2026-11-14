@@ -281,7 +281,7 @@ public final class RoadMapController extends MissionScreen {
         node.setOnAction(event -> choose(level));
         nodes.put(level, node);
 
-        var eyebrow = new Label(text.get(level.kind() == Level.Kind.MINI_GAME ? "level.eyebrowGame" : "level.eyebrow",
+        var eyebrow = new Label(text.get("level.eyebrow",
                 level.number()));
         eyebrow.getStyleClass().add("level-eyebrow");
         var name = new Label(level == Level.LIFTOFF

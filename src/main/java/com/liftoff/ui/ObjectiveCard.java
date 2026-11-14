@@ -51,6 +51,7 @@ public final class ObjectiveCard extends VBox {
         choose.setId("mission-" + mission.id());
         choose.getStyleClass().add(recommended ? "primary" : "secondary");
         choose.setMaxWidth(Double.MAX_VALUE);
+        choose.setMinHeight(54);
         choose.setAccessibleText(text.get("card.chooseAccessible", goal.title()));
         choose.setOnAction(event -> onChoose.run());
         choose.focusedProperty().addListener((property, before, focused) -> {

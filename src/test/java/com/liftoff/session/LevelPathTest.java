@@ -31,6 +31,7 @@ class LevelPathTest {
         assertEquals(4, Level.ASTEROID_DASH.number());
         assertEquals(Level.BUILD, Level.of(MissionStep.BRIEFING));
         assertEquals(Level.BUILD, Level.of(MissionStep.SHIP));
+        assertEquals(Level.BUILD, Level.of(MissionStep.PLAN));
         assertEquals(Level.PACK, Level.of(MissionStep.SUPPLIES));
         assertEquals(Level.LIFTOFF, Level.of(MissionStep.REPORT));
     }

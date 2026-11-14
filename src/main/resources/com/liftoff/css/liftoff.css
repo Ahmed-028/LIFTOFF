@@ -346,13 +346,6 @@
     -fx-opacity: 1;
 }
 
-.button.strip-arrow {
-    -fx-font-size: 26px;
-    -fx-padding: 2 12;
-    -fx-background-radius: 999;
-    -fx-border-radius: 999;
-}
-
 .hyperlink { -fx-text-fill: -cyan-soft; -fx-padding: 0; -fx-font-size: 16px; -fx-underline: true; }
 .hyperlink:focused { -fx-border-color: -cyan; -fx-border-width: 2; -fx-border-radius: 6; }
 
@@ -443,7 +436,7 @@
     -fx-spacing: 10;
     -fx-cursor: hand;
 }
-.choice-card:hover { -fx-background-color: -card-hover; }
+.choice-card:hover { -fx-background-color: -card-hover; -fx-border-color: -card-ring; }
 .choice-card.chosen {
     -fx-background-color: -card-picked;
     -fx-border-color: -card-ring;
@@ -614,7 +607,7 @@
 .part-strip { -fx-padding: 8; -fx-alignment: center; -fx-background-radius: 20; -fx-border-radius: 20; }
 
 .button.part-card {
-    -fx-min-width: 146;
+    -fx-min-width: 116;
     -fx-pref-width: 146;
     -fx-pref-height: 104;
     -fx-text-alignment: center;
@@ -769,8 +762,8 @@
 .report-card {
     -fx-background-color: -report-accent, -card;
     -fx-background-insets: 0, 8 0 0 0;
-    -fx-background-radius: 22, 0 0 22 22;
-    -fx-padding: 22 20 20 20;
+    -fx-background-radius: 22, 22;
+    -fx-padding: 24 20 20 20;
     -fx-spacing: 10;
 }
 .report-card .label { -fx-text-fill: -card-ink; }
@@ -1038,7 +1031,7 @@
     -fx-cursor: hand;
 }
 .button.gauge-fix:hover, .button.gauge-fix:focused { -fx-background-color: rgba(255, 172, 164, 0.32); -fx-border-color: -cyan; }
-.tooltip.tips-tooltip {
+.tips-popup {
     -fx-background-color: -card;
     -fx-background-radius: 16;
     -fx-border-color: -card-ring;
@@ -1063,19 +1056,57 @@
 .button.ending-button { -fx-border-color: -amber; -fx-text-fill: -amber; }
 .button.ending-button:hover { -fx-background-color: rgba(255, 203, 105, 0.16); }
 
-/* ---------- Sound switches ---------- */
-.toggle-button.sound-toggle {
-    -fx-font-size: 13px;
-    -fx-padding: 4 10;
-    -fx-min-height: 34;
+/* ---------- Settings menu ---------- */
+.button.settings-button {
+    -fx-padding: 6 10;
+    -fx-min-height: 42;
+    -fx-min-width: 46;
     -fx-background-radius: 999;
     -fx-border-radius: 999;
+}
+.gear-icon { -fx-fill: -text; }
+.settings-menu {
+    -fx-background-color: -navy-800;
+    -fx-background-radius: 18;
+    -fx-border-color: -shell-line-strong;
+    -fx-border-radius: 18;
+    -fx-border-width: 2;
+    -fx-padding: 16;
+    -fx-min-width: 230;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 18, 0.2, 0, 4);
+}
+.settings-title { -fx-text-fill: -text; -fx-font-size: 20px; -fx-font-weight: bold; }
+.toggle-button.sound-toggle {
+    -fx-font-size: 15px;
+    -fx-padding: 6 14;
+    -fx-min-height: 40;
+    -fx-alignment: center-left;
 }
 .toggle-button.sound-toggle:selected {
     -fx-background-color: rgba(34, 227, 242, 0.18);
     -fx-border-color: -cyan;
     -fx-text-fill: -text;
 }
+
+/* ---------- Science tool families ---------- */
+.tool-group-title { -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: -world-accent; }
+.plan-panel { -fx-padding: 20; }
+
+/* ---------- Report: points and what could have been used better ---------- */
+.points-chip {
+    -fx-background-radius: 999;
+    -fx-padding: 6 14;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-color: -card;
+    -fx-text-fill: -card-ink;
+}
+.points-chip.full { -fx-background-color: #D7F5DC; -fx-text-fill: #145226; }
+.points-chip.partial { -fx-background-color: #FFF0CC; -fx-text-fill: #6B4A00; }
+.report-card.better { -report-accent: #7A4FD1; }
+.better-row { -fx-background-color: -chip; -fx-background-radius: 14; -fx-padding: 10 14; -fx-alignment: top-left; }
+.report-card .better-finding { -fx-font-weight: bold; -fx-font-size: 17px; }
+.report-card .better-swap { -fx-text-fill: #0B6F7A; -fx-font-weight: bold; -fx-font-size: 15px; }
 
 /* ---------- Nova's tutorial ---------- */
 .guide-ring {

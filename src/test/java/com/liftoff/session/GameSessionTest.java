@@ -224,6 +224,7 @@ class GameSessionTest {
     void aConfirmedBuildOpensLaunchAndChangingAPartLocksItAgain() {
         GameSession game = sessionWithParts();
         game.next();
+        game.next();
         chooseAllParts(game, "a");
         game.next();
         game.next();
@@ -253,13 +254,14 @@ class GameSessionTest {
 
         game.selectMission("farm-watch");                  // 1
         game.next();                                       // 2
-        chooseAllParts(game, "a");                         // 2 + one per slot
+        game.next();                                       // 3
+        chooseAllParts(game, "a");                         // 3 + one per slot
         game.goTo(MissionStep.SUPPLIES);
         game.next();
         game.confirmBuild();
         game.back();
 
-        assertEquals(2 + ModuleSlot.values().length + 4, calls.get());
+        assertEquals(3 + ModuleSlot.values().length + 4, calls.get());
     }
 
     @Test
@@ -279,6 +281,7 @@ class GameSessionTest {
     void selectingAMissionResetsTheFlowAndTheDesign() {
         GameSession game = sessionWithParts();
         game.next();
+        game.next();
         chooseAllParts(game, "a");
         game.next();
         game.addInstrument("modis");
@@ -296,6 +299,7 @@ class GameSessionTest {
     @Test
     void redesignFromTheReportKeepsTheParts() {
         GameSession game = sessionWithParts();
+        game.next();
         game.next();
         chooseAllParts(game, "a");
         game.next();

@@ -3,24 +3,22 @@ package com.liftoff.ui;
 import com.liftoff.audio.Audio;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-/** Two small switches for the music and the sound effects. Each says "on" or "off" in words. */
+/** The two switches of the settings menu: music and sound effects. Each says "on" or "off" in words. */
 final class SoundToggles {
 
     private SoundToggles() {
     }
 
-    static HBox create(UiText text) {
+    static VBox create(UiText text) {
         var audio = Audio.get();
-        var row = new HBox(6,
+        var row = new VBox(8,
                 toggle(text, "music", audio::musicOn, audio::setMusicOn),
                 toggle(text, "effects", audio::soundOn, audio::setSoundOn));
-        row.setMinWidth(Region.USE_PREF_SIZE);
         row.getStyleClass().add("sound-toggles");
         return row;
     }
@@ -29,7 +27,7 @@ final class SoundToggles {
         var toggle = new ToggleButton();
         toggle.setId(kind + "-toggle");
         toggle.getStyleClass().addAll("secondary", "sound-toggle");
-        toggle.setMinWidth(Region.USE_PREF_SIZE);
+        toggle.setMaxWidth(Double.MAX_VALUE);
         toggle.setSelected(on.getAsBoolean());
         Runnable label = () -> {
             String state = text.get(toggle.isSelected() ? "sound.on" : "sound.off");

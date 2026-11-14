@@ -9,6 +9,7 @@ public enum Screen {
     STAR_MATCH("star-match.fxml"),
     ASTEROID_DASH("asteroid-dash.fxml"),
     BRIEFING("briefing.fxml"),
+    PLAN("flight-plan.fxml"),
     SHIP("ship-builder.fxml"),
     SUPPLIES("supplies.fxml"),
     REVIEW("review.fxml"),

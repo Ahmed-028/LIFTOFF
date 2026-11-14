@@ -77,6 +77,8 @@ public final class SnapshotTool {
             Files.createDirectories(output);
             current = output;
             if (height == 800) {
+                save(new Scene(new StackPane(new javafx.scene.image.ImageView(LiftoffApp.icon(256))), 256, 256,
+                        javafx.scene.paint.Color.TRANSPARENT), folder.resolve("icon.png"));
                 navigator.playIntro();
                 after(1500, () -> {
                     save(scene, output.resolve("00-intro.png"));
@@ -117,7 +119,13 @@ public final class SnapshotTool {
             button(scene, "#play-level").fire();
             save(scene, output.resolve("03-briefing.png"));
             button(scene, ".primary").fire();
-            require(session.step() == MissionStep.SHIP, "The briefing did not lead to the ship builder");
+            require(session.step() == MissionStep.PLAN, "The briefing did not lead to the flight plan");
+            var orbit = (ChoiceBox<?>) lookup(scene, "#orbit");
+            orbit.getSelectionModel().select(orbitIndex(orbit, "sso-705"));
+            chooseRocket(scene, "electron");
+            save(scene, output.resolve("03b-flight-plan.png"));
+            button(scene, "#toShip").fire();
+            require(session.step() == MissionStep.SHIP, "The flight plan did not lead to the ship builder");
             require(button(scene, "#supplies").isDisabled(), "An empty build can reach Supplies");
             var confirm = (javafx.scene.control.Button) button(scene, "#confirm");
             require(confirm.isDisabled() && confirm.getTooltip().getText().contains("Cargo bay"),
@@ -148,33 +156,27 @@ public final class SnapshotTool {
                 require(session.levels().isDone(com.liftoff.session.Level.STAR_MATCH), "Skipping did not finish Star Match");
                 button(scene, "#play-level").fire();
                 require(session.step() == MissionStep.SUPPLIES, "Supplies step did not open");
-                var airframeChoice = (ChoiceBox<?>) lookup(scene, "#airframe");
-                int fittedAirframe = airframeChoice.getSelectionModel().getSelectedIndex();
-                double originalMass = session.missionResources().get(com.liftoff.engine.ResourceType.MASS).used();
-                double originalBudget = session.missionResources().get(com.liftoff.engine.ResourceType.BUDGET).used();
-                airframeChoice.getSelectionModel().select((fittedAirframe + 1) % airframeChoice.getItems().size());
-                require(originalMass != session.missionResources().get(com.liftoff.engine.ResourceType.MASS).used()
-                                && originalBudget != session.missionResources().get(com.liftoff.engine.ResourceType.BUDGET).used(),
-                        "Changing the airframe did not update mass and budget");
-                airframeChoice.getSelectionModel().select(fittedAirframe);
-                var orbit = (ChoiceBox<?>) lookup(scene, "#orbit");
-                orbit.getSelectionModel().select(orbitIndex(orbit, "sso-705"));
-                supplyTab(scene, 1);
+                supplyTab(scene, 0);
                 button(scene, "#instrument-ali").fire();
                 button(scene, "#details-ali").fire();
                 save(scene, output.resolve("11-instrument-preview.png"));
-                supplyTab(scene, 2);
+                supplyTab(scene, 1);
                 button(scene, "#station-svalbard").fire();
                 button(scene, "#station-fairbanks").fire();
-                supplyTab(scene, 0);
-                var rocket = (ChoiceBox<?>) lookup(scene, "#rocket");
-                rocket.getSelectionModel().select(rocketIndex(rocket, "electron"));
                 var fixMass = (javafx.scene.control.Button) lookup(scene, "#fix-mass");
                 require(fixMass != null, "The over-limit mass gauge offers no tips");
                 fixMass.fire();
-                require(fixMass.getTooltip().isShowing(), "The tips did not open");
-                save(fixMass.getTooltip().getScene(), output.resolve("05b-limit-tips.png"));
-                fixMass.getTooltip().hide();
+                var tips = javafx.stage.Window.getWindows().stream()
+                        .filter(window -> window instanceof javafx.stage.Popup && window.isShowing()).findFirst();
+                require(tips.isPresent(), "The tips did not open");
+                save(tips.get().getScene(), output.resolve("05b-limit-tips.png"));
+                tips.get().hide();
+                button(scene, "#open-settings").fire();
+                var settings = javafx.stage.Window.getWindows().stream()
+                        .filter(window -> window instanceof javafx.stage.Popup && window.isShowing()).findFirst();
+                require(settings.isPresent(), "The settings menu did not open");
+                save(settings.get().getScene(), output.resolve("05c-settings.png"));
+                settings.get().hide();
                 button(scene, "#review").fire();
                 button(scene, "#confirm").fire();
                 require(lookup(scene, "#play-level") != null, "Confirming the build did not fly to the road map");
@@ -193,12 +195,16 @@ public final class SnapshotTool {
                                 issue.kind() == com.liftoff.engine.sim.LaunchIssue.Kind.MASS_OVER_CAPACITY),
                         "Launch did not show the inadequate rocket warning");
                 require(lookup(scene, ".warning-action") != null, "Launch warning has no next action");
-                button(scene, ".action-bar .secondary").fire();
-                button(scene, ".action-bar .secondary").fire();
-                var biggerRocket = (ChoiceBox<?>) lookup(scene, "#rocket");
-                biggerRocket.getSelectionModel().select(rocketIndex(biggerRocket, "atlas-v-401"));
+                for (int back = 0; back < 4; back++) {
+                    button(scene, ".action-bar .secondary").fire();
+                }
+                require(session.step() == MissionStep.PLAN, "Going back did not reach the flight plan");
+                chooseRocket(scene, "atlas-v-401");
+                button(scene, "#toShip").fire();
+                button(scene, "#supplies").fire();
+                toMissionLevel(scene);
                 save(scene, output.resolve("05-supplies.png"));
-                button(scene, ".primary").fire();
+                button(scene, "#review").fire();
                 save(scene, output.resolve("06-review.png"));
                 require(!button(scene, "#confirm").isDisabled(), "Valid build has issues: " + session.buildReport());
                 button(scene, "#confirm").fire();
@@ -271,17 +277,15 @@ public final class SnapshotTool {
     }
 
     private void verifyMoon(Scene scene, GameSession session, CheckedAction next) throws IOException {
-        startMission(scene, "moon-landing", "apollo-service-module", "rl10c-1", "shuttle-fuel-cell",
+        startMission(scene, "moon-landing", "saturn-v", "apollo-service-module", "rl10c-1", "shuttle-fuel-cell",
                 "apollo-11-adapter", "apollo-11-lander");
         require(session.difficulty() == com.liftoff.engine.sim.Difficulty.ENGINEER, "Moon must use medium difficulty");
-        supplyTab(scene, 1);
-        button(scene, "#instrument-lola").fire();
-        supplyTab(scene, 2);
-        button(scene, "#station-wallops").fire();
         supplyTab(scene, 0);
-        chooseRocket(scene, "saturn-v");
+        button(scene, "#instrument-lola").fire();
+        supplyTab(scene, 1);
+        button(scene, "#station-wallops").fire();
+        supplyTab(scene, 2);
         var crew = (TextField) lookup(scene, "#supplies");
-        require(!lookup(scene, "#orbit").getParent().isVisible(), "Moon mission asks for an Earth orbit");
         crew.setText("invalid");
         require(button(scene, "#review").isDisabled(), "Invalid crew supplies can reach Review");
         crew.setText("20");
@@ -293,21 +297,19 @@ public final class SnapshotTool {
     }
 
     private void verifyMars(Scene scene, GameSession session, CheckedAction next) throws IOException {
-        startMission(scene, "mars-drones", "curiosity-cruise", "mr-106", "mmrtg", "mars-2020-entry",
+        startMission(scene, "mars-drones", "atlas-v-541", "curiosity-cruise", "mr-106", "mmrtg", "mars-2020-entry",
                 "perseverance");
         require(session.difficulty() == com.liftoff.engine.sim.Difficulty.MISSION_DIRECTOR,
                 "Mars must use hard difficulty");
-        supplyTab(scene, 1);
+        supplyTab(scene, 0);
         button(scene, "#instrument-mastcam-z").fire();
         button(scene, "#instrument-supercam").fire();
-        supplyTab(scene, 2);
+        supplyTab(scene, 1);
         button(scene, "#station-wallops").fire();
-        supplyTab(scene, 0);
-        chooseRocket(scene, "atlas-v-541");
         finishMission(scene, session, next);
     }
 
-    private void startMission(Scene scene, String id, String... partIds) throws IOException {
+    private void startMission(Scene scene, String id, String rocketId, String... partIds) throws IOException {
         button(scene, ".command-bar .button").fire();
         button(scene, "#mission-" + id).fire();
         button(scene, "#skip-cutscene").fire();
@@ -315,7 +317,10 @@ public final class SnapshotTool {
         button(scene, "#play-level").fire();
         save(scene, current.resolve(id + "-03-briefing.png"));
         button(scene, ".primary").fire();
-        toMissionLevel(scene);
+        require(!lookup(scene, "#orbit").getParent().isVisible(), id + " asks for an Earth orbit");
+        chooseRocket(scene, rocketId);
+        save(scene, current.resolve(id + "-03b-flight-plan.png"));
+        button(scene, "#toShip").fire();
         var slots = com.liftoff.model.ModuleSlot.values();
         for (int index = 0; index < slots.length; index++) {
             part(scene, slots[index].name(), partIds[index]);
@@ -354,6 +359,8 @@ public final class SnapshotTool {
                 require(session.step() == MissionStep.REPORT && session.simulation().orElseThrow().success(),
                         "Mission did not fly through to its report");
                 save(scene, current.resolve(id + "-09-report.png"));
+                ((javafx.scene.control.ScrollPane) lookup(scene, ".clear-scroll")).setVvalue(1);
+                save(scene, current.resolve(id + "-09c-report-better.png"));
                 next.run();
             });
         });

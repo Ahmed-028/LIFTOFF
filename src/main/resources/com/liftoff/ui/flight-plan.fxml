@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.liftoff.ui.FlightPlanController" styleClass="screen, mission-screen">
+    <top>
+        <VBox spacing="8" styleClass="mission-header">
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="command-bar">
+                <Button text="%nav.missions" onAction="#onMissions" styleClass="secondary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <StackPane fx:id="stepperHost" alignment="CENTER_RIGHT"/>
+            </HBox>
+            <HBox alignment="BASELINE_LEFT" spacing="18">
+                <Label text="%plan.heading" styleClass="screen-heading" minWidth="-Infinity"/>
+                <Label text="%supplies.flightPlanHint" styleClass="sub-heading" wrapText="true"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <HBox spacing="18" styleClass="page-content">
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minWidth="420" HBox.hgrow="ALWAYS" styleClass="clear-scroll">
+                <VBox spacing="16" styleClass="panel, plan-panel">
+                    <VBox spacing="8">
+                        <Label text="%supplies.rocket" styleClass="field-label"/>
+                        <Label text="%supplies.chooseRocket" styleClass="muted" wrapText="true"/>
+                        <ChoiceBox fx:id="rocket" accessibleText="%supplies.rocket" maxWidth="Infinity"/>
+                        <Label fx:id="rocketAbout" wrapText="true" styleClass="body-text"/>
+                        <Label fx:id="rocketFacts" wrapText="true" styleClass="reading-value"/>
+                    </VBox>
+                    <VBox fx:id="orbitGroup" spacing="8">
+                        <Label text="%supplies.orbit" styleClass="field-label"/>
+                        <Label text="%supplies.chooseOrbit" styleClass="muted" wrapText="true"/>
+                        <ChoiceBox fx:id="orbit" accessibleText="%supplies.orbit" maxWidth="Infinity"/>
+                        <Label fx:id="orbitAbout" wrapText="true" styleClass="body-text"/>
+                        <Label fx:id="orbitFacts" wrapText="true" styleClass="reading-value"/>
+                    </VBox>
+                    <VBox fx:id="durationGroup" spacing="8">
+                        <Label text="%supplies.duration" styleClass="field-label"/>
+                        <Label text="%plan.durationHint" styleClass="muted" wrapText="true"/>
+                        <ChoiceBox fx:id="duration" accessibleText="%supplies.duration" maxWidth="200"/>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="340" minWidth="275" styleClass="inspection-scroll">
+                <VBox fx:id="readout" spacing="12" styleClass="panel, live-readings">
+                    <Label text="%review.gauges" styleClass="section-title"/>
+                    <StackPane fx:id="gaugeHost"/>
+                </VBox>
+            </ScrollPane>
+        </HBox>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="14" styleClass="action-bar">
+            <BorderPane.margin>
+                <Insets top="12"/>
+            </BorderPane.margin>
+            <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="%plan.nextHint" styleClass="action-hint"/>
+            <Button fx:id="toShip" text="%plan.continue" onAction="#onNext" styleClass="primary"/>
+        </HBox>
+    </bottom>
+</BorderPane>

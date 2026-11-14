@@ -63,6 +63,9 @@ public final class NovaGuide {
         SCRIPT.put(Screen.BRIEFING, List.of(
                 new Step("briefing", ".light-card"),
                 new Step("briefingNext", ".action-bar .primary")));
+        SCRIPT.put(Screen.PLAN, List.of(
+                new Step("rocket", "#rocket"),
+                new Step("planNext", "#toShip")));
         SCRIPT.put(Screen.SHIP, List.of(
                 new Step("tabs", "#tabsHost"),
                 new Step("parts", "#partsHost"),
@@ -73,7 +76,6 @@ public final class NovaGuide {
                 new Step("match", "#boardHost"),
                 new Step("matchSkip", "#skip-game")));
         SCRIPT.put(Screen.SUPPLIES, List.of(
-                new Step("rocket", "#rocket"),
                 new Step("tools", "#supplyTabs"),
                 new Step("readings", "#readout"),
                 new Step("toReview", "#review")));
