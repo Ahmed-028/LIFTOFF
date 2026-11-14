@@ -36,22 +36,23 @@ Earth missions; they are not part of the three-mission ladder.
 
 ## 3. Mission workflow
 
-The same seven steps for every mission. The top stepper in the reference art
-shows the four design steps.
+The same eight steps for every mission. The top stepper shows the design steps
+of the current road-map level.
 
 ```
- BRIEFING --> SHIP --> SUPPLIES --> REVIEW --> LAUNCH --> FLY --> REPORT
- (goal,      (five    (instruments, (all gauges, (checks,  (month  (score,
-  limits)    module    stations,     warnings,   count-    or day   why,
-             tabs)     fuel, crew    Confirm     down)     steps)   redesign)
-                       supplies)     Build)
-                         ^                                            |
-                         +------------------ Redesign ----------------+
+ BRIEFING --> PLAN --> SHIP --> SUPPLIES --> REVIEW --> LAUNCH --> FLY --> REPORT
+ (goal,      (rocket,  (five    (instruments, (all gauges, (checks,  (month  (score,
+  limits)    orbit,    module    stations,     warnings,   count-    or day   why,
+             science   tabs)     crew          Confirm     down)     steps)   redesign)
+             months)             supplies)     Build)
+                         ^                                                     |
+                         +----------------------- Redesign --------------------+
 ```
 
 | Step | Player does | Engine does | Blocked until |
 |---|---|---|---|
 | Briefing | Reads the goal, the limits and what must be measured | Sets the caps for the mission | — |
+| Plan | Chooses the rocket, the science orbit (Earth missions) and the science months | Sets the lift limit the ship must stay under | Briefing read |
 | Ship | Chooses one part in each of the five tabs | Recomputes mass, cost, power, fuel after every change | Briefing read |
 | Supplies | Chooses instruments, ground stations; on Moon/Mars, crew supplies or drones | Recomputes data, comms, power draw, consumables mass | A complete ship |
 | Review | Reads every gauge and warning; presses Confirm Build | Runs every fit and budget check | No check failing |

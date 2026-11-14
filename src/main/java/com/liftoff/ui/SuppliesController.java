@@ -3,33 +3,26 @@ package com.liftoff.ui;
 import com.liftoff.model.GroundStation;
 import com.liftoff.model.Instrument;
 import com.liftoff.model.Objective;
-import com.liftoff.model.LaunchClass;
-import com.liftoff.model.LaunchVehicle;
-import com.liftoff.model.Orbit;
+import com.liftoff.model.ValueBasis;
 import com.liftoff.session.MissionStep;
-import com.liftoff.session.stub.Mission;
-import com.liftoff.session.stub.ModuleSlot;
-import com.liftoff.session.stub.ShipPart;
 import com.liftoff.render.Icons;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
-import javafx.util.StringConverter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.function.Function;
 
 public final class SuppliesController extends MissionScreen {
     private final PartPreview previews = new PartPreview();
@@ -37,21 +30,13 @@ public final class SuppliesController extends MissionScreen {
     @FXML private VBox stations;
     @FXML private StackPane gaugeHost;
     @FXML private VBox readout;
-    @FXML private ChoiceBox<LaunchVehicle> rocket;
-    @FXML private VBox orbitGroup;
-    @FXML private ChoiceBox<Orbit> orbit;
-    @FXML private VBox durationGroup;
-    @FXML private ChoiceBox<Integer> duration;
     @FXML private VBox crewGroup;
+    @FXML private Tab crewTab;
     @FXML private TextField supplies;
     @FXML private Label crewMinimum;
     @FXML private Label suppliesError;
     @FXML private Button review;
     @FXML private TabPane supplyTabs;
-    @FXML private VBox spacecraftPreview;
-    @FXML private ChoiceBox<ShipPart> airframe;
-    @FXML private Button previousTab;
-    @FXML private Button nextTab;
 
     private BuildGauges gauges;
     private WarningList warnings;
@@ -59,101 +44,38 @@ public final class SuppliesController extends MissionScreen {
     @Override
     protected void setUp() {
         var entry = mission();
-        boolean earth = entry.destination() == Mission.Destination.EARTH;
-        boolean variableDuration = entry.steps() == 0;
         var catalog = session.catalog();
-        show(orbitGroup, earth);
-        show(durationGroup, variableDuration);
-        show(crewGroup, entry.crew() > 0);
-
-        rocket.setConverter(names(LaunchVehicle::kidName));
-        rocket.setTooltip(new javafx.scene.control.Tooltip(text.get("supplies.chooseRocket")));
-        rocket.getItems().setAll(catalog.launchVehicles().stream()
-                .filter(vehicle -> Arrays.stream(classes(entry.destination()))
-                        .anyMatch(launchClass -> vehicle.capacityFor(launchClass).isPresent())).toList());
-        rocket.setValue(session.design().launchVehicle());
-        rocket.setOnAction(event -> {
-            if (rocket.getValue() != null) {
-                session.chooseLaunchVehicle(rocket.getValue().id());
-            }
-        });
-        if (earth) {
-            orbit.setConverter(names(Orbit::kidName));
-            orbit.getItems().setAll(catalog.orbits());
-            orbit.setValue(session.design().orbit());
-            orbit.setTooltip(new javafx.scene.control.Tooltip(text.get("supplies.chooseOrbit")));
-            orbit.setOnAction(event -> {
-                if (orbit.getValue() != null) {
-                    session.chooseOrbit(orbit.getValue().id());
-                }
-            });
+        if (entry.crew() == 0) {
+            show(crewGroup, false);
+            supplyTabs.getTabs().remove(crewTab);
         }
-
-        if (variableDuration) {
-            int start = entry.briefing().minScienceMonths();
-            int end = entry.briefing().deadlineMonths();
-            for (int months = start; months <= end; months++) {
-                duration.getItems().add(months);
-            }
-            duration.setValue(session.design().scienceMonths());
-            duration.setOnAction(event -> session.setScienceMonths(duration.getValue()));
-        }
-
         supplies.setText(Double.toString(session.crewSuppliesKg()));
         show(suppliesError, false);
         supplies.textProperty().addListener((property, previous, current) -> updateSupplies(current));
 
         var goal = entry.briefing();
-        var options = catalog.instruments().stream()
-                .sorted(Comparator.comparingInt(item -> measurementPriority(item, goal))).toList();
-        for (var instrument : options) {
-            var option = new CheckBox(instrument.kidName());
-            option.setId("instrument-" + instrument.id());
-            option.setSelected(session.design().instruments().contains(instrument));
-            option.setOnAction(event -> {
-                if (option.isSelected()) {
-                    session.addInstrument(instrument.id());
-                } else {
-                    session.removeInstrument(instrument.id());
-                }
-            });
-            var card = new ChoiceCard(option, text.get("supplies.picked"), text.get("supplies.pick"));
-            Tooltip.install(card, new Tooltip(instrument.name()));
-            String origin = instrument.flewOn() == null ? instrument.name()
-                    : text.get("supplies.flewOn", instrument.name(), instrument.flewOn());
-            card.add(text.label(origin, "muted"));
-            int priority = measurementPriority(instrument, goal);
-            if (priority < 2) {
-                var tag = ChoiceCard.chip(text.get(priority == 0 ? "supplies.goal.required" : "supplies.goal.bonus"),
-                        null, "goal-tag");
-                tag.getStyleClass().add(priority == 0 ? "required" : "bonus");
-                card.add(ChoiceCard.chips(tag));
-            }
-            card.addDetails("details-" + instrument.id(), text.get("supplies.moreDetails"),
-                    text.get("supplies.fewerDetails"), () -> instrumentDetails(instrument));
-            instruments.getChildren().add(card);
-        }
-        airframe.setConverter(names(ShipPart::kidName));
-        airframe.getItems().setAll(catalog.partsFor(entry.id(), ModuleSlot.AIRFRAME));
-        airframe.setValue(session.build().part(ModuleSlot.AIRFRAME).orElse(null));
-        airframe.setOnAction(event -> {
-            if (airframe.getValue() != null) {
-                session.choosePart(airframe.getValue().id());
-            }
-        });
-        supplyTabs.getSelectionModel().selectedIndexProperty().addListener((property, before, index) -> {
-            previousTab.setDisable(index.intValue() == 0);
-            nextTab.setDisable(index.intValue() == supplyTabs.getTabs().size() - 1);
-        });
-        previousTab.setDisable(true);
-
+        var groups = new EnumMap<ToolGroup, List<Instrument>>(ToolGroup.class);
+        catalog.instruments().stream()
+                .sorted(Comparator.comparingInt(item -> measurementPriority(item, goal)))
+                .forEach(item -> groups.computeIfAbsent(ToolGroup.of(item), key -> new ArrayList<>()).add(item));
+        // Groups holding a tool for the must-do goal come first; inside a group the best match leads.
+        groups.entrySet().stream()
+                .sorted(Comparator.comparingInt(group -> measurementPriority(group.getValue().getFirst(), goal)))
+                .forEach(group -> {
+                    String key = "supplies.group." + group.getKey();
+                    var section = new VBox(10, text.label(text.get(key), "tool-group-title"),
+                            text.label(text.get(key + ".about"), "muted"));
+                    section.setId("tools-" + group.getKey().name().toLowerCase(java.util.Locale.ROOT));
+                    section.getStyleClass().add("tool-group");
+                    group.getValue().forEach(instrument -> section.getChildren().add(instrumentCard(instrument, goal)));
+                    instruments.getChildren().add(section);
+                });
         for (GroundStation station : catalog.groundStations()) {
             var option = new CheckBox(station.kidName());
             option.setId("station-" + station.id());
             option.setSelected(session.design().hasStation(station.id()));
             option.setOnAction(event -> session.toggleStation(station.id()));
             var card = new ChoiceCard(option, text.get("supplies.picked"), text.get("supplies.pick"));
-            Tooltip.install(card, new Tooltip(station.name()));
             card.add(text.label(station.name(), "muted"),
                     ChoiceCard.chips(ChoiceCard.chip(text.get("supplies.stationStats", station.bands(),
                             text.cost(station.costMusdPerMonth(), station.costBasis())), Icons.coin(16), "stat-chip")));
@@ -166,19 +88,64 @@ public final class SuppliesController extends MissionScreen {
         readout.getChildren().add(warnings);
     }
 
-    /** What a science tool card shows once its "More details" link is opened. */
-    private java.util.List<Node> instrumentDetails(Instrument instrument) {
+    /**
+     * A science tool card. What the tool does and what it measures are always on the card; the
+     * figures of the real instrument open under "More details".
+     */
+    private ChoiceCard instrumentCard(Instrument instrument, Objective goal) {
+        var option = new CheckBox(instrument.kidName());
+        option.setId("instrument-" + instrument.id());
+        option.setSelected(session.design().instruments().contains(instrument));
+        option.setOnAction(event -> {
+            if (option.isSelected()) {
+                session.addInstrument(instrument.id());
+            } else {
+                session.removeInstrument(instrument.id());
+            }
+        });
+        var card = new ChoiceCard(option, text.get("supplies.picked"), text.get("supplies.pick"));
+        String origin = instrument.flewOn() == null ? instrument.name()
+                : text.get("supplies.flewOn", instrument.name(), instrument.flewOn());
+        card.add(text.label(origin, "muted"));
+        int priority = measurementPriority(instrument, goal);
+        if (priority < 2) {
+            var tag = ChoiceCard.chip(text.get(priority == 0 ? "supplies.goal.required" : "supplies.goal.bonus"),
+                    null, "goal-tag");
+            tag.getStyleClass().add(priority == 0 ? "required" : "bonus");
+            card.add(ChoiceCard.chips(tag));
+        }
+        card.add(text.label(instrument.description(), "body-text"),
+                text.label(text.get("supplies.measures"), "discover-label"),
+                ChoiceCard.chips(instrument.capabilities().stream()
+                        .map(capability -> text.get("measurement." + capability.type())).distinct()
+                        .map(name -> (Node) ChoiceCard.chip(name, null, "goal-tag")).toArray(Node[]::new)));
+        card.addDetails("details-" + instrument.id(), text.get("supplies.moreDetails"),
+                text.get("supplies.fewerDetails"), () -> instrumentDetails(instrument));
+        return card;
+    }
+
+    /** The published figures of the real instrument, shown once "More details" is opened. */
+    private List<Node> instrumentDetails(Instrument instrument) {
         var content = new ArrayList<Node>();
-        content.add(text.label(text.get("supplies.discover"), "discover-label"));
-        content.add(text.label(instrument.description(), "body-text"));
-        var tags = instrument.capabilities().stream().map(capability -> text.get("measurement." + capability.type()))
-                .distinct().map(name -> (Node) ChoiceCard.chip(name, null, "goal-tag")).toArray(Node[]::new);
-        content.add(ChoiceCard.chips(tags));
+        content.add(text.label(text.get("supplies.resolutionTitle"), "discover-label"));
+        for (var capability : instrument.capabilities()) {
+            String name = text.get("measurement." + capability.type());
+            content.add(text.label(capability.resolutionM() == null ? text.get("supplies.resolutionUnknown", name)
+                    : text.get("supplies.resolution", name, capability.resolutionM()), "body-text"));
+        }
+        content.add(text.label(text.get("supplies.facts"), "discover-label"));
         content.add(ChoiceCard.chips(
                 ChoiceCard.chip(text.get("supplies.stat.mass", instrument.massKg()), Icons.mass(16), "stat-chip"),
-                ChoiceCard.chip(text.get("supplies.stat.power", instrument.avgPowerW()), Icons.power(16), "stat-chip"),
-                ChoiceCard.chip(text.get("supplies.stat.data", instrument.dataGbitPerDay()), Icons.data(16), "stat-chip"),
-                ChoiceCard.chip(text.cost(instrument.costMusd(), instrument.costBasis()), Icons.coin(16), "stat-chip")));
+                ChoiceCard.chip(basis("supplies.stat.power", instrument.avgPowerW(), instrument.powerBasis()),
+                        Icons.power(16), "stat-chip"),
+                ChoiceCard.chip(basis("supplies.stat.data", instrument.dataGbitPerDay(), instrument.dataBasis()),
+                        Icons.data(16), "stat-chip"),
+                ChoiceCard.chip(text.cost(instrument.costMusd(), instrument.costBasis()), Icons.coin(16), "stat-chip"),
+                ChoiceCard.chip(basis("supplies.stat.build", instrument.buildMonths(), instrument.buildBasis()),
+                        Icons.clock(16), "stat-chip")));
+        content.add(text.label(text.get("supplies.estimateNote"), "muted"));
+        content.add(text.label(text.get("supplies.source", instrument.source().title(), instrument.source().detail()),
+                "muted"));
         String model = InstrumentVisual.model(instrument);
         boolean renderModel = model != null
                 && javafx.application.Platform.isSupported(javafx.application.ConditionalFeature.SCENE3D);
@@ -194,26 +161,13 @@ public final class SuppliesController extends MissionScreen {
         return content;
     }
 
-    @FXML private void onAirframe() {
-        onStep(MissionStep.SHIP);
-    }
-
-    @FXML private void onPreviousTab() {
-        supplyTabs.getSelectionModel().selectPrevious();
-    }
-
-    @FXML private void onNextTab() {
-        supplyTabs.getSelectionModel().selectNext();
+    /** A figure with an "about" sign in front when the catalog marks it as a game estimate. */
+    private String basis(String key, double value, ValueBasis basis) {
+        return (basis == ValueBasis.GAME_ESTIMATE ? "\u2248" : "") + text.get(key, value);
     }
 
     @Override
     protected void update() {
-        var selected = session.build().part(ModuleSlot.AIRFRAME).orElse(null);
-        if (selected != null && !selected.equals(spacecraftPreview.getUserData())) {
-            spacecraftPreview.setUserData(selected);
-            spacecraftPreview.getChildren().setAll(previews.thumbnail(selected, 310, 175),
-                    text.label(selected.kidName(), "section-title"), text.label(selected.description(), "muted"));
-        }
         crewMinimum.setText(text.get("supplies.crewMinimum", session.requiredCrewSuppliesKg()));
         gauges.refresh(session);
         warnings.showBuildWithoutGauges(session.buildReport().issues());
@@ -253,14 +207,6 @@ public final class SuppliesController extends MissionScreen {
         super.onStep(step);
     }
 
-    private static LaunchClass[] classes(Mission.Destination destination) {
-        return switch (destination) {
-            case EARTH -> new LaunchClass[] { LaunchClass.LOW_INCLINATION, LaunchClass.POLAR };
-            case MOON -> new LaunchClass[] { LaunchClass.TRANS_LUNAR };
-            case MARS -> new LaunchClass[] { LaunchClass.TRANS_MARS };
-        };
-    }
-
     private static int measurementPriority(Instrument instrument, Objective goal) {
         if (instrument.capabilities().stream().anyMatch(capability -> goal.required().stream()
                 .anyMatch(requirement -> requirement.type() == capability.type()))) {
@@ -269,22 +215,25 @@ public final class SuppliesController extends MissionScreen {
         return instrument.capabilities().stream().anyMatch(capability -> goal.bonus().contains(capability.type())) ? 1 : 2;
     }
 
-    private static <T> StringConverter<T> names(Function<T, String> label) {
-        return new StringConverter<>() {
-            @Override
-            public String toString(T value) {
-                return value == null ? "" : label.apply(value);
-            }
-
-            @Override
-            public T fromString(String value) {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
     private static void show(javafx.scene.Node node, boolean visible) {
         node.setVisible(visible);
         node.setManaged(visible);
+    }
+
+    /** Science tools that do a similar job, so the list reads as a few families instead of one long row. */
+    private enum ToolGroup {
+        CAMERA, HEAT, MICROWAVE, LASER, GROUND, WEATHER;
+
+        /** The family of the tool's main (first listed) measurement. */
+        static ToolGroup of(Instrument instrument) {
+            return switch (instrument.capabilities().getFirst().type()) {
+                case LAND_IMAGING, CLOUD_IMAGING, LIGHTNING, MARS_SURFACE_IMAGING -> CAMERA;
+                case THERMAL_IMAGING, ENERGY_BUDGET, LUNAR_THERMAL_MAPPING -> HEAT;
+                case RAIN_MICROWAVE, SEA_ICE_MICROWAVE, MARS_SUBSURFACE_RADAR -> MICROWAVE;
+                case ICE_HEIGHT_LASER, LUNAR_TOPOGRAPHY -> LASER;
+                case LUNAR_SEISMOLOGY, MARS_SURFACE_COMPOSITION -> GROUND;
+                case MARS_WEATHER -> WEATHER;
+            };
+        }
     }
 }

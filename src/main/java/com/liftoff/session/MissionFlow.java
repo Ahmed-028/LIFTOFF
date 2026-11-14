@@ -94,7 +94,8 @@ public final class MissionFlow {
     private String ownReason(MissionStep step) {
         return switch (step) {
             case BRIEFING -> null;
-            case SHIP -> briefingRead ? null : BRIEFING_UNREAD;
+            case PLAN -> briefingRead ? null : BRIEFING_UNREAD;
+            case SHIP -> null;
             case SUPPLIES -> shipComplete.getAsBoolean() ? null : SHIP_INCOMPLETE;
             case REVIEW -> suppliesVisited ? null : SUPPLIES_NOT_VISITED;
             case LAUNCH -> buildConfirmed ? null : BUILD_NOT_CONFIRMED;

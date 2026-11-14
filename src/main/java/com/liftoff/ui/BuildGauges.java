@@ -8,10 +8,11 @@ import com.liftoff.session.SwapAdvisor;
 import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import javafx.geometry.Pos;
+import javafx.animation.PauseTransition;
 import javafx.scene.Node;
+import javafx.stage.Popup;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -29,6 +30,8 @@ public final class BuildGauges extends StackPane {
     private final boolean expanded;
     private final Pane gauges;
     private GameSession session;
+    private Popup openTips;
+    private static final Duration TIPS_SHOWN_FOR = Duration.seconds(5);
 
     BuildGauges(UiText text, boolean expanded) {
         this.text = text;
@@ -43,6 +46,7 @@ public final class BuildGauges extends StackPane {
         this.session = session;
         var resources = session.missionResources();
         var build = session.buildReport();
+        hideTips();
         gauges.getChildren().clear();
         add(resources.get(ResourceType.MASS));
         add(resources.get(ResourceType.BUDGET));
@@ -106,36 +110,58 @@ public final class BuildGauges extends StackPane {
     }
 
     /**
-     * The "Over limit" words become a small button: hovering it (or pressing it with the
-     * keyboard) shows which part swaps would bring this gauge back within its limit.
+     * The "Over limit" words become a small button. Pressing it shows which part swaps would
+     * bring this gauge back within its limit; the tips close by themselves after five seconds,
+     * or sooner on a click anywhere (the popup uses up that click). Nothing opens on hover.
      */
     private Button fixButton(String resource, SwapAdvisor.Goal goal) {
         var button = new Button(text.get("tips.button"));
         button.setId("fix-" + goal.name().toLowerCase(Locale.ROOT));
         button.getStyleClass().add("gauge-fix");
         button.setMinWidth(Region.USE_PREF_SIZE);
-        var tips = new Tooltip();
-        tips.getStyleClass().add("tips-tooltip");
-        // Inside a Group the tips keep their own 360 px layout; as a bare graphic the tooltip
-        // measured the wrapped lines at almost no width and grew thousands of pixels tall.
-        tips.setGraphic(new javafx.scene.Group(tipsContent(resource, goal)));
-        tips.setShowDelay(Duration.millis(120));
-        tips.setHideDelay(Duration.millis(400));
-        tips.setShowDuration(Duration.INDEFINITE);
-        button.setTooltip(tips);
         button.setAccessibleText(text.get("tips.accessible", resource));
         button.setOnAction(event -> {
-            if (tips.isShowing()) {
-                tips.hide();
+            if (openTips != null) {
+                hideTips();
             } else {
-                Bounds at = button.localToScreen(button.getBoundsInLocal());
-                tips.show(button, at.getMinX(), at.getMaxY() + 4);
+                showTips(button, resource, goal);
             }
         });
         return button;
     }
 
-    private Node tipsContent(String resource, SwapAdvisor.Goal goal) {
+    private void showTips(Button button, String resource, SwapAdvisor.Goal goal) {
+        Bounds at = button.localToScreen(button.getBoundsInLocal());
+        if (at == null) {
+            return;
+        }
+        var tips = new Popup();
+        tips.setAutoHide(true);
+        var content = tipsContent(resource, goal);
+        content.getStyleClass().add("tips-popup");
+        tips.getContent().add(content);
+        var timer = new PauseTransition(TIPS_SHOWN_FOR);
+        timer.setOnFinished(event -> tips.hide());
+        tips.setOnHidden(event -> {
+            timer.stop();
+            if (openTips == tips) {
+                openTips = null;
+            }
+        });
+        openTips = tips;
+        tips.show(button, at.getMinX(), at.getMaxY() + 4);
+        timer.play();
+    }
+
+    private void hideTips() {
+        if (openTips != null) {
+            var tips = openTips;
+            openTips = null;
+            tips.hide();
+        }
+    }
+
+    private VBox tipsContent(String resource, SwapAdvisor.Goal goal) {
         var box = new VBox(8);
         box.getStyleClass().add("limit-tips");
         // A fixed width lets the wrapped lines work out their height; without it the window grows very tall.

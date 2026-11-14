@@ -38,6 +38,7 @@ class MissionFlowTest {
     /** Briefing read, ship complete, supplies visited, standing on REVIEW. */
     private void reachReview() {
         flow.next();
+        flow.next();
         completeShip();
         flow.next();
         flow.next();
@@ -78,12 +79,14 @@ class MissionFlowTest {
 
     @Test
     void nextFromTheBriefingMarksItReadAndOpensTheShipStep() {
+        assertEquals(MissionStep.PLAN, flow.next());
         assertEquals(SHIP, flow.next());
         assertTrue(flow.isUnlocked(SHIP));
     }
 
     @Test
     void suppliesCannotBeReachedWithAnIncompleteShip() {
+        flow.next();
         flow.next();
         build = build.with(FakeParts.part("airframe-a", ModuleSlot.AIRFRAME));
         flow.partsChanged();
@@ -98,6 +101,7 @@ class MissionFlowTest {
     @Test
     void aCompleteShipOpensSupplies() {
         flow.next();
+        flow.next();
         completeShip();
 
         assertEquals(SUPPLIES, flow.next());
@@ -105,6 +109,7 @@ class MissionFlowTest {
 
     @Test
     void reviewNeedsTheSuppliesStepVisited() {
+        flow.next();
         flow.next();
         completeShip();
 
@@ -129,6 +134,7 @@ class MissionFlowTest {
 
     @Test
     void anIncompleteShipCannotBeConfirmed() {
+        flow.next();
         flow.next();
 
         assertThrows(IllegalStateException.class, flow::confirmBuild);

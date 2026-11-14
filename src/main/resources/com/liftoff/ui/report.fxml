@@ -21,20 +21,25 @@
                     <Label fx:id="result" styleClass="eyebrow"/>
                     <Label fx:id="score" styleClass="score"/>
                     <Label fx:id="totals" wrapText="true" styleClass="body-text"/>
+                    <FlowPane fx:id="points" hgap="10" vgap="10"/>
                 </VBox>
-                <HBox spacing="18">
-                    <VBox fx:id="worked" prefWidth="360" HBox.hgrow="ALWAYS" styleClass="report-card, worked">
-                        <Label fx:id="workedTitle" text="%report.worked" styleClass="section-title"/>
+                <HBox spacing="18" fillHeight="true">
+                    <VBox fx:id="worked" prefWidth="300" minWidth="220" HBox.hgrow="ALWAYS" styleClass="report-card, worked">
+                        <Label fx:id="workedTitle" text="%report.worked" styleClass="section-title" wrapText="true"/>
                     </VBox>
-                    <VBox prefWidth="360" HBox.hgrow="ALWAYS" styleClass="report-card, broke">
-                        <Label fx:id="brokeTitle" text="%report.broke" styleClass="section-title"/>
-                        <Label fx:id="broke" wrapText="true" styleClass="body-text"/>
+                    <VBox prefWidth="300" minWidth="220" HBox.hgrow="ALWAYS" styleClass="report-card, broke">
+                        <Label fx:id="brokeTitle" text="%report.broke" styleClass="section-title" wrapText="true"/>
+                        <Label fx:id="broke" wrapText="true" minHeight="-Infinity" styleClass="body-text"/>
                     </VBox>
-                    <VBox prefWidth="360" HBox.hgrow="ALWAYS" styleClass="report-card, try">
-                        <Label fx:id="tryTitle" text="%report.try" styleClass="section-title"/>
-                        <Label fx:id="next" wrapText="true" styleClass="body-text"/>
+                    <VBox prefWidth="300" minWidth="220" HBox.hgrow="ALWAYS" styleClass="report-card, try">
+                        <Label fx:id="tryTitle" text="%report.try" styleClass="section-title" wrapText="true"/>
+                        <Label fx:id="next" wrapText="true" minHeight="-Infinity" styleClass="body-text"/>
                     </VBox>
                 </HBox>
+                <VBox fx:id="better" styleClass="report-card, better">
+                    <Label fx:id="betterTitle" text="%report.better" styleClass="section-title" wrapText="true"/>
+                    <Label text="%report.betterHint" styleClass="muted" wrapText="true"/>
+                </VBox>
             </VBox>
         </ScrollPane>
     </center>
@@ -47,6 +52,8 @@
             <Button fx:id="ending" id="watch-ending" text="%report.ending" onAction="#onEnding"
                     styleClass="secondary, ending-button" visible="false" managed="false"/>
             <Label text="%report.nextHint" styleClass="action-hint"/>
+            <Button fx:id="nextMission" id="next-mission" onAction="#onNextMission" styleClass="secondary"
+                    visible="false" managed="false"/>
             <Button text="%report.redesign" onAction="#onRedesign" styleClass="primary" />
         </HBox>
     </bottom>

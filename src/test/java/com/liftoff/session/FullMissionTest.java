@@ -61,6 +61,7 @@ class FullMissionTest {
     private void designFarmWatch(String busId, String instrumentId, String rocketId) {
         session.selectMission("farm-watch");
         session.next();
+        session.next();
         for (ModuleSlot slot : ModuleSlot.values()) {
             session.choosePart(FakeParts.idOf(slot, "a"));
         }
@@ -278,6 +279,7 @@ class FullMissionTest {
 
     private void assemble(String missionId, String... parts) {
         session.selectMission(missionId);
+        session.next();
         session.next();
         for (String part : parts) {
             session.choosePart(part);

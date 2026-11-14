@@ -54,7 +54,7 @@ public abstract class MissionScreen implements ScreenController {
                 map.setOnAction(event -> navigator.showRoadMap(List.of()));
                 commandBar.getChildren().add(1, map);
             }
-            commandBar.getChildren().add(SoundToggles.create(text));
+            commandBar.getChildren().add(SettingsMenu.create(text, navigator));
         }
         setUp();
         refresh();

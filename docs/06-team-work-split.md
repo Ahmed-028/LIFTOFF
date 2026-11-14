@@ -242,7 +242,7 @@ report. No JavaFX.
 
 | Class | Status | What it does |
 |---|---|---|
-| `session/MissionStep` | new | `BRIEFING, SHIP, SUPPLIES, REVIEW, LAUNCH, FLY, REPORT` |
+| `session/MissionStep` | new | `BRIEFING, PLAN, SHIP, SUPPLIES, REVIEW, LAUNCH, FLY, REPORT` |
 | `session/MissionFlow` | new | Which step is current, which steps are unlocked (table in document 05 §3), `next()`, `back()`, `goTo()` |
 | `session/GameSession` | extend | Section 2 additions; delegates to `MissionFlow`; `confirmBuild()` refuses unless `buildReport().canConfirm()` |
 | `engine/sim/LaunchChecker` | new | Mass vs rocket capacity for the destination, fuel vs trip, orbit vs target latitude; returns a list of reasons |

@@ -21,8 +21,7 @@ public final class MissionSelectController implements ScreenController {
     public void attach(SceneNavigator navigator, GameSession session, ResourceBundle messages) {
         this.navigator = navigator;
         var text = new UiText(messages);
-        // The music and sound switches first appear here, once a mission is being chosen.
-        soundHost.getChildren().add(SoundToggles.create(text));
+        soundHost.getChildren().add(SettingsMenu.create(text, navigator));
         for (MissionEntry mission : session.catalog().missions()) {
             var card = new ObjectiveCard(mission, text, () -> {
                 session.selectMission(mission.id());

@@ -18,43 +18,12 @@
         <HBox spacing="18" styleClass="page-content">
             <TabPane fx:id="supplyTabs" tabClosingPolicy="UNAVAILABLE" minWidth="500" HBox.hgrow="ALWAYS"
                      styleClass="supplies-tabs">
-                <Tab text="%supplies.flightPlan">
-                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
-                        <HBox spacing="20" styleClass="panel">
-                            <VBox spacing="10" prefWidth="330" HBox.hgrow="ALWAYS">
-                                <Label text="%slot.AIRFRAME" styleClass="field-label"/>
-                                <ChoiceBox fx:id="airframe" accessibleText="%slot.AIRFRAME" maxWidth="Infinity"/>
-                                <VBox fx:id="spacecraftPreview" spacing="8" styleClass="preview-card"/>
-                                <Button text="%supplies.airframe" onAction="#onAirframe" styleClass="secondary"/>
-                            </VBox>
-                            <VBox spacing="12" prefWidth="270" HBox.hgrow="ALWAYS">
-                                <Label text="%supplies.flightPlanHint" styleClass="muted" wrapText="true"/>
-                                <Label text="%supplies.rocket" styleClass="field-label"/>
-                                <ChoiceBox fx:id="rocket" accessibleText="%supplies.rocket" maxWidth="Infinity"/>
-                                <VBox fx:id="orbitGroup" spacing="8">
-                                    <Label text="%supplies.orbit" styleClass="field-label"/>
-                                    <ChoiceBox fx:id="orbit" accessibleText="%supplies.orbit" maxWidth="Infinity"/>
-                                </VBox>
-                                <VBox fx:id="durationGroup" spacing="8">
-                                    <Label text="%supplies.duration" styleClass="field-label"/>
-                                    <ChoiceBox fx:id="duration" accessibleText="%supplies.duration" maxWidth="Infinity"/>
-                                </VBox>
-                                <VBox fx:id="crewGroup" spacing="8">
-                                    <Label text="%supplies.crew" styleClass="field-label"/>
-                                    <TextField fx:id="supplies" accessibleText="%supplies.crew" maxWidth="200"/>
-                                    <Label fx:id="crewMinimum" wrapText="true" styleClass="reading-value"/>
-                                    <Label fx:id="suppliesError" text="%supplies.invalid" wrapText="true" styleClass="warning"/>
-                                </VBox>
-                            </VBox>
-                        </HBox>
-                    </ScrollPane>
-                </Tab>
                 <Tab text="%supplies.instruments">
                     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
                         <VBox spacing="12" styleClass="panel">
                             <Label text="%supplies.instrumentsHeading" styleClass="choice-heading"/>
                             <Label text="%supplies.instrumentsHint" styleClass="muted" wrapText="true"/>
-                            <VBox fx:id="instruments" spacing="12"/>
+                            <VBox fx:id="instruments" spacing="22"/>
                         </VBox>
                     </ScrollPane>
                 </Tab>
@@ -64,6 +33,18 @@
                             <Label text="%supplies.stationsHeading" styleClass="choice-heading"/>
                             <Label text="%supplies.stationsHint" styleClass="muted" wrapText="true"/>
                             <VBox fx:id="stations" spacing="12"/>
+                        </VBox>
+                    </ScrollPane>
+                </Tab>
+                <Tab fx:id="crewTab" text="%supplies.crewTab">
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="clear-scroll">
+                        <VBox fx:id="crewGroup" spacing="10" styleClass="panel">
+                            <Label text="%supplies.crewHeading" styleClass="choice-heading"/>
+                            <Label text="%supplies.crewHint" styleClass="muted" wrapText="true"/>
+                            <Label text="%supplies.crew" styleClass="field-label"/>
+                            <TextField fx:id="supplies" accessibleText="%supplies.crew" maxWidth="200"/>
+                            <Label fx:id="crewMinimum" wrapText="true" styleClass="reading-value"/>
+                            <Label fx:id="suppliesError" text="%supplies.invalid" wrapText="true" styleClass="warning"/>
                         </VBox>
                     </ScrollPane>
                 </Tab>
@@ -83,8 +64,6 @@
             </BorderPane.margin>
             <Button text="%nav.back" onAction="#onBack" styleClass="secondary"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="previousTab" text="%supplies.previousTab" onAction="#onPreviousTab" styleClass="secondary"/>
-            <Button fx:id="nextTab" text="%supplies.nextTab" onAction="#onNextTab" styleClass="secondary"/>
             <Button fx:id="review" text="%supplies.continue" onAction="#onNext" styleClass="primary"/>
         </HBox>
     </bottom>

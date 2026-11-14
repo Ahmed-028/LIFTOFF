@@ -6,7 +6,14 @@ import com.liftoff.session.GameSession;
 import com.liftoff.session.MissionLog;
 import javafx.application.Application;
 import javafx.application.Platform;
+import com.liftoff.render.RocketArt;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
@@ -50,10 +57,36 @@ public final class LiftoffApp extends Application {
         navigator.playIntro();
 
         stage.setTitle(messages.getString("app.title"));
+        // Ready-made PNG files (made from icon(256) by the snapshot tool); Windows did not show icons drawn at start-up.
+        for (int size : new int[] { 16, 24, 32, 48, 64, 128, 256 }) {
+            stage.getIcons().add(new Image(LiftoffApp.class.getResourceAsStream("/com/liftoff/art/icon-" + size + ".png")));
+        }
         stage.setMinWidth(MIN_WIDTH);
         stage.setScene(scene);
         stage.show();
         stage.setMinHeight(MIN_CONTENT_HEIGHT + stage.getHeight() - scene.getHeight());
+    }
+
+    /** Draws the icon art: the title rocket, flame lit, in front of the hangar window. The art/icon-*.png files are made from it. */
+    public static Image icon(int size) {
+        // The piece of the hangar window behind the title rocket: Earth on the left, stars on the right.
+        var hangar = new Image(LiftoffApp.class.getResource("/com/liftoff/models/hangar.png").toExternalForm());
+        double side = hangar.getHeight() * .444;
+        var backdrop = new ImageView(hangar);
+        backdrop.setViewport(new Rectangle2D((hangar.getWidth() - side) / 2, hangar.getHeight() * .36, side, side));
+        backdrop.setFitWidth(size);
+        backdrop.setFitHeight(size);
+        backdrop.setSmooth(true);
+        var corners = new Rectangle(size, size);
+        corners.setArcWidth(size * .36);
+        corners.setArcHeight(size * .36);
+        backdrop.setClip(corners);
+        var art = new StackPane(backdrop, RocketArt.create(size * .92));
+        art.resize(size, size);
+        art.layout();
+        var transparent = new SnapshotParameters();
+        transparent.setFill(Color.TRANSPARENT);
+        return art.snapshot(transparent, null);
     }
 
     public static void main(String[] args) {

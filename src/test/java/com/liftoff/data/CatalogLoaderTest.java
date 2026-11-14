@@ -84,6 +84,7 @@ class CatalogLoaderTest {
         GameSession session = new GameSession(catalog);
         session.selectMission("farm-watch");
         session.next();
+        session.next();
         session.choosePart("eo1-class");
         session.choosePart("mr-103");
         session.choosePart("sp6x-wings");
